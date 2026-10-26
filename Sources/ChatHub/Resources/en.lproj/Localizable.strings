@@ -33,3 +33,9 @@
 "You have 1 unread message." = "You have 1 unread message.";
 "You have %d unread messages." = "You have %d unread messages.";
 "New message received" = "New message received";
+"Notifications" = "Notifications";
+"System Notifications" = "System Notifications";
+"Receive notifications for new messages across your active and background accounts." = "Receive notifications for new messages across your active and background accounts.";
+"Send Test Notification" = "Send Test Notification";
+"Make sure notifications are enabled for ChatHub in macOS System Settings > Notifications." = "Make sure notifications are enabled for ChatHub in macOS System Settings > Notifications.";
+"Test notification: your system notifications are working properly." = "Test notification: your system notifications are working properly.";

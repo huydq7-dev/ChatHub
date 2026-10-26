@@ -107,6 +107,32 @@ struct SettingsView: View {
                     ))
             }
             Section {
+                HStack {
+                    VStack(alignment: .leading, spacing: HubSpace.xxs) {
+                        Text(tr("System Notifications"))
+                            .font(HubFont.body)
+                        Text(
+                            tr(
+                                "Receive notifications for new messages across your active and background accounts."
+                            )
+                        )
+                        .font(HubFont.caption)
+                        .foregroundStyle(HubStyle.textSecondary)
+                    }
+                    Spacer()
+                    Button(tr("Send Test Notification")) {
+                        HubNotificationCenter.shared.sendTestNotification()
+                    }
+                }
+            } header: {
+                Text(tr("Notifications"))
+            } footer: {
+                Text(
+                    tr(
+                        "Make sure notifications are enabled for ChatHub in macOS System Settings > Notifications."
+                    ))
+            }
+            Section {
                 LabeledContent(tr("Accounts"), value: "\(store.accounts.count)")
                 LabeledContent(tr("Open service sessions"), value: "\(browsers.sessions.count)")
                 Button(tr("Show Workspace File in Finder")) { store.revealWorkspace() }

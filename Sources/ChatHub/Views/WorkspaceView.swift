@@ -46,6 +46,10 @@ struct WorkspaceView: View {
             HubNotificationCenter.shared.onSelectAccount = { id in
                 store.select(id)
             }
+            browsers.preload(store.accounts)
+        }
+        .onChange(of: store.accounts) { _, accounts in
+            browsers.preload(accounts)
         }
         .onChange(of: browserAppearance, initial: true) { _, appearance in browsers.updateAppearance(appearance) }
         .onChange(of: store.selectedID, initial: true) { _, _ in browsers.activate(store.selectedAccount) }
@@ -108,10 +112,18 @@ struct WorkspaceView: View {
                 Button(tr("Try Again")) { store.reloadFromDisk() }
                     .buttonStyle(HubButtonStyle(prominent: true))
             }
-        } else if let account = store.selectedAccount, let session = browsers.sessions[account.id] {
-            ConversationView(account: account, session: session)
         } else {
-            OverviewView()
+            ZStack {
+                if let account = store.selectedAccount, let session = browsers.sessions[account.id] {
+                    ConversationView(account: account, session: session)
+                } else {
+                    ServiceWebView(containerView: browsers.containerView, session: nil)
+                        .frame(width: 0, height: 0)
+                        .opacity(0)
+                        .allowsHitTesting(false)
+                    OverviewView()
+                }
+            }
         }
     }
 }

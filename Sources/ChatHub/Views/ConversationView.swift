@@ -55,7 +55,7 @@ struct ConversationView: View {
             }
             if session.isFinding { ServiceFindBar(session: session) }
             ZStack(alignment: .top) {
-                ServiceWebView(session: session)
+                ServiceWebView(containerView: browsers.containerView, session: session)
                 if case .loading = session.state {
                     ProgressView(value: session.progress)
                         .progressViewStyle(.linear)

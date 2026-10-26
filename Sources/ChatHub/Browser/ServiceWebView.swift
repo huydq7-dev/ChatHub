@@ -4,9 +4,26 @@ import WebKit
 final class WebHostContainerView: NSView {
     private weak var activeWebView: WKWebView?
 
+    func attach(_ webView: WKWebView) {
+        guard webView.superview !== self else { return }
+        let initialBounds = bounds.isEmpty ? NSRect(x: 0, y: 0, width: 800, height: 600) : bounds
+        webView.frame = initialBounds
+        webView.autoresizingMask = [.width, .height]
+        webView.alphaValue = 0.0
+        addSubview(webView, positioned: .below, relativeTo: nil)
+    }
+
+    func detach(_ webView: WKWebView) {
+        if activeWebView === webView {
+            activeWebView = nil
+        }
+        webView.removeFromSuperview()
+    }
+
     func show(_ webView: WKWebView) {
         if webView.superview !== self {
-            webView.frame = bounds
+            let initialBounds = bounds.isEmpty ? NSRect(x: 0, y: 0, width: 800, height: 600) : bounds
+            webView.frame = initialBounds
             webView.autoresizingMask = [.width, .height]
             addSubview(webView, positioned: .above, relativeTo: nil)
         } else if subviews.last !== webView {
@@ -17,12 +34,15 @@ final class WebHostContainerView: NSView {
             let isActive = (subview === webView)
             subview.alphaValue = isActive ? 1.0 : 0.0
             if isActive {
-                subview.frame = bounds
+                if !bounds.isEmpty {
+                    subview.frame = bounds
+                }
                 subview.needsDisplay = true
                 subview.needsLayout = true
             }
         }
         window?.invalidateCursorRects(for: self)
+        window?.makeFirstResponder(webView)
     }
 
     override func setFrameSize(_ newSize: NSSize) {
@@ -61,15 +81,19 @@ final class WebHostContainerView: NSView {
 }
 
 struct ServiceWebView: NSViewRepresentable {
-    let session: BrowserSession
+    let containerView: WebHostContainerView
+    let session: BrowserSession?
 
     func makeNSView(context: Context) -> WebHostContainerView {
-        let container = WebHostContainerView()
-        container.show(session.webView)
-        return container
+        if let session {
+            containerView.show(session.webView)
+        }
+        return containerView
     }
 
     func updateNSView(_ nsView: WebHostContainerView, context: Context) {
-        nsView.show(session.webView)
+        if let session {
+            containerView.show(session.webView)
+        }
     }
 }

@@ -1,6 +1,6 @@
 import AppKit
 import Observation
-import UserNotifications
+@preconcurrency import UserNotifications
 import WebKit
 
 #if SWIFT_PACKAGE
@@ -11,8 +11,13 @@ import WebKit
 final class HubNotificationCenter: NSObject, UNUserNotificationCenterDelegate {
     static let shared = HubNotificationCenter()
     var onSelectAccount: ((UUID) -> Void)?
+    var onNotificationClick: ((UUID, String) -> Void)?
     private var unreadByAccount: [UUID: Int] = [:]
+    private var initializedAccounts: Set<UUID> = []
     private var lastNotificationTime: [UUID: Date] = [:]
+    private var lastRichNotificationTime: [UUID: Date] = [:]
+    private var recentNotificationFingerprints: [String: Date] = [:]
+    private var pendingBadgeFallbackTasks: [UUID: Task<Void, Never>] = [:]
     private var isConfigured = false
 
     private var canUseUserNotifications: Bool {
@@ -28,28 +33,65 @@ final class HubNotificationCenter: NSObject, UNUserNotificationCenterDelegate {
     }
 
     func updateUnreadCount(_ count: Int, for account: ChatAccount) {
+        let isFirstReport = !initializedAccounts.contains(account.id)
+        if isFirstReport {
+            initializedAccounts.insert(account.id)
+        }
         let clamped = max(0, count)
         let previous = unreadByAccount[account.id] ?? 0
-        guard clamped != previous else { return }
+        guard clamped != previous || isFirstReport else { return }
         unreadByAccount[account.id] = clamped
         updateDockBadge()
-        if clamped > previous {
-            let now = Date()
-            if let last = lastNotificationTime[account.id], now.timeIntervalSince(last) < 3.0 {
-                return
+
+        if clamped == 0 {
+            clearDeliveredNotifications(for: account.id)
+            pendingBadgeFallbackTasks[account.id]?.cancel()
+            pendingBadgeFallbackTasks.removeValue(forKey: account.id)
+            return
+        }
+
+        if !isFirstReport && clamped > previous {
+            pendingBadgeFallbackTasks[account.id]?.cancel()
+            pendingBadgeFallbackTasks[account.id] = Task { [weak self] in
+                try? await Task.sleep(nanoseconds: 700_000_000)
+                guard !Task.isCancelled, let self else { return }
+                let now = Date()
+                if let lastRich = lastRichNotificationTime[account.id], now.timeIntervalSince(lastRich) < 2.5 {
+                    return
+                }
+                if let lastFallback = lastNotificationTime[account.id], now.timeIntervalSince(lastFallback) < 3.0 {
+                    return
+                }
+                let body =
+                    clamped == 1
+                    ? tr("You have 1 unread message.")
+                    : String(format: tr("You have %d unread messages."), clamped)
+                postNotification(account: account, title: account.name, body: body)
             }
-            let body =
-                clamped == 1
-                ? tr("You have 1 unread message.")
-                : String(format: tr("You have %d unread messages."), clamped)
-            postNotification(account: account, title: account.name, body: body)
         }
     }
 
     func removeAccount(_ accountID: UUID) {
+        initializedAccounts.remove(accountID)
         unreadByAccount.removeValue(forKey: accountID)
         lastNotificationTime.removeValue(forKey: accountID)
+        lastRichNotificationTime.removeValue(forKey: accountID)
+        pendingBadgeFallbackTasks[accountID]?.cancel()
+        pendingBadgeFallbackTasks.removeValue(forKey: accountID)
+        clearDeliveredNotifications(for: accountID)
         updateDockBadge()
+    }
+
+    private func clearDeliveredNotifications(for accountID: UUID) {
+        guard canUseUserNotifications else { return }
+        UNUserNotificationCenter.current().getDeliveredNotifications { notifications in
+            let ids = notifications.filter {
+                ($0.request.content.userInfo["accountID"] as? String) == accountID.uuidString
+            }.map(\.request.identifier)
+            if !ids.isEmpty {
+                UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: ids)
+            }
+        }
     }
 
     private func updateDockBadge() {
@@ -57,27 +99,68 @@ final class HubNotificationCenter: NSObject, UNUserNotificationCenterDelegate {
         NSApplication.shared.dockTile.badgeLabel = total > 0 ? (total > 99 ? "99+" : "\(total)") : nil
     }
 
-    func postNotification(account: ChatAccount, title: String, body: String) {
-        lastNotificationTime[account.id] = Date()
+    func postNotification(account: ChatAccount, title: String, body: String, tag: String = "") {
+        let cleanTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
+        let cleanBody = body.trimmingCharacters(in: .whitespacesAndNewlines)
+        let effectiveTitle =
+            (cleanTitle.isEmpty || cleanTitle == account.name)
+            ? account.name : "\(account.name) · \(cleanTitle)"
+        let effectiveBody = cleanBody.isEmpty ? tr("New message received") : cleanBody
+
+        let fingerprint = "\(account.id.uuidString):\(effectiveTitle):\(effectiveBody):\(tag)"
+        let now = Date()
+        if let lastSeen = recentNotificationFingerprints[fingerprint], now.timeIntervalSince(lastSeen) < 4.0 {
+            return
+        }
+        recentNotificationFingerprints[fingerprint] = now
+        if recentNotificationFingerprints.count > 50 {
+            recentNotificationFingerprints = recentNotificationFingerprints.filter {
+                now.timeIntervalSince($0.value) < 10.0
+            }
+        }
+
+        lastNotificationTime[account.id] = now
+        if !tag.isEmpty || cleanBody != tr("You have 1 unread message.") {
+            lastRichNotificationTime[account.id] = now
+            pendingBadgeFallbackTasks[account.id]?.cancel()
+        }
+
         if !NSApplication.shared.isActive {
             NSApplication.shared.requestUserAttention(.informationalRequest)
         }
         guard canUseUserNotifications else { return }
         configure()
         let center = UNUserNotificationCenter.current()
-        let cleanTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
-        let cleanBody = body.trimmingCharacters(in: .whitespacesAndNewlines)
         let content = UNMutableNotificationContent()
-        if cleanTitle.isEmpty || cleanTitle == account.name {
-            content.title = account.name
-        } else {
-            content.title = "\(account.name) · \(cleanTitle)"
-        }
-        content.body = cleanBody.isEmpty ? tr("New message received") : cleanBody
+        content.title = effectiveTitle
+        content.body = effectiveBody
         content.sound = .default
-        content.userInfo = ["accountID": account.id.uuidString]
+        content.userInfo = ["accountID": account.id.uuidString, "tag": tag]
+        let identifier =
+            tag.isEmpty
+            ? "chathub.\(account.id.uuidString).\(UUID().uuidString)"
+            : "chathub.\(account.id.uuidString).\(tag)"
         let request = UNNotificationRequest(
-            identifier: "chathub.\(account.id.uuidString).\(UUID().uuidString)",
+            identifier: identifier,
+            content: content,
+            trigger: nil
+        )
+        center.add(request)
+    }
+
+    func sendTestNotification() {
+        if !NSApplication.shared.isActive {
+            NSApplication.shared.requestUserAttention(.informationalRequest)
+        }
+        guard canUseUserNotifications else { return }
+        configure()
+        let center = UNUserNotificationCenter.current()
+        let content = UNMutableNotificationContent()
+        content.title = "ChatHub"
+        content.body = tr("Test notification: your system notifications are working properly.")
+        content.sound = .default
+        let request = UNNotificationRequest(
+            identifier: "chathub.test.\(UUID().uuidString)",
             content: content,
             trigger: nil
         )
@@ -98,6 +181,7 @@ final class HubNotificationCenter: NSObject, UNUserNotificationCenterDelegate {
         withCompletionHandler completionHandler: @escaping () -> Void
     ) {
         let accountIDString = response.notification.request.content.userInfo["accountID"] as? String
+        let tag = response.notification.request.content.userInfo["tag"] as? String
         Task { @MainActor in
             NSApplication.shared.activate(ignoringOtherApps: true)
             if let window = NSApplication.shared.windows.first(where: { $0.identifier?.rawValue == "workspace" })
@@ -107,6 +191,7 @@ final class HubNotificationCenter: NSObject, UNUserNotificationCenterDelegate {
             }
             if let accountIDString, let uuid = UUID(uuidString: accountIDString) {
                 HubNotificationCenter.shared.onSelectAccount?(uuid)
+                HubNotificationCenter.shared.onNotificationClick?(uuid, tag ?? "")
             }
         }
         completionHandler()
@@ -146,6 +231,55 @@ final class BrowserSession: NSObject {
             const post = (payload) => {
                 try { window.webkit?.messageHandlers?.chatHubNotify?.postMessage(payload); } catch (_) {}
             };
+
+            window.__chatHubIsFocused = false;
+            window.__chatHubSetFocused = function(val) {
+                const active = Boolean(val);
+                if (window.__chatHubIsFocused === active) return;
+                window.__chatHubIsFocused = active;
+                try {
+                    if (active) {
+                        window.dispatchEvent(new Event("focus"));
+                        document.dispatchEvent(new Event("focus"));
+                    } else {
+                        window.dispatchEvent(new Event("blur"));
+                        document.dispatchEvent(new Event("blur"));
+                    }
+                } catch (_) {}
+            };
+
+            try {
+                const nativeHasFocus = Document.prototype.hasFocus;
+                Document.prototype.hasFocus = function() {
+                    if (!window.__chatHubIsFocused) return false;
+                    try {
+                        return nativeHasFocus.call(this);
+                    } catch (_) {
+                        return true;
+                    }
+                };
+            } catch (_) {}
+
+            const notiRegistry = new Map();
+            window.__chatHubNotificationRegistry = notiRegistry;
+            window.__chatHubTriggerNotificationClick = function(tag) {
+                try {
+                    if (tag && notiRegistry.has(tag)) {
+                        const noti = notiRegistry.get(tag);
+                        const ev = new Event("click");
+                        noti.dispatchEvent(ev);
+                        if (typeof noti.onclick === "function") noti.onclick(ev);
+                        return;
+                    }
+                    for (const noti of notiRegistry.values()) {
+                        const ev = new Event("click");
+                        noti.dispatchEvent(ev);
+                        if (typeof noti.onclick === "function") noti.onclick(ev);
+                        break;
+                    }
+                } catch (_) {}
+            };
+
             class ChatHubNotification extends EventTarget {
                 static get permission() { return "granted"; }
                 static requestPermission(cb) {
@@ -157,14 +291,31 @@ final class BrowserSession: NSObject {
                     this.title = String(title ?? "");
                     this.body = String(options?.body ?? "");
                     this.tag = String(options?.tag ?? "");
+                    this.icon = String(options?.icon ?? "");
                     this.onclick = null;
                     this.onclose = null;
+                    this.onshow = null;
+                    this.onerror = null;
+
+                    const tagKey = this.tag || ("noti_" + Date.now() + "_" + Math.random().toString(36).slice(2, 7));
+                    notiRegistry.set(tagKey, this);
+                    if (notiRegistry.size > 20) {
+                        const firstKey = notiRegistry.keys().next().value;
+                        notiRegistry.delete(firstKey);
+                    }
+
                     post({
                         kind: "notify",
                         title: this.title.slice(0, 160),
                         body: this.body.slice(0, 300),
                         tag: this.tag.slice(0, 80)
                     });
+
+                    setTimeout(() => {
+                        const ev = new Event("show");
+                        this.dispatchEvent(ev);
+                        if (typeof this.onshow === "function") this.onshow(ev);
+                    }, 0);
                 }
                 close() {
                     const ev = new Event("close");
@@ -176,10 +327,206 @@ final class BrowserSession: NSObject {
                 window.Notification = ChatHubNotification;
             } catch (_) {}
 
+            try {
+                delete window.PushManager;
+                window.PushManager = undefined;
+            } catch (_) {}
+
+            if (typeof ServiceWorkerRegistration !== "undefined" && ServiceWorkerRegistration.prototype) {
+                try {
+                    const origShow = ServiceWorkerRegistration.prototype.showNotification;
+                    ServiceWorkerRegistration.prototype.showNotification = function(title, options) {
+                        post({
+                            kind: "notify",
+                            title: String(title || "").slice(0, 160),
+                            body: String(options?.body || "").slice(0, 300),
+                            tag: String(options?.tag || "").slice(0, 80)
+                        });
+                        return Promise.resolve();
+                    };
+                } catch (_) {}
+            }
+
+            if (typeof ServiceWorker !== "undefined" && ServiceWorker.prototype) {
+                try {
+                    const origPostMessage = ServiceWorker.prototype.postMessage;
+                    ServiceWorker.prototype.postMessage = function(message, transfer) {
+                        if (message && typeof message === "object") {
+                            if (message.type === "showMessageNotification" || message.action === "showNotification") {
+                                const t = message.title || message.payload?.title || "";
+                                const b = message.options?.body || message.body || message.payload?.body || "";
+                                const tag = message.options?.tag || message.tag || "";
+                                post({
+                                    kind: "notify",
+                                    title: String(t).slice(0, 160),
+                                    body: String(b).slice(0, 300),
+                                    tag: String(tag).slice(0, 80)
+                                });
+                            }
+                        }
+                        return origPostMessage.apply(this, arguments);
+                    };
+                } catch (_) {}
+            }
+
+            if (location.hostname === "web.telegram.org" && typeof IDBObjectStore !== "undefined") {
+                try {
+                    const origGet = IDBObjectStore.prototype.get;
+                    IDBObjectStore.prototype.get = function(key) {
+                        const req = origGet.apply(this, arguments);
+                        if (this.name === "tt-global-state") {
+                            req.addEventListener("success", function() {
+                                try {
+                                    const res = req.result;
+                                    if (res && res.settings && res.settings.byKey) {
+                                        res.settings.byKey.hasWebNotifications = true;
+                                        res.settings.byKey.hasPushNotifications = false;
+                                    }
+                                } catch (_) {}
+                            });
+                        }
+                        return req;
+                    };
+                } catch (_) {}
+            }
+
+            if (location.hostname.includes("facebook.com") || location.hostname.includes("messenger.com")) {
+                try {
+                    const origMatchMedia = window.matchMedia;
+                    if (typeof origMatchMedia === "function") {
+                        window.matchMedia = function(query) {
+                            const res = origMatchMedia.apply(this, arguments);
+                            if (typeof query === "string" && query.includes("display-mode: standalone")) {
+                                return {
+                                    matches: true,
+                                    media: query,
+                                    onchange: null,
+                                    addListener: function() {},
+                                    removeListener: function() {},
+                                    addEventListener: function() {},
+                                    removeEventListener: function() {},
+                                    dispatchEvent: function() { return false; }
+                                };
+                            }
+                            return res;
+                        };
+                    }
+                } catch (_) {}
+
+                try {
+                    let currentD = window.__d;
+                    Object.defineProperty(window, "__d", {
+                        configurable: true,
+                        enumerable: true,
+                        get: function() { return currentD; },
+                        set: function(fn) {
+                            currentD = function(name, deps, factory) {
+                                if (typeof name === "string" && name.includes("MWNotificationRenderer")) {
+                                    const origFactory = factory;
+                                    factory = function(a, b, c, d, e, f) {
+                                        const res = origFactory.apply(this, arguments);
+                                        try {
+                                            const exportsObj = (f && f.exports) || (e && e.exports);
+                                            if (exportsObj && typeof exportsObj.renderDocumentTitle === "function") {
+                                                const origRender = exportsObj.renderDocumentTitle;
+                                                exportsObj.renderDocumentTitle = function(message, actorId, thread, contact, participant) {
+                                                    try {
+                                                        if (!window.__chatHubIsFocused) {
+                                                            const sender = contact?.name || participant?.name || thread?.name || "Messenger";
+                                                            const text = message?.text || message?.snippet || "Tin nhắn mới";
+                                                            post({
+                                                                kind: "notify",
+                                                                title: String(sender).slice(0, 160),
+                                                                body: String(text).slice(0, 300),
+                                                                tag: String(thread?.thread_key || thread?.id || "")
+                                                            });
+                                                        }
+                                                    } catch (_) {}
+                                                    return origRender.apply(this, arguments);
+                                                };
+                                            }
+                                        } catch (_) {}
+                                        return res;
+                                    };
+                                }
+                                return fn.apply(this, arguments);
+                            };
+                        }
+                    });
+                } catch (_) {}
+            }
+
+            if (location.hostname === "chat.zalo.me") {
+                try {
+                    if (typeof Storage !== "undefined") {
+                        const origGetItem = Storage.prototype.getItem;
+                        Storage.prototype.getItem = function(key) {
+                            if (key === "askNoti" || key === "notification_permission") return "1";
+                            return origGetItem.apply(this, arguments);
+                        };
+                    }
+                } catch (_) {}
+                window.$znoti = window.$znoti || {
+                    show: function(title, options) {
+                        new ChatHubNotification(title, options);
+                    }
+                };
+            }
+
+            function parseZaloBadge(el) {
+                if (!el) return 0;
+                const txt = (el.textContent || "").trim();
+                if (txt) {
+                    const n = parseInt(txt, 10);
+                    if (!Number.isNaN(n)) return n;
+                }
+                const classStr = el.className + " " + Array.from(el.children).map(c => c.className).join(" ");
+                const match = classStr.match(/fa-([0-9]+)_|fa-num([0-9]+)/);
+                if (match) {
+                    const num = parseInt(match[1] || match[2], 10);
+                    if (!Number.isNaN(num)) return num;
+                }
+                if (classStr.includes("fa-5_Plus") || classStr.includes("5_Plus") || classStr.includes("plus")) {
+                    return 5;
+                }
+                const label = el.getAttribute("aria-label") || el.getAttribute("title") || "";
+                if (label) {
+                    const n = parseInt(label.replace(/\\D/g, ""), 10);
+                    if (!Number.isNaN(n)) return n;
+                }
+                return 1;
+            }
+
             let lastBadgeCount = -1;
+            let lastTitle = "";
             let badgeTimer = null;
+
+            function checkTitleBlink() {
+                const curTitle = document.title;
+                if (curTitle === lastTitle) return;
+                lastTitle = curTitle;
+                if (window.__chatHubIsFocused) return;
+                if (location.hostname.includes("facebook.com") || location.hostname.includes("messenger.com")) {
+                    const titleMatch = curTitle.match(/^(?:\\(\\d+\\)\\s+)?(.+?):\\s+(.+)$/)
+                        || curTitle.match(/^(?:\\(\\d+\\)\\s+)?(.+?)\\s+(đã gửi|sent\\b)(.*)$/i);
+                    if (titleMatch) {
+                        const sender = (titleMatch[1] || "Messenger").trim();
+                        const body = (titleMatch[2] || titleMatch[3] || "Tin nhắn mới").trim();
+                        if (sender !== "Messenger" && !curTitle.includes("Messenger |") && !curTitle.includes("Facebook")) {
+                            post({
+                                kind: "notify",
+                                title: sender.slice(0, 160),
+                                body: body.slice(0, 300),
+                                tag: "title_blink"
+                            });
+                        }
+                    }
+                }
+            }
+
             function computeBadgeCount() {
                 badgeTimer = null;
+                checkTitleBlink();
                 const titleMatch = document.title.match(/\\((\\d+)\\+?\\)|\\[(\\d+)\\+?\\]/);
                 if (titleMatch) {
                     const n = parseInt(titleMatch[1] || titleMatch[2], 10);
@@ -192,14 +539,14 @@ final class BrowserSession: NSObject {
                 let count = 0;
                 const host = location.hostname;
                 if (host === "chat.zalo.me") {
-                    const navBadge = document.querySelector("#main-tab .z-noti-badge");
-                    const navNum = navBadge ? parseInt(navBadge.textContent || "", 10) : 0;
+                    const navBadge = document.querySelector("#main-tab .z-noti-badge, #sidebarNav .z-noti-badge");
+                    const navNum = parseZaloBadge(navBadge);
                     if (navNum > 0) {
                         count = navNum;
                     } else {
-                        for (const el of document.querySelectorAll(".conv-action__unread .z-noti-badge, .conv-unread")) {
-                            const v = parseInt(el.textContent || "", 10);
-                            count += Number.isNaN(v) ? 1 : v;
+                        for (const el of document.querySelectorAll(".conv-action__unread .z-noti-badge, .conv-unread, .z-noti-badge")) {
+                            if (el.closest("#main-tab") || el.closest("#sidebarNav")) continue;
+                            count += parseZaloBadge(el);
                         }
                     }
                 } else if (host === "web.telegram.org") {
@@ -322,7 +669,10 @@ final class BrowserSession: NSObject {
         case "notify":
             let title = (payload["title"] as? String) ?? ""
             let body = (payload["body"] as? String) ?? ""
-            HubNotificationCenter.shared.postNotification(account: account, title: title, body: body)
+            let tag = (payload["tag"] as? String) ?? ""
+            HubNotificationCenter.shared.postNotification(
+                account: account, title: title, body: body, tag: tag
+            )
         case "badge":
             if let count = payload["count"] as? Int {
                 applyUnreadCount(count)
@@ -409,6 +759,23 @@ final class BrowserSession: NSObject {
                 }
             })();
             """,
+            completionHandler: nil
+        )
+    }
+
+    func setHubFocus(active: Bool) {
+        webView.evaluateJavaScript(
+            "window.__chatHubSetFocused?.(\(active ? "true" : "false"));",
+            completionHandler: nil
+        )
+    }
+
+    func handleNotificationClick(tag: String) {
+        let escapedTag =
+            tag.replacingOccurrences(of: "\\", with: "\\\\")
+            .replacingOccurrences(of: "\"", with: "\\\"")
+        webView.evaluateJavaScript(
+            "window.__chatHubTriggerNotificationClick?.(\"\(escapedTag)\");",
             completionHandler: nil
         )
     }
