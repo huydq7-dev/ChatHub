@@ -7,6 +7,7 @@ struct ChatHubApp: App {
     @State private var store = WorkspaceStore()
     @State private var browsers = BrowserPool()
     @State private var layout = WorkspaceLayout()
+    @State private var updater = AppUpdater()
     @AppStorage("appearance") private var appearance = "system"
 
     init() { ChatAppearancePreferences.migrate() }
@@ -17,13 +18,17 @@ struct ChatHubApp: App {
                 .environment(store)
                 .environment(browsers)
                 .environment(layout)
+                .environment(updater)
                 .preferredColorScheme(appearance == "system" ? nil : appearance == "dark" ? .dark : .light)
                 .frame(minWidth: 860, minHeight: 600)
         }
         .defaultSize(width: 1280, height: 840)
         .windowStyle(.hiddenTitleBar)
-        .windowToolbarStyle(.unified)
         .commands {
+            CommandGroup(after: .appInfo) {
+                Button(tr("Check for Updates…")) { updater.checkManually() }
+                    .disabled(updater.isChecking)
+            }
             CommandGroup(replacing: .newItem) {
                 Button(tr("Add Account…")) { store.add() }
                     .keyboardShortcut("n", modifiers: .command)
@@ -63,6 +68,7 @@ struct ChatHubApp: App {
                 .environment(store)
                 .environment(browsers)
                 .environment(layout)
+                .environment(updater)
                 .preferredColorScheme(appearance == "system" ? nil : appearance == "dark" ? .dark : .light)
         }
     }

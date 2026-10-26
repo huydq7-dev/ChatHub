@@ -143,7 +143,7 @@ struct WorkspaceToolbar: ToolbarContent {
     }
 }
 
-private struct AppearanceStudioPopover: View {
+struct AppearanceStudioPopover: View {
     let supportsServiceTools: Bool
     @AppStorage("appearance") private var appearance = "system"
     @AppStorage(ChatAppearancePreferences.themeKey) private var nativeThemeEnabled = true

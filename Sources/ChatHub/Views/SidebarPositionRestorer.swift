@@ -29,6 +29,7 @@ struct SidebarPositionRestorer: NSViewRepresentable {
             let position = requestedWidth
             DispatchQueue.main.async { [weak self] in
                 guard let self else { return }
+                self.window?.isMovableByWindowBackground = true
                 var ancestor = superview
                 while let candidate = ancestor {
                     if let split = candidate as? NSSplitView, split.isVertical, split.subviews.count == 2 {
