@@ -346,14 +346,7 @@ struct HubInputFieldSurface: ViewModifier {
         content
             .padding(.horizontal, HubSpace.sm)
             .frame(minHeight: HubSpace.searchHeight)
-            .background(
-                HubStyle.raised,
-                in: RoundedRectangle(cornerRadius: HubRadius.control, style: .continuous)
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: HubRadius.control, style: .continuous)
-                    .strokeBorder(HubStyle.border, lineWidth: 1)
-            )
+            .liquidGlassCard(cornerRadius: HubRadius.control)
     }
 }
 
@@ -368,15 +361,7 @@ struct HubBadge: View {
             .foregroundStyle(prominent ? .white : HubStyle.textSecondary)
             .padding(.horizontal, HubSpace.xs)
             .padding(.vertical, 3)
-            .background(
-                prominent ? HubStyle.accent : HubStyle.raised,
-                in: Capsule()
-            )
-            .overlay {
-                if !prominent {
-                    Capsule().strokeBorder(HubStyle.border, lineWidth: 1)
-                }
-            }
+            .liquidGlassCapsule(tint: prominent ? HubStyle.accent : nil)
     }
 }
 
@@ -402,5 +387,119 @@ struct HubButtonStyle: ButtonStyle {
             .opacity(configuration.isPressed ? 0.9 : 1)
             .animation(.easeOut(duration: 0.12), value: configuration.isPressed)
             .contentShape(RoundedRectangle(cornerRadius: HubRadius.control, style: .continuous))
+    }
+}
+
+// MARK: - Liquid Glass Design System (macOS 26+ Native with Graceful Fallback)
+
+struct LiquidGlassCapsuleModifier: ViewModifier {
+    var tint: Color? = nil
+    var interactive: Bool = false
+
+    func body(content: Content) -> some View {
+        if #available(macOS 26.0, *) {
+            if let tint {
+                if interactive {
+                    content.glassEffect(.regular.tint(tint).interactive(), in: .capsule)
+                } else {
+                    content.glassEffect(.regular.tint(tint), in: .capsule)
+                }
+            } else {
+                if interactive {
+                    content.glassEffect(.regular.interactive(), in: .capsule)
+                } else {
+                    content.glassEffect(.regular, in: .capsule)
+                }
+            }
+        } else {
+            if let tint {
+                content
+                    .background(tint, in: Capsule())
+                    .overlay {
+                        Capsule().strokeBorder(Color.white.opacity(0.18), lineWidth: 1)
+                    }
+            } else {
+                content
+                    .background(.ultraThinMaterial, in: Capsule())
+                    .overlay {
+                        Capsule().strokeBorder(HubStyle.border, lineWidth: 1)
+                    }
+            }
+        }
+    }
+}
+
+struct LiquidGlassCardModifier: ViewModifier {
+    var cornerRadius: CGFloat = HubRadius.card
+    var tint: Color? = nil
+    var interactive: Bool = false
+
+    func body(content: Content) -> some View {
+        if #available(macOS 26.0, *) {
+            let shape = RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+            if let tint {
+                if interactive {
+                    content.glassEffect(.regular.tint(tint).interactive(), in: shape)
+                } else {
+                    content.glassEffect(.regular.tint(tint), in: shape)
+                }
+            } else {
+                if interactive {
+                    content.glassEffect(.regular.interactive(), in: shape)
+                } else {
+                    content.glassEffect(.regular, in: shape)
+                }
+            }
+        } else {
+            let shape = RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+            if let tint {
+                content
+                    .background(tint.opacity(0.08), in: shape)
+                    .background(.ultraThinMaterial, in: shape)
+                    .overlay {
+                        shape.strokeBorder(tint.opacity(0.35), lineWidth: 1)
+                    }
+            } else {
+                content
+                    .background(.ultraThinMaterial, in: shape)
+                    .overlay {
+                        shape.strokeBorder(HubStyle.border, lineWidth: 1)
+                    }
+            }
+        }
+    }
+}
+
+struct HubGlassContainer<Content: View>: View {
+    var spacing: CGFloat = 20.0
+    @ViewBuilder var content: () -> Content
+
+    init(spacing: CGFloat = 20.0, @ViewBuilder content: @escaping () -> Content) {
+        self.spacing = spacing
+        self.content = content
+    }
+
+    var body: some View {
+        if #available(macOS 26.0, *) {
+            GlassEffectContainer(spacing: spacing) {
+                content()
+            }
+        } else {
+            content()
+        }
+    }
+}
+
+extension View {
+    func liquidGlassCapsule(tint: Color? = nil, interactive: Bool = false) -> some View {
+        modifier(LiquidGlassCapsuleModifier(tint: tint, interactive: interactive))
+    }
+
+    func liquidGlassCard(
+        cornerRadius: CGFloat = HubRadius.card,
+        tint: Color? = nil,
+        interactive: Bool = false
+    ) -> some View {
+        modifier(LiquidGlassCardModifier(cornerRadius: cornerRadius, tint: tint, interactive: interactive))
     }
 }

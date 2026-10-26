@@ -52,13 +52,7 @@ struct WorkspaceToolbar: ToolbarContent {
             }
             .padding(.horizontal, HubSpace.sm)
             .padding(.vertical, 5)
-            .background(
-                HubStyle.raised,
-                in: Capsule()
-            )
-            .overlay(
-                Capsule().strokeBorder(HubStyle.border, lineWidth: 1)
-            )
+            .liquidGlassCapsule(interactive: true)
             .accessibilityElement(children: .combine)
         }
         ToolbarItemGroup(placement: .primaryAction) {
@@ -255,7 +249,7 @@ private struct AppearanceStudioPopover: View {
         }
         .padding(HubSpace.md)
         .frame(width: 288)
-        .background(HubStyle.surface)
+        .liquidGlassCard(cornerRadius: 16)
         .tint(HubStyle.accentColor(for: selectedAccent))
     }
 }

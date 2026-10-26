@@ -47,7 +47,7 @@ struct AccountSwitcherView: View {
             }
             .padding(.horizontal, HubSpace.lg)
             .padding(.vertical, HubSpace.md)
-            .background(HubStyle.surface)
+            .liquidGlassCard(cornerRadius: 0)
 
             Divider().overlay(HubStyle.border)
 
@@ -147,9 +147,10 @@ struct AccountSwitcherView: View {
             .padding(.horizontal, HubSpace.sm)
             .padding(.vertical, 10)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(
-                isSelected ? HubStyle.selected : .clear,
-                in: RoundedRectangle(cornerRadius: HubRadius.row, style: .continuous)
+            .liquidGlassCard(
+                cornerRadius: HubRadius.row,
+                tint: isSelected ? HubStyle.accent.opacity(0.18) : nil,
+                interactive: true
             )
             .overlay(alignment: .leading) {
                 if isSelected {
