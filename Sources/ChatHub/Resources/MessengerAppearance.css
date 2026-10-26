@@ -116,7 +116,11 @@ html[data-chathub-service="messenger"] :is(
     --chat-thread-background-color: var(--hub-canvas) !important;
     --chat-thread-background-image: none !important;
     --chat-thread-background-gradient: none !important;
-    --chat-thread-scrollbar-thumb-color: var(--hub-secondary) !important;
+    --chat-thread-scrollbar-thumb-color: var(--hub-scrollbar) !important;
+    --chat-thread-scrollbar-thumb-hover-color: var(--hub-scrollbar-hover) !important;
+    --chat-thread-scrollbar-thumb-active-color: var(--hub-scrollbar-active) !important;
+    --scroll-thumb: var(--hub-scrollbar) !important;
+    --scroll-thumb-hover: var(--hub-scrollbar-hover) !important;
     --chat-incoming-message-bubble-border-radius: var(--hub-radius-bubble) !important;
     --chat-outgoing-message-bubble-border-radius: var(--hub-radius-bubble) !important;
     --chat-bubble-border-radius: var(--hub-radius-bubble) !important;
@@ -288,4 +292,105 @@ html[data-chathub-service="messenger"][data-chathub-focus="true"] :is(.x1bc3s5a,
 }
 html[data-chathub-service="messenger"] [role="main"] [style*="--chat-composer-button-color"] {
     background-image: none !important;
+}
+
+/* Unified Messenger scrollbars */
+html[data-chathub-service="messenger"] :is(
+    [role="navigation"],
+    [role="grid"],
+    [role="main"],
+    .x1odjw0f,
+    .x10wlt62,
+    .x78zum5,
+    .x1n2onr6,
+    [data-virtualized="true"],
+    [aria-label="Thread list"],
+    [aria-label="Messages"]
+)::-webkit-scrollbar {
+    width: 6px !important;
+    height: 6px !important;
+    background: transparent !important;
+    background-color: transparent !important;
+}
+
+html[data-chathub-service="messenger"] :is(
+    [role="navigation"],
+    [role="grid"],
+    [role="main"],
+    .x1odjw0f,
+    .x10wlt62,
+    .x78zum5,
+    .x1n2onr6,
+    [data-virtualized="true"],
+    [aria-label="Thread list"],
+    [aria-label="Messages"]
+)::-webkit-scrollbar-track {
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+html[data-chathub-service="messenger"] :is(
+    [role="navigation"],
+    [role="grid"],
+    [role="main"],
+    .x1odjw0f,
+    .x10wlt62,
+    .x78zum5,
+    .x1n2onr6,
+    [data-virtualized="true"],
+    [aria-label="Thread list"],
+    [aria-label="Messages"]
+)::-webkit-scrollbar-thumb {
+    background: var(--hub-scrollbar) !important;
+    background-color: var(--hub-scrollbar) !important;
+    border-radius: var(--hub-radius-pill) !important;
+    border: none !important;
+    box-shadow: none !important;
+    min-height: 20px;
+}
+
+html[data-chathub-service="messenger"] :is(
+    [role="navigation"],
+    [role="grid"],
+    [role="main"],
+    .x1odjw0f,
+    .x10wlt62,
+    .x78zum5,
+    .x1n2onr6,
+    [data-virtualized="true"],
+    [aria-label="Thread list"],
+    [aria-label="Messages"]
+):hover::-webkit-scrollbar-thumb,
+html[data-chathub-service="messenger"] :is(
+    [role="navigation"],
+    [role="grid"],
+    [role="main"],
+    .x1odjw0f,
+    .x10wlt62,
+    .x78zum5,
+    .x1n2onr6,
+    [data-virtualized="true"],
+    [aria-label="Thread list"],
+    [aria-label="Messages"]
+)::-webkit-scrollbar-thumb:hover {
+    background: var(--hub-scrollbar-hover) !important;
+    background-color: var(--hub-scrollbar-hover) !important;
+}
+
+html[data-chathub-service="messenger"] :is(
+    [role="navigation"],
+    [role="grid"],
+    [role="main"],
+    .x1odjw0f,
+    .x10wlt62,
+    .x78zum5,
+    .x1n2onr6,
+    [data-virtualized="true"],
+    [aria-label="Thread list"],
+    [aria-label="Messages"]
+)::-webkit-scrollbar-thumb:active {
+    background: var(--hub-scrollbar-active) !important;
+    background-color: var(--hub-scrollbar-active) !important;
 }

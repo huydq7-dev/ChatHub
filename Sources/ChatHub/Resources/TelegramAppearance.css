@@ -88,6 +88,8 @@ html[data-chathub-service="telegram"] :is(
     --shadow-message: var(--hub-shadow-card) !important;
     --column-header-height: var(--hub-header-height) !important;
     --middle-header-height: var(--hub-header-height) !important;
+    --color-scrollbar: var(--hub-scrollbar) !important;
+    --scrollbar-width: 6px !important;
 }
 
 /* Left column, header & search bar */
@@ -525,4 +527,105 @@ html[data-chathub-service="telegram"] #Main > div:first-child:not([id]):not(.Tra
 html[data-chathub-service="telegram"] #Main > div:first-child:not([id]):not(.Transition)::after {
     opacity: 0 !important;
     background-image: none !important;
+}
+
+/* Unified Telegram scrollbars */
+html[data-chathub-service="telegram"] :is(
+    .custom-scroll,
+    .custom-scroll-x,
+    .Transition_slide,
+    .MessageList,
+    .chat-list,
+    .LeftSearch,
+    .search-content,
+    .settings-content,
+    .picker-list,
+    .media-list
+)::-webkit-scrollbar {
+    width: 6px !important;
+    height: 6px !important;
+    background: transparent !important;
+    background-color: transparent !important;
+}
+
+html[data-chathub-service="telegram"] :is(
+    .custom-scroll,
+    .custom-scroll-x,
+    .Transition_slide,
+    .MessageList,
+    .chat-list,
+    .LeftSearch,
+    .search-content,
+    .settings-content,
+    .picker-list,
+    .media-list
+)::-webkit-scrollbar-track {
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+html[data-chathub-service="telegram"] :is(
+    .custom-scroll,
+    .custom-scroll-x,
+    .Transition_slide,
+    .MessageList,
+    .chat-list,
+    .LeftSearch,
+    .search-content,
+    .settings-content,
+    .picker-list,
+    .media-list
+)::-webkit-scrollbar-thumb {
+    background: var(--hub-scrollbar) !important;
+    background-color: var(--hub-scrollbar) !important;
+    border-radius: var(--hub-radius-pill) !important;
+    border: none !important;
+    box-shadow: none !important;
+    min-height: 20px;
+}
+
+html[data-chathub-service="telegram"] :is(
+    .custom-scroll,
+    .custom-scroll-x,
+    .Transition_slide,
+    .MessageList,
+    .chat-list,
+    .LeftSearch,
+    .search-content,
+    .settings-content,
+    .picker-list,
+    .media-list
+):hover::-webkit-scrollbar-thumb,
+html[data-chathub-service="telegram"] :is(
+    .custom-scroll,
+    .custom-scroll-x,
+    .Transition_slide,
+    .MessageList,
+    .chat-list,
+    .LeftSearch,
+    .search-content,
+    .settings-content,
+    .picker-list,
+    .media-list
+)::-webkit-scrollbar-thumb:hover {
+    background: var(--hub-scrollbar-hover) !important;
+    background-color: var(--hub-scrollbar-hover) !important;
+}
+
+html[data-chathub-service="telegram"] :is(
+    .custom-scroll,
+    .custom-scroll-x,
+    .Transition_slide,
+    .MessageList,
+    .chat-list,
+    .LeftSearch,
+    .search-content,
+    .settings-content,
+    .picker-list,
+    .media-list
+)::-webkit-scrollbar-thumb:active {
+    background: var(--hub-scrollbar-active) !important;
+    background-color: var(--hub-scrollbar-active) !important;
 }

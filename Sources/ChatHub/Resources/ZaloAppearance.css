@@ -310,3 +310,128 @@ html[data-chathub-focus="true"] #chat-box-bar-id .chat-box-toolbar-item:has(
     html[data-chathub-theme] .conv-item { transition-duration: 0s; }
 }
 html[data-chathub-reduce-motion="true"] .conv-item { transition-duration: 0s; }
+
+/* Unified Zalo scrollbars */
+html[data-chathub-theme] :is(
+    #conversation-scroll,
+    .conv-list,
+    .chat-message-list,
+    .list-friend,
+    .contact-list,
+    .message-view__body,
+    .chat-content,
+    .message-list,
+    #sidebarNav,
+    .zalo-chat-list,
+    .pin-msg-wrapper,
+    .group-board-body,
+    .zl-chat-list,
+    .min-size-labels
+)::-webkit-scrollbar {
+    width: 6px !important;
+    height: 6px !important;
+    background: transparent !important;
+    background-color: transparent !important;
+}
+
+html[data-chathub-theme] :is(
+    #conversation-scroll,
+    .conv-list,
+    .chat-message-list,
+    .list-friend,
+    .contact-list,
+    .message-view__body,
+    .chat-content,
+    .message-list,
+    #sidebarNav,
+    .zalo-chat-list,
+    .pin-msg-wrapper,
+    .group-board-body,
+    .zl-chat-list,
+    .min-size-labels
+)::-webkit-scrollbar-track {
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+html[data-chathub-theme] :is(
+    #conversation-scroll,
+    .conv-list,
+    .chat-message-list,
+    .list-friend,
+    .contact-list,
+    .message-view__body,
+    .chat-content,
+    .message-list,
+    #sidebarNav,
+    .zalo-chat-list,
+    .pin-msg-wrapper,
+    .group-board-body,
+    .zl-chat-list,
+    .min-size-labels
+)::-webkit-scrollbar-thumb {
+    background: var(--hub-scrollbar) !important;
+    background-color: var(--hub-scrollbar) !important;
+    border-radius: var(--hub-radius-pill) !important;
+    border: none !important;
+    box-shadow: none !important;
+    min-height: 20px;
+}
+
+html[data-chathub-theme] :is(
+    #conversation-scroll,
+    .conv-list,
+    .chat-message-list,
+    .list-friend,
+    .contact-list,
+    .message-view__body,
+    .chat-content,
+    .message-list,
+    #sidebarNav,
+    .zalo-chat-list,
+    .pin-msg-wrapper,
+    .group-board-body,
+    .zl-chat-list,
+    .min-size-labels
+):hover::-webkit-scrollbar-thumb,
+html[data-chathub-theme] :is(
+    #conversation-scroll,
+    .conv-list,
+    .chat-message-list,
+    .list-friend,
+    .contact-list,
+    .message-view__body,
+    .chat-content,
+    .message-list,
+    #sidebarNav,
+    .zalo-chat-list,
+    .pin-msg-wrapper,
+    .group-board-body,
+    .zl-chat-list,
+    .min-size-labels
+)::-webkit-scrollbar-thumb:hover {
+    background: var(--hub-scrollbar-hover) !important;
+    background-color: var(--hub-scrollbar-hover) !important;
+}
+
+html[data-chathub-theme] :is(
+    #conversation-scroll,
+    .conv-list,
+    .chat-message-list,
+    .list-friend,
+    .contact-list,
+    .message-view__body,
+    .chat-content,
+    .message-list,
+    #sidebarNav,
+    .zalo-chat-list,
+    .pin-msg-wrapper,
+    .group-board-body,
+    .zl-chat-list,
+    .min-size-labels
+)::-webkit-scrollbar-thumb:active {
+    background: var(--hub-scrollbar-active) !important;
+    background-color: var(--hub-scrollbar-active) !important;
+}

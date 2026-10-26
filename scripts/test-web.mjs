@@ -177,3 +177,16 @@ test('SPA navigation out of Messenger removes appearance and never observes the 
     assert.equal(p.attributes.size, 0);
     assert.equal(p.observers.length, 0);
 });
+
+test('scrollbar styles and tokens are unified across all supported services', () => {
+    for (const service of ['zalo', 'telegram', 'messenger']) {
+        const p = page({ service });
+        const style = p.elements.get('chathub-native-appearance-v1');
+        assert.ok(style, `style injected for ${service}`);
+        assert.ok(style.textContent.includes('--hub-scrollbar:'), `defines scrollbar token for ${service}`);
+        assert.ok(style.textContent.includes('--hub-scrollbar-hover:'), `defines hover token for ${service}`);
+        assert.ok(style.textContent.includes('--hub-scrollbar-active:'), `defines active token for ${service}`);
+        assert.ok(style.textContent.includes('scrollbar-width: thin !important;'), `sets standard scrollbar-width for ${service}`);
+        assert.ok(style.textContent.includes('::-webkit-scrollbar-thumb'), `sets webkit scrollbar thumb for ${service}`);
+    }
+});
