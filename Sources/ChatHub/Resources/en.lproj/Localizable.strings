@@ -1,0 +1,35 @@
+"ChatHub" = "ChatHub";
+
+"Show extra service tools" = "Show extra service tools";
+
+"Hide extra service tools" = "Hide extra service tools";
+
+"A focused chat layout with ChatHub’s colors and a borderless composer. Show extra tools for contacts, service settings and the full chat toolbar. Turn off appearance matching to restore Zalo’s original interface." = "A focused chat layout with ChatHub’s colors and a borderless composer. Show extra tools for contacts, service settings and the full chat toolbar. Turn off appearance matching to restore Zalo’s original interface.";
+
+"Chat appearance" = "Chat appearance";
+
+"One ChatHub appearance for Telegram, Messenger and Zalo. Colors, typography and chat surfaces follow the appearance above. Show extra tools to access service-specific controls. Turn off to restore the original interfaces." = "One ChatHub appearance for Telegram, Messenger and Zalo. Colors, typography and chat surfaces follow the appearance above. Show extra tools to access service-specific controls. Turn off to restore the original interfaces.";
+
+"Calling, screen sharing and background notifications depend on each service." = "Calling, screen sharing and background notifications depend on each service.";
+"Customize Appearance" = "Customize Appearance";
+"Appearance Studio" = "Appearance Studio";
+"Instant across ChatHub and chat services" = "Instant across ChatHub and chat services";
+"Accent color" = "Accent color";
+"Text size" = "Text size";
+"Layout density" = "Layout density";
+"Iris" = "Iris";
+"Ocean" = "Ocean";
+"Emerald" = "Emerald";
+"Amber" = "Amber";
+"Rose" = "Rose";
+"Graphite" = "Graphite";
+"Compact" = "Compact";
+"Default" = "Default";
+"Comfortable" = "Comfortable";
+"Small" = "Small";
+"Large" = "Large";
+"Move Up" = "Move Up";
+"Move Down" = "Move Down";
+"You have 1 unread message." = "You have 1 unread message.";
+"You have %d unread messages." = "You have %d unread messages.";
+"New message received" = "New message received";

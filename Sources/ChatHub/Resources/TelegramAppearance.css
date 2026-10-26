@@ -1,0 +1,488 @@
+/* Telegram Web A: stable component identities from its public source. */
+html[data-chathub-service="telegram"],
+html[data-chathub-service="telegram"].theme-light,
+html[data-chathub-service="telegram"].theme-dark,
+html[data-chathub-service="telegram"] :is(
+    body,
+    #Main,
+    #LeftColumn,
+    #MiddleColumn,
+    #RightColumn,
+    .messages-layout,
+    #MiddleColumn .messages-layout > .Transition > .Transition_slide-active,
+    [style*="--theme-background-color"]
+) {
+    --theme-background-color: var(--hub-canvas) !important;
+    --pattern-color: transparent !important;
+    --pattern-intensity: 0 !important;
+    --custom-background: none !important;
+    --font-family: var(--hub-font) !important;
+    --color-background: var(--hub-surface) !important;
+    --color-background-secondary: var(--hub-raised) !important;
+    --color-background-secondary-accent: var(--hub-selected) !important;
+    --color-background-sidebar: var(--hub-surface) !important;
+    --color-background-selected: var(--hub-selected) !important;
+    --color-background-own: var(--hub-outgoing) !important;
+    --color-background-own-apple: var(--hub-outgoing) !important;
+    --color-background-own-selected: var(--hub-selected) !important;
+    --color-background-compact-menu: var(--hub-surface) !important;
+    --color-background-compact-menu-reactions: var(--hub-raised) !important;
+    --color-text: var(--hub-text) !important;
+    --color-text-rgb: var(--hub-text-rgb) !important;
+    --color-text-lighter: var(--hub-text) !important;
+    --color-text-secondary: var(--hub-secondary) !important;
+    --color-text-secondary-apple: var(--hub-secondary) !important;
+    --color-text-secondary-rgb: var(--hub-secondary-rgb) !important;
+    --color-text-meta: var(--hub-secondary) !important;
+    --color-text-meta-apple: var(--hub-secondary) !important;
+    --color-text-meta-rgb: var(--hub-secondary-rgb) !important;
+    --color-text-meta-colored: var(--hub-link) !important;
+    --color-icon-secondary: var(--hub-secondary) !important;
+    --color-primary: var(--hub-link) !important;
+    --color-primary-shade: var(--hub-link) !important;
+    --color-primary-shade-darker: var(--hub-link) !important;
+    --color-primary-shade-rgb: var(--hub-accent-rgb) !important;
+    --color-primary-opacity: var(--hub-selected) !important;
+    --color-primary-tint: var(--hub-selected) !important;
+    --color-links: var(--hub-link) !important;
+    --color-own-links: var(--hub-link) !important;
+    --color-placeholders: var(--hub-placeholder) !important;
+    --color-borders: var(--hub-border) !important;
+    --color-borders-input: var(--hub-border) !important;
+    --color-borders-alternate: var(--hub-border) !important;
+    --color-dividers: var(--hub-border) !important;
+    --color-chat-hover: var(--hub-hover) !important;
+    --color-chat-active: var(--hub-selected) !important;
+    --color-item-active: var(--hub-selected) !important;
+    --color-item-hover: var(--hub-hover) !important;
+    --color-composer-button: var(--hub-link) !important;
+    --color-message-meta-own: var(--hub-secondary) !important;
+    --color-message-reaction: var(--hub-selected) !important;
+    --color-message-reaction-own: var(--hub-selected) !important;
+    --color-message-reaction-chosen-hover: var(--hub-selected) !important;
+    --color-message-reaction-chosen-hover-own: var(--hub-selected) !important;
+    --color-accent-own: var(--hub-link) !important;
+    --color-accent-own-rgb: var(--hub-accent-rgb) !important;
+    --color-reply-hover: var(--hub-hover) !important;
+    --color-reply-active: var(--hub-selected) !important;
+    --color-reply-own: var(--hub-link) !important;
+    --color-reply-own-hover: var(--hub-hover) !important;
+    --color-reply-own-active: var(--hub-selected) !important;
+    --color-interactive-element-hover: var(--hub-hover) !important;
+    --border-radius-messages: var(--hub-radius-bubble) !important;
+    --border-radius-messages-small: 10px !important;
+    --border-radius-default: var(--hub-radius-row) !important;
+    --border-radius-island: 0px !important;
+    --border-radius-pane: 0px !important;
+    --border-radius-list-item: 0px !important;
+    --chat-list-inline-inset: 0px !important;
+    --middle-panel-inline-padding: 0px !important;
+    --middle-header-gap: 0px !important;
+    --messages-container-width: 100% !important;
+    --composer-pill-radius: var(--hub-radius-composer) !important;
+    --message-text-size: var(--hub-size-message) !important;
+    --shadow-footer: none !important;
+    --shadow-island: none !important;
+    --shadow-pane: none !important;
+    --shadow-chat-list-panel: none !important;
+    --shadow-message: var(--hub-shadow-card) !important;
+    --column-header-height: var(--hub-header-height) !important;
+    --middle-header-height: var(--hub-header-height) !important;
+}
+
+/* Left column, header & search bar */
+html[data-chathub-service="telegram"] :is(
+    #LeftColumn,
+    #LeftColumn-main,
+    #LeftColumn-main > .Transition,
+    #LeftColumn-main > .Transition > .Transition_slide,
+    .ChatFolders,
+    .ChatFolders-content,
+    .ChatFolders-content > .Transition,
+    .ChatFolders-content > .Transition > .Transition_slide,
+    .chat-list,
+    #RightColumn,
+    .left-header
+) {
+    background: var(--hub-surface) !important;
+    background-color: var(--hub-surface) !important;
+    font-family: var(--hub-font) !important;
+}
+html[data-chathub-service="telegram"] #LeftColumn {
+    margin: 0 !important;
+    height: 100% !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    border-right: 1px solid var(--hub-border) !important;
+}
+html[data-chathub-service="telegram"] .chat-list {
+    padding: 0 !important;
+    padding-inline: 0 !important;
+}
+html[data-chathub-service="telegram"] #LeftColumn-main .ChatFolders-content.with-tabs > .Transition {
+    margin-top: 2.375rem !important;
+}
+html[data-chathub-service="telegram"] #LeftColumn-main .ChatFolders-content.with-tabs .chat-list {
+    padding-top: 0 !important;
+}
+html[data-chathub-service="telegram"] :is(.M6ZdO77E, .LnbVG6fp) {
+    top: 0 !important;
+    inset-inline: 0 !important;
+    border-radius: 0 !important;
+    border: none !important;
+    border-bottom: 1px solid var(--hub-border) !important;
+    background: var(--hub-surface) !important;
+    background-color: var(--hub-surface) !important;
+    box-shadow: none !important;
+}
+html[data-chathub-service="telegram"] :is(.left-header, .MiddleHeader) {
+    min-height: var(--hub-header-height) !important;
+    padding-left: var(--hub-header-pad-x) !important;
+    padding-right: var(--hub-header-pad-x) !important;
+    border-bottom: 1px solid var(--hub-border) !important;
+    box-shadow: none !important;
+    font-family: var(--hub-font) !important;
+}
+html[data-chathub-service="telegram"] .MiddleHeader {
+    width: 100% !important;
+    max-width: none !important;
+    margin: var(--middle-header-player-height, 0px) 0 0 0 !important;
+    border-radius: 0 !important;
+    transform: none !important;
+    background: var(--hub-canvas) !important;
+    background-color: var(--hub-canvas) !important;
+}
+html[data-chathub-service="telegram"] ._7zgs9ckg {
+    top: calc(var(--middle-header-player-height, 0px) + var(--hub-header-height)) !important;
+    width: 100% !important;
+    max-width: none !important;
+    margin-inline: 0 !important;
+    border-radius: 0 !important;
+    transform: none !important;
+    background: var(--hub-surface) !important;
+    background-color: var(--hub-surface) !important;
+    box-shadow: none !important;
+}
+html[data-chathub-service="telegram"] :is(.HeaderPinnedMessageWrapper, .o9pW489x, .SetQDn1R, .ChatReportPane) {
+    border-radius: 0 !important;
+    background: var(--hub-surface) !important;
+    background-color: var(--hub-surface) !important;
+    border-bottom: 1px solid var(--hub-border) !important;
+    box-shadow: none !important;
+    padding-inline: var(--hub-header-pad-x) !important;
+}
+html[data-chathub-service="telegram"] :is(.WUxSaBoe, ._1sMCE8-P) {
+    max-width: none !important;
+    background: transparent !important;
+    background-color: transparent !important;
+}
+html[data-chathub-service="telegram"] ._8HQZHGlv:not(:has(.VHKhZm4Y)) {
+    display: none !important;
+}
+html[data-chathub-service="telegram"] :is(
+    .MiddleHeader,
+    ._7zgs9ckg,
+    .HeaderPinnedMessageWrapper,
+    .o9pW489x,
+    .WUxSaBoe,
+    ._8HQZHGlv,
+    .N9ZNgB49,
+    .Chat,
+    .Composer,
+    .ComposerEmbeddedMessage,
+    .EmbeddedMessage
+) :is(
+    .Transition,
+    .Transition_slide,
+    .Transition_slide-active,
+    .chat-info-wrapper,
+    .ChatInfo,
+    .header-tools,
+    .HeaderActions
+) {
+    background: transparent !important;
+    background-color: transparent !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+}
+html[data-chathub-service="telegram"] .MiddleHeader :is(.title, h3) {
+    font-size: var(--hub-size-header) !important;
+    font-weight: var(--hub-weight-semibold) !important;
+    line-height: var(--hub-leading-tight) !important;
+    letter-spacing: var(--hub-tracking-tight) !important;
+    color: var(--hub-text) !important;
+}
+html[data-chathub-service="telegram"] .MiddleHeader :is(.status, .user-status, .group-status) {
+    font-size: var(--hub-size-caption) !important;
+    font-weight: var(--hub-weight-regular) !important;
+    color: var(--hub-secondary) !important;
+}
+html[data-chathub-service="telegram"] .SearchInput {
+    background: var(--hub-raised) !important;
+    border-radius: var(--hub-radius-control) !important;
+    border: 1px solid transparent !important;
+    box-shadow: none !important;
+}
+html[data-chathub-service="telegram"] .SearchInput input {
+    background: transparent !important;
+    border-radius: var(--hub-radius-control) !important;
+    border-color: transparent !important;
+    font-family: var(--hub-font) !important;
+    font-size: var(--hub-size-body) !important;
+    font-weight: var(--hub-weight-regular) !important;
+    color: var(--hub-text) !important;
+}
+
+/* Conversation rows: unified geometry, selection bar and typography */
+html[data-chathub-service="telegram"] .Chat {
+    --background-color: var(--hub-surface) !important;
+    margin: 0 !important;
+}
+html[data-chathub-service="telegram"] .Chat .ListItem-button {
+    border-radius: 0 !important;
+    margin: 0 !important;
+    padding-inline: var(--hub-row-pad-x) !important;
+    transition: background-color 140ms ease-out;
+}
+html[data-chathub-service="telegram"] .Chat:not(.selected):not(.active):hover .ListItem-button {
+    --background-color: var(--hub-hover) !important;
+    background: var(--hub-hover) !important;
+}
+html[data-chathub-service="telegram"] .Chat:is(.selected, .active) .ListItem-button,
+html[data-chathub-service="telegram"] .Chat:is(.selected, .active):hover .ListItem-button,
+html[data-chathub-service="telegram"] .Chat .ListItem-button:is(.selected, .active) {
+    --background-color: var(--hub-selected) !important;
+    --color-text: var(--hub-text) !important;
+    --color-text-secondary: var(--hub-secondary) !important;
+    --color-text-meta: var(--hub-secondary) !important;
+    --color-text-meta-colored: var(--hub-link) !important;
+    --color-chat-username: var(--hub-text) !important;
+    --color-icon-secondary: var(--hub-secondary) !important;
+    background: var(--hub-selected) !important;
+    color: var(--hub-text) !important;
+    box-shadow: none !important;
+    border-left: none !important;
+}
+html[data-chathub-service="telegram"] .Chat:is(.selected, .active) :is(.title, .FullNameTitle, h3) {
+    color: var(--hub-text) !important;
+}
+html[data-chathub-service="telegram"] .Chat:is(.selected, .active) :is(.subtitle, .LastMessageMeta, .last-message, .last-message-summary) {
+    color: var(--hub-secondary) !important;
+}
+html[data-chathub-service="telegram"] .Chat :is(.title, h3) {
+    font-size: var(--hub-size-row-title) !important;
+    font-weight: var(--hub-weight-semibold) !important;
+    line-height: var(--hub-leading-tight) !important;
+    letter-spacing: var(--hub-tracking-tight) !important;
+    color: var(--hub-text) !important;
+}
+html[data-chathub-service="telegram"] .Chat :is(.subtitle, .last-message, .last-message-summary) {
+    font-size: var(--hub-size-row-snippet) !important;
+    font-weight: var(--hub-weight-regular) !important;
+    line-height: var(--hub-leading-snug) !important;
+    color: var(--hub-secondary) !important;
+}
+html[data-chathub-service="telegram"] .Chat :is(.LastMessageMeta, .LastMessageMeta .time) {
+    font-size: var(--hub-size-meta) !important;
+    font-weight: var(--hub-weight-medium) !important;
+    font-variant-numeric: tabular-nums !important;
+    color: var(--hub-secondary) !important;
+}
+html[data-chathub-service="telegram"] .ChatBadge.unread:not(.muted) {
+    background: var(--hub-accent) !important;
+    color: var(--hub-accent-contrast) !important;
+    border-radius: var(--hub-radius-pill) !important;
+    font-size: var(--hub-size-meta) !important;
+    font-weight: var(--hub-weight-semibold) !important;
+    font-variant-numeric: tabular-nums !important;
+}
+
+/* Message stream & bubbles */
+html[data-chathub-service="telegram"] :is(
+    #MiddleColumn,
+    .MessageList,
+    .messages-layout,
+    #MiddleColumn .messages-layout > .Transition > .Transition_slide,
+    #MiddleColumn .messages-layout > .Transition > .Transition_slide-active
+) {
+    background: var(--hub-canvas) !important;
+}
+html[data-chathub-service="telegram"] .MessageList .messages-container {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding-inline: var(--hub-header-pad-x) !important;
+}
+html[data-chathub-service="telegram"] :is(
+    .MessageMeta,
+    .MessageOutgoingStatus,
+    .MessageOutgoingStatus .Transition,
+    .MessageOutgoingStatus .Transition_slide,
+    .MessageOutgoingStatus .Transition_slide-active,
+    .MessageOutgoingStatus i
+) {
+    background: transparent !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
+}
+/* Remove decorative wallpaper only. Media and shared images are untouched. */
+html[data-chathub-service="telegram"] :is(.background-bg, .background-color, .background-gradient, .background-canvas, .background-pattern, .hrXj504d) {
+    background: var(--hub-canvas) !important;
+    background-color: var(--hub-canvas) !important;
+    background-image: none !important;
+}
+html[data-chathub-service="telegram"] :is(.hrXj504d::before, .hrXj504d::after, ._4fgy3GBs) {
+    display: none !important;
+    opacity: 0 !important;
+    background-image: none !important;
+}
+html[data-chathub-service="telegram"] .Message {
+    --background-color: var(--hub-raised) !important;
+    --color-text: var(--hub-text) !important;
+    --hover-color: var(--hub-hover) !important;
+    --active-color: var(--hub-selected) !important;
+}
+html[data-chathub-service="telegram"] .Message.own {
+    --background-color: var(--hub-outgoing) !important;
+    --color-text: var(--hub-text) !important;
+    --color-accent-own: var(--hub-link) !important;
+    --color-message-meta-own: var(--hub-secondary) !important;
+}
+html[data-chathub-service="telegram"] .Message:not(.is-album) .message-content:not(.media):not(.custom-shape) {
+    border-radius: var(--hub-radius-bubble) !important;
+    padding: var(--hub-bubble-pad-y) var(--hub-bubble-pad-x) !important;
+    border: 1px solid var(--hub-bubble-border) !important;
+    box-shadow: var(--hub-shadow-card) !important;
+    font-size: var(--hub-size-message) !important;
+    font-weight: var(--hub-weight-regular) !important;
+    line-height: var(--hub-leading-message) !important;
+    letter-spacing: var(--hub-tracking-normal) !important;
+}
+html[data-chathub-service="telegram"] :is(
+    .Message .message-content:is(.media, .custom-shape),
+    .Message.is-album .message-content,
+    .Message .media-inner,
+    .Message .Album
+) {
+    border: none !important;
+    box-shadow: none !important;
+}
+html[data-chathub-service="telegram"] .Message .message-content:is(.media, .custom-shape):not(.text):not(.has-subheader):not(.has-replies) {
+    padding: 0 !important;
+    background: transparent !important;
+    background-color: transparent !important;
+}
+html[data-chathub-service="telegram"] .Message .text-content {
+    font-size: var(--hub-size-message) !important;
+    font-weight: var(--hub-weight-regular) !important;
+    line-height: var(--hub-leading-message) !important;
+    letter-spacing: var(--hub-tracking-normal) !important;
+}
+html[data-chathub-service="telegram"] .Message .MessageMeta,
+html[data-chathub-service="telegram"] .Message .MessageMeta .message-time {
+    font-size: var(--hub-size-meta) !important;
+    font-weight: var(--hub-weight-medium) !important;
+    font-variant-numeric: tabular-nums !important;
+    color: var(--hub-secondary) !important;
+}
+html[data-chathub-service="telegram"] :is(.sticky-date > span, .action-message-content) {
+    border-radius: var(--hub-radius-pill) !important;
+    padding: 4px 12px !important;
+    background: var(--hub-surface) !important;
+    border: 1px solid var(--hub-border) !important;
+    color: var(--hub-secondary) !important;
+    font-size: var(--hub-size-meta) !important;
+    font-weight: var(--hub-weight-medium) !important;
+}
+html[data-chathub-service="telegram"] .Message .svg-appendix { display: none !important; }
+
+/* Unified floating composer */
+html[data-chathub-service="telegram"] #MiddleColumn .middle-column-footer {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 var(--hub-composer-margin-x) var(--hub-composer-margin-bottom) !important;
+    transform: none !important;
+}
+html[data-chathub-service="telegram"] :is(.Composer.is-chat-composer, .Composer:not(.is-chat-composer) .composer-wrapper) {
+    background: var(--hub-raised) !important;
+    border: 1px solid var(--hub-border) !important;
+    border-radius: var(--hub-radius-composer) !important;
+    box-shadow: var(--hub-shadow-composer) !important;
+}
+html[data-chathub-service="telegram"] .Composer.is-chat-composer :is(
+    .composer-wrapper,
+    .ComposerEmbeddedMessage,
+    .ComposerEmbeddedMessage_inner,
+    #message-input-text,
+    .message-input-wrapper
+) {
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+}
+html[data-chathub-service="telegram"] .composer-wrapper::before { display: none !important; }
+html[data-chathub-service="telegram"] .Composer :is([contenteditable="true"], .form-control, textarea):is(:focus, :focus-visible),
+html[data-chathub-service="telegram"] .Composer :is([contenteditable="true"], .form-control, textarea) {
+    outline: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    font-family: var(--hub-font) !important;
+    font-size: var(--hub-size-message) !important;
+    font-weight: var(--hub-weight-regular) !important;
+    line-height: var(--hub-leading-message) !important;
+    letter-spacing: var(--hub-tracking-normal) !important;
+    color: var(--hub-text) !important;
+}
+html[data-chathub-service="telegram"] .Composer:not(.is-chat-composer) > .Button {
+    background: var(--hub-raised) !important;
+    border: 1px solid var(--hub-border) !important;
+    box-shadow: var(--hub-shadow-card) !important;
+    border-radius: var(--hub-radius-composer) !important;
+}
+html[data-chathub-service="telegram"] .Composer.is-chat-composer > .Button {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+@media (min-width: 1276px) {
+    html[data-chathub-service="telegram"] #Main.right-column-open #MiddleColumn :is(.middle-column-footer, ._7zgs9ckg, .MiddleHeader) {
+        width: calc(100% - var(--right-column-width, 0px)) !important;
+        max-width: calc(100% - var(--right-column-width, 0px)) !important;
+        margin-left: 0 !important;
+        margin-right: auto !important;
+        transform: none !important;
+    }
+}
+@media (min-width: 900px) {
+    html[data-chathub-service="telegram"] #Main { --left-column-width: var(--hub-list-width) !important; }
+    html[data-chathub-service="telegram"] #LeftColumn { width: var(--hub-list-width) !important; }
+}
+
+/* Remove the provider's floating island frame on desktop. Keep its compact
+   navigation behavior at smaller widths and retain in-call header space. */
+@media (min-width: 926px) {
+    html[data-chathub-service="telegram"] body:not(.has-call-header) #LeftColumn {
+        margin: 0 !important;
+        height: 100% !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+    }
+}
+/* Wallpaper is the first, un-ID'd layer emitted by Telegram's Wallpaper wrapper.
+   Canvas here is decorative; message/media canvases live inside MiddleColumn. */
+html[data-chathub-service="telegram"] #Main {
+    --custom-background: none !important;
+    background: var(--hub-canvas) !important;
+}
+html[data-chathub-service="telegram"] #Main > div:first-child:not([id]):not(.Transition) > canvas {
+    display: none !important;
+}
+html[data-chathub-service="telegram"] #Main > div:first-child:not([id]):not(.Transition)::before,
+html[data-chathub-service="telegram"] #Main > div:first-child:not([id]):not(.Transition)::after {
+    opacity: 0 !important;
+    background-image: none !important;
+}

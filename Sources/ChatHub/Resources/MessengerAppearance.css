@@ -1,0 +1,291 @@
+/* Meta's semantic palette and ARIA structure.
+   Bubble theme and M5 card layout variables are also defined on inner containers. */
+html[data-chathub-service="messenger"],
+html[data-chathub-service="messenger"] :is(
+    body,
+    .__fb-light-mode,
+    .__fb-dark-mode,
+    [role="main"],
+    [role="navigation"],
+    .xz23t90,
+    [style*="--chat-"],
+    [style*="--mwp-"],
+    [style*="--messenger-"]
+) {
+    --font-family-apple: var(--hub-font) !important;
+    --font-family-default: var(--hub-font) !important;
+    --font-family-segoe: var(--hub-font) !important;
+    --font-family-system-fds: var(--hub-font) !important;
+    --body-font-family: var(--hub-font) !important;
+    --body-emphasized-font-family: var(--hub-font) !important;
+    --body-medium-font-family: var(--hub-font) !important;
+    --body-large-font-family: var(--hub-font) !important;
+    --primary-label-font-family: var(--hub-font) !important;
+    --primary-label-emphasized-font-family: var(--hub-font) !important;
+    --secondary-label-font-family: var(--hub-font) !important;
+    --secondary-label-emphasized-font-family: var(--hub-font) !important;
+    --meta-font-family: var(--hub-font) !important;
+    --meta-emphasized-font-family: var(--hub-font) !important;
+    --headline-large-font-family: var(--hub-font) !important;
+    --headline-medium-font-family: var(--hub-font) !important;
+    --headline-small-font-family: var(--hub-font) !important;
+    --headline1-font-family: var(--hub-font) !important;
+    --headline2-font-family: var(--hub-font) !important;
+    --headline3-font-family: var(--hub-font) !important;
+    --primary-text: var(--hub-text) !important;
+    --secondary-text: var(--hub-secondary) !important;
+    --placeholder-text: var(--hub-placeholder) !important;
+    --disabled-text: var(--hub-placeholder) !important;
+    --primary-icon: var(--hub-text) !important;
+    --secondary-icon: var(--hub-secondary) !important;
+    --accent: var(--hub-link) !important;
+    --blue-link: var(--hub-link) !important;
+    --primary-button-background: var(--hub-accent) !important;
+    --primary-button-text: var(--hub-accent-contrast) !important;
+    --primary-deemphasized-button-background: var(--hub-selected) !important;
+    --primary-deemphasized-button-text: var(--hub-link) !important;
+    --button-tonal-primary-background: var(--hub-selected) !important;
+    --button-tonal-primary-text: var(--hub-link) !important;
+    --secondary-button-background: var(--hub-raised) !important;
+    --secondary-button-text: var(--hub-text) !important;
+    --web-wash: var(--hub-canvas) !important;
+    --wash: var(--hub-raised) !important;
+    --ui-background: var(--hub-canvas) !important;
+    --background-deemphasized: var(--hub-raised) !important;
+    --background-emphasized: var(--hub-surface) !important;
+    --comment-background: var(--hub-raised) !important;
+    --card-background: var(--hub-surface) !important;
+    --card-background-flat: var(--hub-surface) !important;
+    --card-background-filled: var(--hub-raised) !important;
+    --card-background-over-page: var(--hub-surface) !important;
+    --surface-background: var(--hub-surface) !important;
+    --popover-background: var(--hub-surface) !important;
+    --nav-bar-background: var(--hub-surface) !important;
+    --messenger-card-background: var(--hub-surface) !important;
+    --messenger-reply-background: var(--hub-raised) !important;
+    --messenger-reply-background-hover: var(--hub-hover) !important;
+    --messenger-card-background-hover: var(--hub-hover) !important;
+    --messenger-selected-background: var(--hub-selected) !important;
+    --messenger-seen-background: var(--hub-secondary) !important;
+    --messenger-card-spacing: 0px !important;
+    --messenger-card-corner-radius: 0px !important;
+    --messenger-card-box-shadow: none !important;
+    --messenger-card-max-width: 100vw !important;
+    --messenger-application-max-width: 100vw !important;
+    --hosted-view-selected-state: var(--hub-selected) !important;
+    --x---hosted-view-selected-state: var(--hub-selected) !important;
+    --nav-list-selected: var(--hub-selected) !important;
+    --chip-background-selected: var(--hub-selected) !important;
+    --notification-badge: var(--hub-accent) !important;
+    --input-background: var(--hub-raised) !important;
+    --search-input-background: var(--hub-raised) !important;
+    --input-text: var(--hub-text) !important;
+    --input-border-color: transparent !important;
+    --divider: var(--hub-border) !important;
+    --border-color: var(--hub-border) !important;
+    --container-border: var(--hub-border) !important;
+    --hover-overlay: var(--hub-hover) !important;
+    --pressed-overlay: var(--hub-hover) !important;
+    --selected-overlay: var(--hub-selected) !important;
+    --list-cell-corner-radius: var(--hub-radius-row) !important;
+    --nav-list-cell-corner-radius: var(--hub-radius-row) !important;
+    --chat-incoming-message-bubble-background-color: var(--hub-raised) !important;
+    --chat-incoming-message-text-color: var(--hub-text) !important;
+    --chat-outgoing-message-bubble-background-color: var(--hub-outgoing) !important;
+    --chat-outgoing-message-text-color: var(--hub-text) !important;
+    --chat-message-text-color: var(--hub-text) !important;
+    --chat-replied-message-background-color: var(--hub-surface) !important;
+    --chat-quoted-incoming-message-bubble-color: var(--hub-surface) !important;
+    --chat-text-blockquote-color-background: var(--hub-selected) !important;
+    --chat-composer-input-background-color: var(--hub-raised) !important;
+    --chat-composer-caret-color: var(--hub-link) !important;
+    --chat-outgoing-message-background-gradient: none !important;
+    --chat-primary-button-background-color: var(--hub-accent) !important;
+    --mwp-header-background-color: var(--hub-surface) !important;
+    --mwp-header-button-color: var(--hub-link) !important;
+    --mwp-header-text-color: var(--hub-text) !important;
+    --mwp-subheader-text-color: var(--hub-secondary) !important;
+    --mwp-primary-theme-color: var(--hub-link) !important;
+    --mwp-message-row-background: var(--hub-canvas) !important;
+    --mwp-reply-background-color: var(--hub-raised) !important;
+    --reaction-pill-background-color: var(--hub-raised) !important;
+    --chat-composer-background-color: var(--hub-raised) !important;
+    --chat-composer-button-color: var(--hub-link) !important;
+    --chat-composer-text-color: var(--hub-text) !important;
+    --chat-thread-header-background-color: var(--hub-surface) !important;
+    --chat-thread-background-color: var(--hub-canvas) !important;
+    --chat-thread-background-image: none !important;
+    --chat-thread-background-gradient: none !important;
+    --chat-thread-scrollbar-thumb-color: var(--hub-secondary) !important;
+    --chat-incoming-message-bubble-border-radius: var(--hub-radius-bubble) !important;
+    --chat-outgoing-message-bubble-border-radius: var(--hub-radius-bubble) !important;
+    --chat-bubble-border-radius: var(--hub-radius-bubble) !important;
+}
+
+/* Flatten M5 floating card layout ("bubble" cards) into full-bleed split panes */
+html[data-chathub-service="messenger"] :is(.x13dmulc, .x1105k1t, .xkbglvu, .x166lnxr) {
+    margin-top: 0 !important;
+    margin-inline-start: 0 !important;
+    padding-inline-start: 0 !important;
+    padding-inline-end: 0 !important;
+}
+html[data-chathub-service="messenger"] :is(.x6zc37e, .xyjqprf, .x1tynv8c, .xgu6akr) {
+    border-start-start-radius: 0 !important;
+    border-start-end-radius: 0 !important;
+    border-end-end-radius: 0 !important;
+    border-end-start-radius: 0 !important;
+    border-radius: 0 !important;
+}
+html[data-chathub-service="messenger"] .x1qpj6lr {
+    box-shadow: none !important;
+}
+html[data-chathub-service="messenger"] [role="main"] .xcrg951 {
+    background-color: var(--hub-canvas) !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+}
+html[data-chathub-service="messenger"] [role="main"] :is(.xgyuaek, .x1ne3efk) {
+    flex: 1 1 0% !important;
+    max-width: none !important;
+}
+html[data-chathub-service="messenger"] [role="main"] .x1105k1t + .x1105k1t {
+    border-inline-start: 1px solid var(--hub-border) !important;
+    background-color: var(--hub-surface) !important;
+}
+
+/* Left conversation pane & search input:
+   Messenger wraps the search icon and <input role="searchbox"> inside a rounded <label>
+   already styled via --input-background. Keep the inner <input> transparent with its
+   native padding so the search icon and text never collide. */
+html[data-chathub-service="messenger"] :is([role="main"], [role="navigation"]) {
+    font-family: var(--hub-font) !important;
+    font-size: var(--hub-size-body) !important;
+    line-height: var(--hub-leading-snug) !important;
+    letter-spacing: var(--hub-tracking-normal) !important;
+    color: var(--hub-text) !important;
+}
+html[data-chathub-service="messenger"] [role="navigation"] {
+    background: var(--hub-surface) !important;
+    border-right: 1px solid var(--hub-border) !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+}
+html[data-chathub-service="messenger"] [role="navigation"] :is(h1, h2) {
+    font-family: var(--hub-font) !important;
+    font-size: var(--hub-size-header) !important;
+    font-weight: var(--hub-weight-semibold) !important;
+    line-height: var(--hub-leading-tight) !important;
+    letter-spacing: var(--hub-tracking-tight) !important;
+    color: var(--hub-text) !important;
+}
+html[data-chathub-service="messenger"] label:has(:is([role="searchbox"], input[type="search"])) {
+    background: var(--hub-raised) !important;
+    border-radius: var(--hub-radius-control) !important;
+    border: 1px solid transparent !important;
+    box-shadow: none !important;
+}
+html[data-chathub-service="messenger"] label:has(:is([role="searchbox"], input[type="search"])):focus-within {
+    border-color: var(--hub-link) !important;
+}
+html[data-chathub-service="messenger"] :is([role="searchbox"], input[type="search"]),
+html[data-chathub-service="messenger"] :is([role="searchbox"], input[type="search"]):is(:focus, :focus-visible) {
+    background: transparent !important;
+    color: var(--hub-text) !important;
+    font-family: var(--hub-font) !important;
+    font-size: var(--hub-size-body) !important;
+    font-weight: var(--hub-weight-regular) !important;
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+/* Conversation rows: preserve Messenger's internal row padding while unifying selection & radius */
+html[data-chathub-service="messenger"] :is([role="row"], [role="row"] [role="link"]) {
+    border-radius: 0 !important;
+    transition: background-color 140ms ease-out;
+}
+html[data-chathub-service="messenger"] :is([aria-current="page"], [aria-selected="true"][role="row"]) {
+    background-color: var(--hub-selected) !important;
+    box-shadow: none !important;
+    border-left: none !important;
+}
+
+/* Thread header & message stream */
+html[data-chathub-service="messenger"] [role="main"] {
+    background-color: var(--hub-canvas) !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+}
+html[data-chathub-service="messenger"] [role="main"] :is(h1, h2) {
+    font-family: var(--hub-font) !important;
+    font-size: var(--hub-size-header) !important;
+    font-weight: var(--hub-weight-semibold) !important;
+    line-height: var(--hub-leading-tight) !important;
+    letter-spacing: var(--hub-tracking-tight) !important;
+    color: var(--hub-text) !important;
+}
+html[data-chathub-service="messenger"] [role="main"] [role="grid"] [dir="auto"] {
+    font-family: var(--hub-font) !important;
+    font-size: var(--hub-size-message) !important;
+    font-weight: var(--hub-weight-regular) !important;
+    line-height: var(--hub-leading-message) !important;
+    letter-spacing: var(--hub-tracking-normal) !important;
+}
+html[data-chathub-service="messenger"] [role="main"] :is(time, abbr, h4) {
+    font-size: var(--hub-size-meta) !important;
+    font-weight: var(--hub-weight-medium) !important;
+    font-variant-numeric: tabular-nums !important;
+    color: var(--hub-secondary) !important;
+}
+
+/* Preserve rich editor semantics and handlers, remove the browser focus box. */
+html[data-chathub-service="messenger"] [role="main"] [contenteditable="true"] {
+    background: transparent !important;
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    color: var(--hub-text) !important;
+    font-family: var(--hub-font) !important;
+    font-size: var(--hub-size-message) !important;
+    font-weight: var(--hub-weight-regular) !important;
+    line-height: var(--hub-leading-message) !important;
+    letter-spacing: var(--hub-tracking-normal) !important;
+}
+html[data-chathub-service="messenger"] [role="main"] [role="textbox"]:focus-visible { outline: none !important; }
+
+/* Focused mode: reclaim Facebook's 56px top banner and redundant left switcher rail
+   purely via Comet's CSS variables and landmark attributes (zero subtree :has() cost). */
+html[data-chathub-service="messenger"][data-chathub-focus="true"],
+html[data-chathub-service="messenger"][data-chathub-focus="true"] :is(
+    body,
+    .xz23t90,
+    [style*="--x---header-height"],
+    [role="main"],
+    [role="navigation"]
+) {
+    --header-height: 0px !important;
+    --x---header-height: 0px !important;
+    --messenger-sidebar-collapsed-width: 0px !important;
+}
+html[data-chathub-service="messenger"][data-chathub-focus="true"] :is([role="banner"], [role="navigation"]:has(+ [role="navigation"])) {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    min-height: 0 !important;
+}
+html[data-chathub-service="messenger"][data-chathub-focus="true"] :is(.x1bc3s5a, .x85a59c, .x1og2svy, .xtp0wl1) {
+    height: 100vh !important;
+    min-height: 100vh !important;
+    max-height: 100vh !important;
+}
+@media (min-width: 900px) {
+    html[data-chathub-service="messenger"] [role="navigation"]:not(:has(+ [role="navigation"])) {
+        flex: 0 0 var(--hub-list-width) !important;
+        width: var(--hub-list-width) !important;
+        min-width: var(--hub-list-width) !important;
+        max-width: var(--hub-list-width) !important;
+    }
+}
+html[data-chathub-service="messenger"] [role="main"] [style*="--chat-composer-button-color"] {
+    background-image: none !important;
+}

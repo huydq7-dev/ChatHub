@@ -1,0 +1,43 @@
+name: ChatHub
+options:
+  bundleIdPrefix: app.chathub
+  deploymentTarget:
+    macOS: "14.0"
+  developmentLanguage: en
+  createIntermediateGroups: true
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    SWIFT_STRICT_CONCURRENCY: complete
+    MACOSX_DEPLOYMENT_TARGET: "14.0"
+    CODE_SIGN_IDENTITY: "-"
+    CODE_SIGN_STYLE: Manual
+    DEVELOPMENT_TEAM: ""
+    ENABLE_HARDENED_RUNTIME: YES
+    MARKETING_VERSION: "0.2.0"
+    CURRENT_PROJECT_VERSION: "2"
+    CLANG_ENABLE_CODE_COVERAGE: NO
+targets:
+  ChatHub:
+    type: application
+    platform: macOS
+    sources:
+      - path: Sources/ChatHub
+        excludes: [Resources]
+      - path: Sources/ChatHubCore
+      - path: Sources/ChatHub/Resources
+        buildPhase: resources
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: app.chathub.mac
+        PRODUCT_NAME: ChatHub
+        GENERATE_INFOPLIST_FILE: NO
+        INFOPLIST_FILE: Config/Info.plist
+        CODE_SIGN_ENTITLEMENTS: Config/ChatHub.entitlements
+      configs:
+        Release:
+          CODE_SIGN_INJECT_BASE_ENTITLEMENTS: NO
+    scheme:
+      gatherCoverageData: false
+      environmentVariables:
+        OS_ACTIVITY_MODE: default

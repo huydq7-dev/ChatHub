@@ -1,0 +1,312 @@
+/* Scoped to the authenticated chat shell. Keep original editors, attachments,
+   event handlers and icon fonts; layout changes are reversible with Service Tools. */
+html[data-chathub-theme],
+html[data-chathub-theme] body,
+html[data-chathub-theme] .light,
+html[data-chathub-theme] .dark {
+    --surface-background: var(--hub-canvas) !important;
+    --surface-background-subtle: var(--hub-canvas) !important;
+    --surface-alt: var(--hub-surface) !important;
+    --surface-background-overlay: var(--hub-raised) !important;
+    --surface-brand: var(--hub-accent) !important;
+    --layer-background: var(--hub-surface) !important;
+    --layer-background-subtle: var(--hub-raised) !important;
+    --layer-background-hover: var(--hub-hover) !important;
+    --layer-background-selected: var(--hub-selected) !important;
+    --layer-background-disabled: var(--hub-raised) !important;
+    --layer-background-CSC: var(--hub-canvas) !important;
+    --layer-background-leftmenu: var(--hub-rail) !important;
+    --layer-background-leftmenu-hover: var(--hub-hover) !important;
+    --layer-background-leftmenu-selected: var(--hub-selected) !important;
+    --layer-background-navbar-normal: var(--hub-rail) !important;
+    --layer-background-navbar-hover: var(--hub-hover) !important;
+    --layer-background-navbar-selected: var(--hub-selected) !important;
+    --layer-background-navbar-sublevel: var(--hub-surface) !important;
+    --layer-background-navbar-sublevel-normal: var(--hub-surface) !important;
+    --layer-background-navbar-sublevel-hover: var(--hub-hover) !important;
+    --layer-background-navbar-sublevel-selected: var(--hub-selected) !important;
+    --text-primary: var(--hub-text) !important;
+    --text-secondary: var(--hub-secondary) !important;
+    --text-placeholder: var(--hub-placeholder) !important;
+    --text-navbar-sublevel-normal: var(--hub-text) !important;
+    --text-navbar-sublevel-selected: var(--hub-text) !important;
+    --text-information: var(--hub-link) !important;
+    --text-mention: var(--hub-link) !important;
+    --text-brand: var(--hub-link) !important;
+    --icon-primary: var(--hub-text) !important;
+    --icon-secondary: var(--hub-secondary) !important;
+    --icon-navbar-normal: var(--hub-secondary) !important;
+    --icon-navbar-sublevel-normal: var(--hub-secondary) !important;
+    --icon-navbar-sublevel-selected: var(--hub-link) !important;
+    --icon-information: var(--hub-link) !important;
+    --icon-brand: var(--hub-link) !important;
+    --border: var(--hub-border) !important;
+    --border-bold: var(--hub-border) !important;
+    --border-subtle: var(--hub-border) !important;
+    --border-brand: var(--hub-link) !important;
+    --border-focused: var(--hub-link) !important;
+    --divider: var(--hub-border) !important;
+    --divider-bold: var(--hub-border) !important;
+    --divider-subtle: var(--hub-border) !important;
+    --input-field-bg-filled: var(--hub-raised) !important;
+    --input-field-bg-filled-hover: var(--hub-hover) !important;
+    --input-field-bg-outline: var(--hub-surface) !important;
+    --white-message: var(--hub-raised) !important;
+    --white-message-selected: var(--hub-selected) !important;
+    --white-quote: var(--hub-surface) !important;
+    --blue-message: var(--hub-outgoing) !important;
+    --blue-message-selected: var(--hub-selected) !important;
+    --blue-quote: var(--hub-selected) !important;
+    --text-quote: var(--hub-secondary) !important;
+    --shadow-bubble: var(--hub-shadow-card) !important;
+    --reaction-background: var(--hub-raised) !important;
+    --floating-menu: var(--hub-raised) !important;
+    --partial-quote-floating: var(--hub-raised) !important;
+    --bg-message-info: var(--hub-surface) !important;
+    --N90: var(--hub-secondary) !important;
+    --BA50: var(--hub-secondary) !important;
+    --button-primary-normal: var(--hub-accent) !important;
+    --button-primary-hover: var(--hub-accent-hover) !important;
+    --button-primary-pressed: var(--hub-accent-pressed) !important;
+    --button-primary-tonal-normal: var(--hub-selected) !important;
+    --button-primary-tonal-text: var(--hub-link) !important;
+    --button-secondary-neutral-normal: var(--hub-raised) !important;
+    --button-secondary-neutral-text: var(--hub-text) !important;
+    --button-tertiary-neutral-text: var(--hub-secondary) !important;
+    --button-tertiary-neutral-hover: var(--hub-hover) !important;
+    --button-tertiary-primary-text: var(--hub-link) !important;
+    --button-tertiary-primary-hover: var(--hub-hover) !important;
+}
+
+html[data-chathub-theme] body {
+    --nav-width: var(--hub-list-width);
+    font-family: var(--hub-font) !important;
+    font-size: var(--hub-size-body) !important;
+    line-height: var(--hub-leading-snug) !important;
+    letter-spacing: var(--hub-tracking-normal) !important;
+    text-shadow: none !important;
+    color: var(--hub-text);
+    background: var(--hub-canvas);
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Left conversation pane & search header:
+   Preserve Zalo's native #contact-search & #contact-search-input padding so the
+   magnifying glass icon never collides with placeholder text and the filter bar
+   ("Tất cả / Chưa đọc") never overlaps the first virtualized conversation row. */
+html[data-chathub-theme] #sidebarNav {
+    background: var(--hub-surface) !important;
+    border-right: 1px solid var(--hub-border) !important;
+}
+html[data-chathub-theme] #contact-search {
+    background: var(--hub-surface) !important;
+}
+html[data-chathub-theme] .group-search {
+    background: transparent !important;
+    border: none !important;
+}
+html[data-chathub-theme] #contact-search-input {
+    border-radius: var(--hub-radius-control) !important;
+    background: var(--hub-raised) !important;
+    border: 1px solid transparent !important;
+    font-family: var(--hub-font) !important;
+    font-size: var(--hub-size-body) !important;
+    font-weight: var(--hub-weight-regular) !important;
+    color: var(--hub-text) !important;
+    box-shadow: none !important;
+}
+html[data-chathub-theme] #contact-search-input:focus {
+    border-color: var(--hub-link) !important;
+    outline: none !important;
+}
+html[data-chathub-theme] :is(.tab-indicator, .msg-filters-bar .tab-indicator, [class*="tab-indicator"]) {
+    background-color: var(--hub-link) !important;
+    border-color: var(--hub-link) !important;
+}
+html[data-chathub-theme] .msg-filters-bar .selected {
+    color: var(--hub-link) !important;
+    border-bottom-color: var(--hub-link) !important;
+}
+
+/* Conversation rows: preserve virtualized row padding/height while unifying selection & typography */
+html[data-chathub-theme] .conv-item {
+    border-radius: 0 !important;
+    transition: background-color 140ms ease-out;
+}
+html[data-chathub-theme] .conv-item:hover {
+    background-color: var(--hub-hover) !important;
+}
+html[data-chathub-theme] .conv-item:is(.selected, .active, [aria-selected="true"]) {
+    background-color: var(--hub-selected) !important;
+    box-shadow: none !important;
+    border-left: none !important;
+}
+html[data-chathub-theme] :is(.conv-item-title__name, .conv-item-title .truncate, .msg-item .conv-item-title__name) {
+    font-size: var(--hub-size-row-title) !important;
+    font-weight: var(--hub-weight-semibold) !important;
+    line-height: var(--hub-leading-tight) !important;
+    letter-spacing: var(--hub-tracking-tight) !important;
+    color: var(--hub-text) !important;
+}
+html[data-chathub-theme] :is(.conv-message, .conv-item-body__main, .conv-dbname, .conv-item-body .truncate) {
+    font-size: var(--hub-size-row-snippet) !important;
+    font-weight: var(--hub-weight-regular) !important;
+    line-height: var(--hub-leading-snug) !important;
+    color: var(--hub-secondary) !important;
+}
+html[data-chathub-theme] :is(.conv-item-title__more, .conv-time, .conv-item-title__time) {
+    font-size: var(--hub-size-meta) !important;
+    font-weight: var(--hub-weight-medium) !important;
+    font-variant-numeric: tabular-nums !important;
+    color: var(--hub-secondary) !important;
+}
+html[data-chathub-theme] :is(.conv-unread, .z-noti-badge, .conv-action__unread .z-noti-badge) {
+    background: var(--hub-accent) !important;
+    color: var(--hub-accent-contrast) !important;
+    border-radius: var(--hub-radius-pill) !important;
+    font-size: var(--hub-size-meta) !important;
+    font-weight: var(--hub-weight-semibold) !important;
+    font-variant-numeric: tabular-nums !important;
+}
+
+/* Conversation header bar */
+html[data-chathub-theme] :is(#header, .thread-chat-header, .chat-header) {
+    background: var(--hub-surface) !important;
+    border-bottom: 1px solid var(--hub-border) !important;
+    box-shadow: none !important;
+}
+html[data-chathub-theme] .header-title {
+    font-size: var(--hub-size-header) !important;
+    font-weight: var(--hub-weight-semibold) !important;
+    line-height: var(--hub-leading-tight) !important;
+    letter-spacing: var(--hub-tracking-tight) !important;
+    color: var(--hub-text) !important;
+}
+html[data-chathub-theme] :is(.header-subtitle, .header-info__subtitle, .chat-header-subtitle) {
+    font-size: var(--hub-size-caption) !important;
+    font-weight: var(--hub-weight-regular) !important;
+    color: var(--hub-secondary) !important;
+}
+
+/* Message stream & bubbles */
+html[data-chathub-theme] .chat-content .card {
+    border-radius: var(--hub-radius-bubble) !important;
+    padding: var(--hub-bubble-pad-y) var(--hub-bubble-pad-x) !important;
+    border: 1px solid var(--hub-bubble-border) !important;
+    box-shadow: var(--hub-shadow-card) !important;
+    font-size: var(--hub-size-message) !important;
+    font-weight: var(--hub-weight-regular) !important;
+    line-height: var(--hub-leading-message) !important;
+    letter-spacing: var(--hub-tracking-normal) !important;
+}
+html[data-chathub-theme] .chat-content .card :is(.text, .card--text) {
+    font-size: var(--hub-size-message) !important;
+    font-weight: var(--hub-weight-regular) !important;
+    line-height: var(--hub-leading-message) !important;
+    letter-spacing: var(--hub-tracking-normal) !important;
+    color: var(--hub-text) !important;
+}
+html[data-chathub-theme] :is(.quote-banner, .card-quote) {
+    border-radius: var(--hub-radius-control) !important;
+    border-left: 3px solid var(--hub-link) !important;
+    background: var(--hub-surface) !important;
+    padding: 6px 10px !important;
+    font-size: var(--hub-size-caption) !important;
+}
+html[data-chathub-theme] :is(.card-send-time, .card-send-time__sendTime, .card-send-status, .message-time) {
+    font-size: var(--hub-size-meta) !important;
+    font-weight: var(--hub-weight-medium) !important;
+    font-variant-numeric: tabular-nums !important;
+    color: var(--hub-secondary) !important;
+}
+html[data-chathub-theme] :is(.MSABtn-btn, .msg-reaction-icon, .reacts-list, .reaction-emoji-list, .chat-message__actions) {
+    background-color: var(--hub-raised) !important;
+    border-color: var(--hub-border) !important;
+    color: var(--hub-secondary) !important;
+    box-shadow: var(--hub-shadow-card) !important;
+}
+html[data-chathub-theme] :is(.MSABtn-btn:hover, .msg-reaction-icon:hover) {
+    background-color: var(--hub-surface) !important;
+    color: var(--hub-text) !important;
+}
+html[data-chathub-theme] :is(.chat-date, .chat-date::before, .chat-date::after, .chat-date > span::before, .chat-date > span::after) {
+    border: none !important;
+    box-shadow: none !important;
+    background-image: none !important;
+}
+html[data-chathub-theme] .chat-date > span {
+    display: inline-block !important;
+    border-radius: var(--hub-radius-pill) !important;
+    padding: 4px 12px !important;
+    background: var(--hub-surface) !important;
+    border: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+    color: var(--hub-secondary) !important;
+    font-size: var(--hub-size-meta) !important;
+    font-weight: var(--hub-weight-medium) !important;
+    font-variant-numeric: tabular-nums !important;
+}
+
+/* Unified floating composer */
+html[data-chathub-theme] .chat-box-input-container {
+    margin: 10px var(--hub-composer-margin-x) var(--hub-composer-margin-bottom) !important;
+    border-radius: var(--hub-radius-composer) !important;
+    background: var(--hub-raised) !important;
+    border: 1px solid var(--hub-border) !important;
+    box-shadow: var(--hub-shadow-composer) !important;
+}
+html[data-chathub-theme] :is(.chat-box-input, .chat-box-input__content, .chat-box-input__tools, .chat-box-bar, #ztoolbar.chat-input-v2) {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+html[data-chathub-theme] .chat-input-container {
+    padding: var(--hub-composer-pad-y) var(--hub-composer-pad-x) !important;
+}
+html[data-chathub-theme] .chat-box-input-container :is([contenteditable="true"], textarea, .input-v4),
+html[data-chathub-theme] .chat-box-input-container :is([contenteditable="true"], textarea, .input-v4):is(:focus, :focus-visible) {
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    font-family: var(--hub-font) !important;
+    font-size: var(--hub-size-message) !important;
+    font-weight: var(--hub-weight-regular) !important;
+    line-height: var(--hub-leading-message) !important;
+    letter-spacing: var(--hub-tracking-normal) !important;
+    color: var(--hub-text) !important;
+    caret-color: var(--hub-link);
+}
+/* Preserve visible keyboard focus outside the composer, including search and menus. */
+html[data-chathub-theme] :is(input, button, [role="button"]):focus-visible {
+    outline: 2px solid var(--hub-link);
+    outline-offset: 2px;
+}
+
+/* ChatHub already owns the account rail. Keep the service rail available on demand.
+   Width tracks the provider's own --nav-width so fixed and virtualized panes agree. */
+html[data-chathub-focus="true"] body { --nav-width: var(--hub-list-width); }
+html[data-chathub-focus="true"] #main-tab { display: none !important; }
+html[data-chathub-focus="true"] #sidebarNav:not(.compact-mode) { width: var(--nav-width); }
+html[data-chathub-focus="true"] .conv-list-semi-compact { min-width: var(--nav-width); }
+html[data-chathub-focus="true"] #sidebarNav.compact-mode.show-chat { width: 0; }
+html[data-chathub-focus="true"] .conv-list-compact { min-width: 100vw; }
+
+/* Component identities verified in the provider's public UI bundle (2026-10-26).
+   Hide only named secondary actions. Photo/file/sticker/send and More are intact;
+   unrecognized controls stay visible. Rich-text controls keep their own layout. */
+html[data-chathub-focus="true"] #chat-box-bar-id .chat-box-toolbar-item:has(
+    .screen-capture-button,
+    .screen-capture-options-button,
+    [data-id="div_CT_Menu"],
+    [data-id="div_RTF_Menu"],
+    [data-id="div_IMPT_Menu"],
+    [data-id="div_Tsk_Menu"],
+    [data-id="div_RMD_Menu"]
+) { display: none !important; }
+
+@media (prefers-reduced-motion: reduce) {
+    html[data-chathub-theme] .conv-item { transition-duration: 0s; }
+}
+html[data-chathub-reduce-motion="true"] .conv-item { transition-duration: 0s; }

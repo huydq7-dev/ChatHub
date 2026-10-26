@@ -1,0 +1,526 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0921D305FEC399B0D78D15FF /* Design.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CF831FCF5A5F165258861A8 /* Design.swift */; };
+		1154283E44FB7DE6729E4311 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = B95DC1BEDD2E1858E6EDCCAB /* Localizable.strings */; };
+		247AF29D141208C8D47DC150 /* TelegramAppearance.css in Resources */ = {isa = PBXBuildFile; fileRef = 3D819505BBB842178CE2B809 /* TelegramAppearance.css */; };
+		32F76B7F5355F9A6BA10F945 /* BrowserPool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB65ECBABE4AE20647C690AB /* BrowserPool.swift */; };
+		41F0FAAE2482EF4B2F9CCA78 /* WorkspaceStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D8604B5158582591AEF800A /* WorkspaceStore.swift */; };
+		4620D657B1FB199B7B5934F8 /* OverviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE203BD69534DF61DC8D6D9E /* OverviewView.swift */; };
+		4D2D429B7AB2FB658047F652 /* NavigationPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9ABC46808A44AC5DD7DCF0F9 /* NavigationPolicy.swift */; };
+		6890E5BB682EBB02E6D5DE3B /* WebAppearance.js in Resources */ = {isa = PBXBuildFile; fileRef = E989AF73A4455FE75013B5B8 /* WebAppearance.js */; };
+		7C2AB98A9FC87D0144260EE2 /* BrowserSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = A391E86918F2857937E05619 /* BrowserSession.swift */; };
+		7FBC79616E8A0AFEB932B80F /* WorkspaceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60A07362E7D58CCD1323E9D9 /* WorkspaceView.swift */; };
+		8A31A424C8179B7F51732C43 /* BrowserAppearance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F328BB0DC986FC8F983B730 /* BrowserAppearance.swift */; };
+		8AAEAF6492079798DA770668 /* ChatAccount.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15169739DF0C2C21D57C70D3 /* ChatAccount.swift */; };
+		93C54A72EF89145A2CEE1851 /* AccountSwitcherView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F4EA6D3D42CDCA5EB2557B4 /* AccountSwitcherView.swift */; };
+		96AFDF5F0BA34BC90D066FF5 /* ServiceTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 366D91B9B2E4D0E361316A75 /* ServiceTheme.swift */; };
+		9C3A4B79F9335AD3A563C3F5 /* ChatAppearancePreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5833F64E417C41E6F05A14D2 /* ChatAppearancePreferences.swift */; };
+		9C78655E5AD98B76F6299E8B /* ZaloAppearance.css in Resources */ = {isa = PBXBuildFile; fileRef = BEA4CBF97662091D4D2EBF60 /* ZaloAppearance.css */; };
+		A7EA45FF2FAEAF154AACBA15 /* ChatAppearance.css in Resources */ = {isa = PBXBuildFile; fileRef = 0734362CE88AA8C35EA71522 /* ChatAppearance.css */; };
+		AA272F37132FB9654D992D6E /* WorkspaceLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB948D8B94B7532D510EF71 /* WorkspaceLayout.swift */; };
+		ACDB888DE6D8D0D56B73CE38 /* DownloadHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EC590C4FF0299A0DDF806B7 /* DownloadHandler.swift */; };
+		B0C3FE636975DE9AAFF621E3 /* AccountEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71927B67C507CE8C5AA78962 /* AccountEditor.swift */; };
+		B229BE17A704DA7F9592D1D3 /* MessengerAppearance.css in Resources */ = {isa = PBXBuildFile; fileRef = 589B05AD08C3EC85A10E0980 /* MessengerAppearance.css */; };
+		B348C093640F53BC1B458172 /* BrowserPopup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A0A0D1E90F5F584C48EE122 /* BrowserPopup.swift */; };
+		B38A41E81859E5DBB7AA2AC9 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C092968BE13F142C081C83A6 /* SettingsView.swift */; };
+		B4A1B8DF17FA28DBC20D1079 /* DownloadedFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15FBFE37C64805E9143E2475 /* DownloadedFile.swift */; };
+		B715F57DC4F25FB3DCCD3591 /* AppIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = BFEE3FA6C106B30B70D11F31 /* AppIcon.icns */; };
+		C1A010010000000000000001 /* icon-telegram.png in Resources */ = {isa = PBXBuildFile; fileRef = D1A010010000000000000001 /* icon-telegram.png */; };
+		C1A010020000000000000002 /* icon-zalo.png in Resources */ = {isa = PBXBuildFile; fileRef = D1A010020000000000000002 /* icon-zalo.png */; };
+		C1A010030000000000000003 /* icon-messenger.png in Resources */ = {isa = PBXBuildFile; fileRef = D1A010030000000000000003 /* icon-messenger.png */; };
+		C1A010040000000000000004 /* icon-whatsapp.png in Resources */ = {isa = PBXBuildFile; fileRef = D1A010040000000000000004 /* icon-whatsapp.png */; };
+		C1A010050000000000000005 /* icon-discord.png in Resources */ = {isa = PBXBuildFile; fileRef = D1A010050000000000000005 /* icon-discord.png */; };
+		B8AF4F75BCE3D3E12A2CAA0A /* WorkspaceToolbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75C8DEA79ECADB4AC53A77A5 /* WorkspaceToolbar.swift */; };
+		B8D05B97932C5E2BFDA931D6 /* ChatHubApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35CA23D250648B876EDAAD9B /* ChatHubApp.swift */; };
+		B9CE5C566E9B3D4DC93E8F2F /* WorkspaceRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FB35DB69AB7EF45CD225AFD /* WorkspaceRepository.swift */; };
+		C06D2C0DCF813870D776F050 /* ConversationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C9E590D59CAAB599A4646ED /* ConversationView.swift */; };
+		C66BACB7AE7F2BA76AC35F0A /* Localization.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABD75900051EC04AC08F52F4 /* Localization.swift */; };
+		DC27F22385552FBF18C9138E /* SidebarPositionRestorer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5625241992CE58C736AE5B1 /* SidebarPositionRestorer.swift */; };
+		FA1120536E882DF15D7B2BDA /* WebNavigationFailure.swift in Sources */ = {isa = PBXBuildFile; fileRef = B89326CF898775FEDD83BD63 /* WebNavigationFailure.swift */; };
+		FF2D3F88B6EEC4A48DC7B203 /* ServiceWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4140B9BD02BCD1A826FA1ED4 /* ServiceWebView.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		0734362CE88AA8C35EA71522 /* ChatAppearance.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = ChatAppearance.css; sourceTree = "<group>"; };
+		0A0A0D1E90F5F584C48EE122 /* BrowserPopup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserPopup.swift; sourceTree = "<group>"; };
+		15169739DF0C2C21D57C70D3 /* ChatAccount.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatAccount.swift; sourceTree = "<group>"; };
+		15FBFE37C64805E9143E2475 /* DownloadedFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadedFile.swift; sourceTree = "<group>"; };
+		1A976FE272AF1BE0CEDB9565 /* ChatHub.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ChatHub.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		2CF831FCF5A5F165258861A8 /* Design.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Design.swift; sourceTree = "<group>"; };
+		2EC590C4FF0299A0DDF806B7 /* DownloadHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadHandler.swift; sourceTree = "<group>"; };
+		2F328BB0DC986FC8F983B730 /* BrowserAppearance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserAppearance.swift; sourceTree = "<group>"; };
+		35CA23D250648B876EDAAD9B /* ChatHubApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatHubApp.swift; sourceTree = "<group>"; };
+		366D91B9B2E4D0E361316A75 /* ServiceTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceTheme.swift; sourceTree = "<group>"; };
+		3C4D1E654169E063E4C3B784 /* vi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = vi; path = vi.lproj/Localizable.strings; sourceTree = "<group>"; };
+		3D819505BBB842178CE2B809 /* TelegramAppearance.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = TelegramAppearance.css; sourceTree = "<group>"; };
+		4140B9BD02BCD1A826FA1ED4 /* ServiceWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceWebView.swift; sourceTree = "<group>"; };
+		4D8604B5158582591AEF800A /* WorkspaceStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceStore.swift; sourceTree = "<group>"; };
+		5833F64E417C41E6F05A14D2 /* ChatAppearancePreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatAppearancePreferences.swift; sourceTree = "<group>"; };
+		589B05AD08C3EC85A10E0980 /* MessengerAppearance.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = MessengerAppearance.css; sourceTree = "<group>"; };
+		5F4EA6D3D42CDCA5EB2557B4 /* AccountSwitcherView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountSwitcherView.swift; sourceTree = "<group>"; };
+		60A07362E7D58CCD1323E9D9 /* WorkspaceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceView.swift; sourceTree = "<group>"; };
+		60EC718AFEB186FBBAD2327B /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		6FB35DB69AB7EF45CD225AFD /* WorkspaceRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceRepository.swift; sourceTree = "<group>"; };
+		71927B67C507CE8C5AA78962 /* AccountEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountEditor.swift; sourceTree = "<group>"; };
+		75C8DEA79ECADB4AC53A77A5 /* WorkspaceToolbar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceToolbar.swift; sourceTree = "<group>"; };
+		9ABC46808A44AC5DD7DCF0F9 /* NavigationPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationPolicy.swift; sourceTree = "<group>"; };
+		9C9E590D59CAAB599A4646ED /* ConversationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationView.swift; sourceTree = "<group>"; };
+		9FB948D8B94B7532D510EF71 /* WorkspaceLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceLayout.swift; sourceTree = "<group>"; };
+		A391E86918F2857937E05619 /* BrowserSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserSession.swift; sourceTree = "<group>"; };
+		A5625241992CE58C736AE5B1 /* SidebarPositionRestorer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidebarPositionRestorer.swift; sourceTree = "<group>"; };
+		ABD75900051EC04AC08F52F4 /* Localization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Localization.swift; sourceTree = "<group>"; };
+		B89326CF898775FEDD83BD63 /* WebNavigationFailure.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebNavigationFailure.swift; sourceTree = "<group>"; };
+		BEA4CBF97662091D4D2EBF60 /* ZaloAppearance.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = ZaloAppearance.css; sourceTree = "<group>"; };
+		BFEE3FA6C106B30B70D11F31 /* AppIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = AppIcon.icns; sourceTree = "<group>"; };
+		D1A010010000000000000001 /* icon-telegram.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "icon-telegram.png"; sourceTree = "<group>"; };
+		D1A010020000000000000002 /* icon-zalo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "icon-zalo.png"; sourceTree = "<group>"; };
+		D1A010030000000000000003 /* icon-messenger.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "icon-messenger.png"; sourceTree = "<group>"; };
+		D1A010040000000000000004 /* icon-whatsapp.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "icon-whatsapp.png"; sourceTree = "<group>"; };
+		D1A010050000000000000005 /* icon-discord.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "icon-discord.png"; sourceTree = "<group>"; };
+		C092968BE13F142C081C83A6 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		DB65ECBABE4AE20647C690AB /* BrowserPool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserPool.swift; sourceTree = "<group>"; };
+		E989AF73A4455FE75013B5B8 /* WebAppearance.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = WebAppearance.js; sourceTree = "<group>"; };
+		FE203BD69534DF61DC8D6D9E /* OverviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverviewView.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		4B93387737B5F71E98FD3926 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				1A976FE272AF1BE0CEDB9565 /* ChatHub.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		88B96A3153315257E97A0117 /* ChatHubCore */ = {
+			isa = PBXGroup;
+			children = (
+				2F328BB0DC986FC8F983B730 /* BrowserAppearance.swift */,
+				15169739DF0C2C21D57C70D3 /* ChatAccount.swift */,
+				15FBFE37C64805E9143E2475 /* DownloadedFile.swift */,
+				9ABC46808A44AC5DD7DCF0F9 /* NavigationPolicy.swift */,
+				B89326CF898775FEDD83BD63 /* WebNavigationFailure.swift */,
+				6FB35DB69AB7EF45CD225AFD /* WorkspaceRepository.swift */,
+			);
+			path = ChatHubCore;
+			sourceTree = "<group>";
+		};
+		A1D2A16715F1E2618F37C9F0 /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				D0A5AA090F4DAEC2899AFB0D /* ChatHub */,
+				88B96A3153315257E97A0117 /* ChatHubCore */,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
+		AE0E1EF626A68BAD2E0CF1C2 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				71927B67C507CE8C5AA78962 /* AccountEditor.swift */,
+				5F4EA6D3D42CDCA5EB2557B4 /* AccountSwitcherView.swift */,
+				9C9E590D59CAAB599A4646ED /* ConversationView.swift */,
+				2CF831FCF5A5F165258861A8 /* Design.swift */,
+				FE203BD69534DF61DC8D6D9E /* OverviewView.swift */,
+				C092968BE13F142C081C83A6 /* SettingsView.swift */,
+				A5625241992CE58C736AE5B1 /* SidebarPositionRestorer.swift */,
+				75C8DEA79ECADB4AC53A77A5 /* WorkspaceToolbar.swift */,
+				60A07362E7D58CCD1323E9D9 /* WorkspaceView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		B3C9E932AF36982A9ED1A68A /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				BFEE3FA6C106B30B70D11F31 /* AppIcon.icns */,
+				D1A010010000000000000001 /* icon-telegram.png */,
+				D1A010020000000000000002 /* icon-zalo.png */,
+				D1A010030000000000000003 /* icon-messenger.png */,
+				D1A010040000000000000004 /* icon-whatsapp.png */,
+				D1A010050000000000000005 /* icon-discord.png */,
+				0734362CE88AA8C35EA71522 /* ChatAppearance.css */,
+				589B05AD08C3EC85A10E0980 /* MessengerAppearance.css */,
+				3D819505BBB842178CE2B809 /* TelegramAppearance.css */,
+				E989AF73A4455FE75013B5B8 /* WebAppearance.js */,
+				BEA4CBF97662091D4D2EBF60 /* ZaloAppearance.css */,
+				B95DC1BEDD2E1858E6EDCCAB /* Localizable.strings */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		C0447BCF8C025B206D915D78 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				5833F64E417C41E6F05A14D2 /* ChatAppearancePreferences.swift */,
+				35CA23D250648B876EDAAD9B /* ChatHubApp.swift */,
+				ABD75900051EC04AC08F52F4 /* Localization.swift */,
+				9FB948D8B94B7532D510EF71 /* WorkspaceLayout.swift */,
+				4D8604B5158582591AEF800A /* WorkspaceStore.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		CA5AE88EFCB4249C50BBA853 /* Browser */ = {
+			isa = PBXGroup;
+			children = (
+				DB65ECBABE4AE20647C690AB /* BrowserPool.swift */,
+				0A0A0D1E90F5F584C48EE122 /* BrowserPopup.swift */,
+				A391E86918F2857937E05619 /* BrowserSession.swift */,
+				2EC590C4FF0299A0DDF806B7 /* DownloadHandler.swift */,
+				366D91B9B2E4D0E361316A75 /* ServiceTheme.swift */,
+				4140B9BD02BCD1A826FA1ED4 /* ServiceWebView.swift */,
+			);
+			path = Browser;
+			sourceTree = "<group>";
+		};
+		CC83226C2F4E347F0FF3F0C8 = {
+			isa = PBXGroup;
+			children = (
+				A1D2A16715F1E2618F37C9F0 /* Sources */,
+				4B93387737B5F71E98FD3926 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		D0A5AA090F4DAEC2899AFB0D /* ChatHub */ = {
+			isa = PBXGroup;
+			children = (
+				C0447BCF8C025B206D915D78 /* App */,
+				CA5AE88EFCB4249C50BBA853 /* Browser */,
+				B3C9E932AF36982A9ED1A68A /* Resources */,
+				AE0E1EF626A68BAD2E0CF1C2 /* Views */,
+			);
+			path = ChatHub;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		DAEC54ABCA97BFCD191442B6 /* ChatHub */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3E12192C4035632E26082E5D /* Build configuration list for PBXNativeTarget "ChatHub" */;
+			buildPhases = (
+				58D0963C7DD3D21D0D31B418 /* Sources */,
+				2A2BA62FE75047AF463DF0BD /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ChatHub;
+			packageProductDependencies = (
+			);
+			productName = ChatHub;
+			productReference = 1A976FE272AF1BE0CEDB9565 /* ChatHub.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		9F02DBD817C27DBABF9288CA /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					DAEC54ABCA97BFCD191442B6 = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Manual;
+					};
+				};
+			};
+			buildConfigurationList = 1FD983FBD7D920D430B3EC04 /* Build configuration list for PBXProject "ChatHub" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+				vi,
+			);
+			mainGroup = CC83226C2F4E347F0FF3F0C8;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 4B93387737B5F71E98FD3926 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				DAEC54ABCA97BFCD191442B6 /* ChatHub */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		2A2BA62FE75047AF463DF0BD /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B715F57DC4F25FB3DCCD3591 /* AppIcon.icns in Resources */,
+				C1A010010000000000000001 /* icon-telegram.png in Resources */,
+				C1A010020000000000000002 /* icon-zalo.png in Resources */,
+				C1A010030000000000000003 /* icon-messenger.png in Resources */,
+				C1A010040000000000000004 /* icon-whatsapp.png in Resources */,
+				C1A010050000000000000005 /* icon-discord.png in Resources */,
+				A7EA45FF2FAEAF154AACBA15 /* ChatAppearance.css in Resources */,
+				1154283E44FB7DE6729E4311 /* Localizable.strings in Resources */,
+				B229BE17A704DA7F9592D1D3 /* MessengerAppearance.css in Resources */,
+				247AF29D141208C8D47DC150 /* TelegramAppearance.css in Resources */,
+				6890E5BB682EBB02E6D5DE3B /* WebAppearance.js in Resources */,
+				9C78655E5AD98B76F6299E8B /* ZaloAppearance.css in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		58D0963C7DD3D21D0D31B418 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B0C3FE636975DE9AAFF621E3 /* AccountEditor.swift in Sources */,
+				93C54A72EF89145A2CEE1851 /* AccountSwitcherView.swift in Sources */,
+				8A31A424C8179B7F51732C43 /* BrowserAppearance.swift in Sources */,
+				32F76B7F5355F9A6BA10F945 /* BrowserPool.swift in Sources */,
+				B348C093640F53BC1B458172 /* BrowserPopup.swift in Sources */,
+				7C2AB98A9FC87D0144260EE2 /* BrowserSession.swift in Sources */,
+				8AAEAF6492079798DA770668 /* ChatAccount.swift in Sources */,
+				9C3A4B79F9335AD3A563C3F5 /* ChatAppearancePreferences.swift in Sources */,
+				B8D05B97932C5E2BFDA931D6 /* ChatHubApp.swift in Sources */,
+				C06D2C0DCF813870D776F050 /* ConversationView.swift in Sources */,
+				0921D305FEC399B0D78D15FF /* Design.swift in Sources */,
+				ACDB888DE6D8D0D56B73CE38 /* DownloadHandler.swift in Sources */,
+				B4A1B8DF17FA28DBC20D1079 /* DownloadedFile.swift in Sources */,
+				C66BACB7AE7F2BA76AC35F0A /* Localization.swift in Sources */,
+				4D2D429B7AB2FB658047F652 /* NavigationPolicy.swift in Sources */,
+				4620D657B1FB199B7B5934F8 /* OverviewView.swift in Sources */,
+				96AFDF5F0BA34BC90D066FF5 /* ServiceTheme.swift in Sources */,
+				FF2D3F88B6EEC4A48DC7B203 /* ServiceWebView.swift in Sources */,
+				B38A41E81859E5DBB7AA2AC9 /* SettingsView.swift in Sources */,
+				DC27F22385552FBF18C9138E /* SidebarPositionRestorer.swift in Sources */,
+				FA1120536E882DF15D7B2BDA /* WebNavigationFailure.swift in Sources */,
+				AA272F37132FB9654D992D6E /* WorkspaceLayout.swift in Sources */,
+				B9CE5C566E9B3D4DC93E8F2F /* WorkspaceRepository.swift in Sources */,
+				41F0FAAE2482EF4B2F9CCA78 /* WorkspaceStore.swift in Sources */,
+				B8AF4F75BCE3D3E12A2CAA0A /* WorkspaceToolbar.swift in Sources */,
+				7FBC79616E8A0AFEB932B80F /* WorkspaceView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		B95DC1BEDD2E1858E6EDCCAB /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				60EC718AFEB186FBBAD2327B /* en */,
+				3C4D1E654169E063E4C3B784 /* vi */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		456F52E3EEA2C176DD5ECBE4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_CODE_COVERAGE = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 2;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 0.2.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_VERSION = 6.0;
+			};
+			name = Debug;
+		};
+		8C58D82AAAC5BDD74590425A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_CODE_COVERAGE = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 2;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = "";
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MARKETING_VERSION = 0.2.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_VERSION = 6.0;
+			};
+			name = Release;
+		};
+		AFD55F6C1D0DE8ABF4980FAD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Config/ChatHub.entitlements;
+				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Config/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = app.chathub.mac;
+				PRODUCT_NAME = ChatHub;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		C3B4F4FA5FFE989D154DFC8B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Config/ChatHub.entitlements;
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Config/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = app.chathub.mac;
+				PRODUCT_NAME = ChatHub;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1FD983FBD7D920D430B3EC04 /* Build configuration list for PBXProject "ChatHub" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				456F52E3EEA2C176DD5ECBE4 /* Debug */,
+				8C58D82AAAC5BDD74590425A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		3E12192C4035632E26082E5D /* Build configuration list for PBXNativeTarget "ChatHub" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C3B4F4FA5FFE989D154DFC8B /* Debug */,
+				AFD55F6C1D0DE8ABF4980FAD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 9F02DBD817C27DBABF9288CA /* Project object */;
+}

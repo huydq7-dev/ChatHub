@@ -1,0 +1,324 @@
+/* Shared ChatHub design tokens; every service adapter consumes these values. */
+html[data-chathub-theme="light"] {
+    --hub-canvas: #f3f3f5;
+    --hub-surface: #ffffff;
+    --hub-raised: #f7f7f9;
+    --hub-rail: #ececf0;
+    --hub-text: #232327;
+    --hub-secondary: #696970;
+    --hub-placeholder: #85858d;
+    --hub-border: rgba(30, 30, 38, 0.10);
+    --hub-bubble-border: rgba(30, 30, 38, 0.06);
+    --hub-hover: rgba(60, 45, 105, 0.05);
+    --hub-selected: #ece7fb;
+    --hub-outgoing: #eae4fc;
+    --hub-link: #5f46bc;
+    --hub-accent: #6652d9;
+    --hub-accent-hover: #5844c5;
+    --hub-accent-pressed: #4935b2;
+    --hub-accent-contrast: #ffffff;
+    --hub-text-rgb: 35, 35, 39;
+    --hub-secondary-rgb: 105, 105, 112;
+    --hub-accent-rgb: 102, 82, 217;
+    --hub-shadow-card: 0 1px 2px rgba(20, 18, 36, 0.04);
+    --hub-shadow-composer: 0 2px 8px rgba(20, 18, 36, 0.04);
+    --hub-scrollbar: rgba(105, 105, 112, 0.24);
+    --hub-scrollbar-hover: rgba(105, 105, 112, 0.42);
+    color-scheme: light;
+}
+
+html[data-chathub-theme="dark"] {
+    --hub-canvas: #202023;
+    --hub-surface: #28282c;
+    --hub-raised: #323237;
+    --hub-rail: #242427;
+    --hub-text: #eeeef2;
+    --hub-secondary: #aeaeb8;
+    --hub-placeholder: #94949f;
+    --hub-border: rgba(255, 255, 255, 0.10);
+    --hub-bubble-border: rgba(255, 255, 255, 0.07);
+    --hub-hover: rgba(255, 255, 255, 0.06);
+    --hub-selected: #393146;
+    --hub-outgoing: #42345f;
+    --hub-link: #c1abff;
+    --hub-accent: #7862eb;
+    --hub-accent-hover: #8975f2;
+    --hub-accent-pressed: #6652d9;
+    --hub-accent-contrast: #ffffff;
+    --hub-text-rgb: 238, 238, 242;
+    --hub-secondary-rgb: 174, 174, 184;
+    --hub-accent-rgb: 193, 171, 255;
+    --hub-shadow-card: 0 1px 3px rgba(0, 0, 0, 0.22);
+    --hub-shadow-composer: 0 4px 12px rgba(0, 0, 0, 0.26);
+    --hub-scrollbar: rgba(174, 174, 184, 0.22);
+    --hub-scrollbar-hover: rgba(174, 174, 184, 0.38);
+    color-scheme: dark;
+}
+
+/* Curated Accent Palettes (Light & Dark) */
+html[data-chathub-theme="light"][data-chathub-accent="ocean"] {
+    --hub-hover: rgba(37, 99, 235, 0.05);
+    --hub-selected: #e6effd;
+    --hub-outgoing: #e2ecfc;
+    --hub-link: #1d4ed8;
+    --hub-accent: #2563eb;
+    --hub-accent-hover: #1d4ed8;
+    --hub-accent-pressed: #1e40af;
+    --hub-accent-rgb: 37, 99, 235;
+}
+html[data-chathub-theme="dark"][data-chathub-accent="ocean"] {
+    --hub-selected: #25344d;
+    --hub-outgoing: #263b5e;
+    --hub-link: #93c5fd;
+    --hub-accent: #3b82f6;
+    --hub-accent-hover: #60a5fa;
+    --hub-accent-pressed: #2563eb;
+    --hub-accent-rgb: 147, 197, 253;
+}
+
+html[data-chathub-theme="light"][data-chathub-accent="emerald"] {
+    --hub-hover: rgba(13, 148, 136, 0.05);
+    --hub-selected: #e3f5f2;
+    --hub-outgoing: #def2ee;
+    --hub-link: #0f766e;
+    --hub-accent: #0d9488;
+    --hub-accent-hover: #0f766e;
+    --hub-accent-pressed: #115e59;
+    --hub-accent-rgb: 13, 148, 136;
+}
+html[data-chathub-theme="dark"][data-chathub-accent="emerald"] {
+    --hub-selected: #213837;
+    --hub-outgoing: #224240;
+    --hub-link: #6ee7b7;
+    --hub-accent: #14b8a6;
+    --hub-accent-hover: #2dd4bf;
+    --hub-accent-pressed: #0d9488;
+    --hub-accent-rgb: 110, 231, 183;
+}
+
+html[data-chathub-theme="light"][data-chathub-accent="amber"] {
+    --hub-hover: rgba(217, 119, 6, 0.05);
+    --hub-selected: #faefe1;
+    --hub-outgoing: #f8ead6;
+    --hub-link: #b45309;
+    --hub-accent: #d97706;
+    --hub-accent-hover: #b45309;
+    --hub-accent-pressed: #92400e;
+    --hub-accent-rgb: 217, 119, 6;
+}
+html[data-chathub-theme="dark"][data-chathub-accent="amber"] {
+    --hub-selected: #3f3224;
+    --hub-outgoing: #4a3723;
+    --hub-link: #fcd34d;
+    --hub-accent: #f59e0b;
+    --hub-accent-hover: #fbbf24;
+    --hub-accent-pressed: #d97706;
+    --hub-accent-rgb: 252, 211, 77;
+}
+
+html[data-chathub-theme="light"][data-chathub-accent="rose"] {
+    --hub-hover: rgba(225, 29, 72, 0.05);
+    --hub-selected: #fce8ee;
+    --hub-outgoing: #fae2ea;
+    --hub-link: #be123c;
+    --hub-accent: #e11d48;
+    --hub-accent-hover: #be123c;
+    --hub-accent-pressed: #9f1239;
+    --hub-accent-rgb: 225, 29, 72;
+}
+html[data-chathub-theme="dark"][data-chathub-accent="rose"] {
+    --hub-selected: #432934;
+    --hub-outgoing: #502b3b;
+    --hub-link: #fda4af;
+    --hub-accent: #f43f5e;
+    --hub-accent-hover: #fb7185;
+    --hub-accent-pressed: #e11d48;
+    --hub-accent-rgb: 253, 164, 175;
+}
+
+html[data-chathub-theme="light"][data-chathub-accent="graphite"] {
+    --hub-hover: rgba(39, 39, 42, 0.05);
+    --hub-selected: #e7e7ec;
+    --hub-outgoing: #e3e3e9;
+    --hub-link: #3f3f46;
+    --hub-accent: #3f3f46;
+    --hub-accent-hover: #27272a;
+    --hub-accent-pressed: #18181b;
+    --hub-accent-rgb: 63, 63, 70;
+}
+html[data-chathub-theme="dark"][data-chathub-accent="graphite"] {
+    --hub-selected: #35353b;
+    --hub-outgoing: #3d3d45;
+    --hub-link: #d4d4d8;
+    --hub-accent: #71717a;
+    --hub-accent-hover: #a1a1aa;
+    --hub-accent-pressed: #52525b;
+    --hub-accent-rgb: 212, 212, 216;
+}
+
+html[data-chathub-theme] {
+    /* Unified Typography System (Default Scale) */
+    --hub-font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", sans-serif;
+    --hub-font-mono: ui-monospace, "SF Mono", Menlo, monospace;
+    --hub-size-header: 15px;
+    --hub-size-message: 14.5px;
+    --hub-size-row-title: 13.5px;
+    --hub-size-body: 13px;
+    --hub-size-row-snippet: 12.5px;
+    --hub-size-caption: 12px;
+    --hub-size-meta: 11px;
+    --hub-weight-regular: 400;
+    --hub-weight-medium: 500;
+    --hub-weight-semibold: 600;
+    --hub-weight-bold: 700;
+    --hub-leading-tight: 1.28;
+    --hub-leading-snug: 1.36;
+    --hub-leading-message: 1.46;
+    --hub-tracking-tight: -0.012em;
+    --hub-tracking-normal: -0.005em;
+
+    /* Unified Spatial, Padding & Radius System (Default Density) */
+    --hub-list-width: 340px;
+    --hub-header-height: 60px;
+    --hub-header-pad-x: 18px;
+    --hub-search-height: 36px;
+    --hub-search-pad-x: 12px;
+    --hub-row-inset-x: 8px;
+    --hub-row-pad-x: 12px;
+    --hub-row-pad-y: 10px;
+    --hub-bubble-pad-x: 14px;
+    --hub-bubble-pad-y: 10px;
+    --hub-composer-margin-x: 18px;
+    --hub-composer-margin-bottom: 16px;
+    --hub-composer-pad-x: 14px;
+    --hub-composer-pad-y: 10px;
+    --hub-radius-control: 10px;
+    --hub-radius-row: 12px;
+    --hub-radius-bubble: 16px;
+    --hub-radius-composer: 16px;
+    --hub-radius-pill: 999px;
+
+    font-family: var(--hub-font);
+    font-size: var(--hub-size-body);
+    line-height: var(--hub-leading-snug);
+    letter-spacing: var(--hub-tracking-normal);
+    background: var(--hub-canvas);
+    accent-color: var(--hub-link);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+}
+
+/* Customizable Text Scale */
+html[data-chathub-theme][data-chathub-text-scale="small"] {
+    --hub-size-header: 14px;
+    --hub-size-message: 13.5px;
+    --hub-size-row-title: 12.5px;
+    --hub-size-body: 12px;
+    --hub-size-row-snippet: 11.5px;
+    --hub-size-caption: 11px;
+    --hub-size-meta: 10.5px;
+}
+html[data-chathub-theme][data-chathub-text-scale="large"] {
+    --hub-size-header: 16px;
+    --hub-size-message: 16px;
+    --hub-size-row-title: 14.5px;
+    --hub-size-body: 14px;
+    --hub-size-row-snippet: 13.5px;
+    --hub-size-caption: 13px;
+    --hub-size-meta: 11.5px;
+}
+
+/* Customizable Layout Density */
+html[data-chathub-theme][data-chathub-density="compact"] {
+    --hub-list-width: 304px;
+    --hub-header-height: 54px;
+    --hub-header-pad-x: 14px;
+    --hub-row-pad-x: 10px;
+    --hub-row-pad-y: 8px;
+    --hub-bubble-pad-x: 12px;
+    --hub-bubble-pad-y: 8px;
+    --hub-composer-margin-x: 12px;
+    --hub-composer-margin-bottom: 12px;
+    --hub-composer-pad-x: 12px;
+    --hub-composer-pad-y: 8px;
+    --hub-radius-row: 10px;
+    --hub-radius-bubble: 14px;
+    --hub-radius-composer: 14px;
+}
+html[data-chathub-theme][data-chathub-density="comfortable"] {
+    --hub-list-width: 372px;
+    --hub-header-height: 64px;
+    --hub-header-pad-x: 22px;
+    --hub-row-pad-x: 14px;
+    --hub-row-pad-y: 12px;
+    --hub-bubble-pad-x: 16px;
+    --hub-bubble-pad-y: 12px;
+    --hub-composer-margin-x: 22px;
+    --hub-composer-margin-bottom: 20px;
+    --hub-composer-pad-x: 16px;
+    --hub-composer-pad-y: 12px;
+    --hub-radius-row: 14px;
+    --hub-radius-bubble: 18px;
+    --hub-radius-composer: 18px;
+}
+
+html[data-chathub-theme] body {
+    font-family: var(--hub-font) !important;
+    font-size: var(--hub-size-body);
+    line-height: var(--hub-leading-snug);
+    letter-spacing: var(--hub-tracking-normal);
+    background-color: var(--hub-canvas) !important;
+    color: var(--hub-text);
+    -webkit-font-smoothing: antialiased;
+}
+
+html[data-chathub-theme] :is(button, select) {
+    font-family: var(--hub-font) !important;
+}
+
+html[data-chathub-theme] :is(code, pre) {
+    font-family: var(--hub-font-mono) !important;
+}
+
+html[data-chathub-theme] :is(input, textarea, [contenteditable="true"]) {
+    font-family: var(--hub-font) !important;
+    font-size: var(--hub-size-message);
+    line-height: var(--hub-leading-message);
+    letter-spacing: var(--hub-tracking-normal);
+    caret-color: var(--hub-link);
+}
+
+html[data-chathub-theme] :is(time, abbr) {
+    font-variant-numeric: tabular-nums;
+}
+
+html[data-chathub-theme] ::selection {
+    background: var(--hub-selected);
+    color: var(--hub-text);
+}
+
+html[data-chathub-theme] :is(button, [role="button"], input):focus-visible {
+    outline: 2px solid var(--hub-link);
+    outline-offset: 2px;
+}
+
+/* Unified slim native-style scrollbars across all embedded services. */
+html[data-chathub-theme] ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+html[data-chathub-theme] ::-webkit-scrollbar-track {
+    background: transparent;
+}
+html[data-chathub-theme] ::-webkit-scrollbar-thumb {
+    background: var(--hub-scrollbar);
+    border-radius: var(--hub-radius-pill);
+}
+html[data-chathub-theme] ::-webkit-scrollbar-thumb:hover {
+    background: var(--hub-scrollbar-hover);
+}
+
+html[data-chathub-reduce-motion="true"] :is(.conv-item, .Chat, [role="row"]) {
+    transition-duration: 0s !important;
+}
