@@ -189,7 +189,12 @@ html[data-chathub-theme] :is(.header-subtitle, .header-info__subtitle, .chat-hea
 }
 
 /* Message stream & bubbles */
-html[data-chathub-theme] .chat-content .card {
+html[data-chathub-theme] :is(
+    .chat-content .card,
+    .bubble-content,
+    .message-view__body :is(.text, .content),
+    .msg-text
+) {
     border-radius: var(--hub-radius-bubble) !important;
     padding: var(--hub-bubble-pad-y) var(--hub-bubble-pad-x) !important;
     border: 1px solid var(--hub-bubble-border) !important;
@@ -199,12 +204,22 @@ html[data-chathub-theme] .chat-content .card {
     line-height: var(--hub-leading-message) !important;
     letter-spacing: var(--hub-tracking-normal) !important;
 }
-html[data-chathub-theme] .chat-content .card :is(.text, .card--text) {
+html[data-chathub-theme] :is(
+    .chat-content .card :is(.text, .card--text),
+    .bubble-content :is(.text, .content),
+    .message-view__body :is(.text, .content),
+    .msg-text
+) {
     font-size: var(--hub-size-message) !important;
     font-weight: var(--hub-weight-regular) !important;
     line-height: var(--hub-leading-message) !important;
     letter-spacing: var(--hub-tracking-normal) !important;
     color: var(--hub-text) !important;
+}
+html[data-chathub-theme] :is(.msg-info .sender-name, .member-name, .card-sender-name) {
+    font-size: var(--hub-size-caption) !important;
+    font-weight: var(--hub-weight-semibold) !important;
+    line-height: var(--hub-leading-tight) !important;
 }
 html[data-chathub-theme] :is(.quote-banner, .card-quote) {
     border-radius: var(--hub-radius-control) !important;

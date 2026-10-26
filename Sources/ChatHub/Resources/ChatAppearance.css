@@ -200,8 +200,8 @@ html[data-chathub-theme] {
     --hub-radius-composer: 16px;
     --hub-radius-pill: 999px;
 
-    font-family: var(--hub-font);
-    font-size: var(--hub-size-body);
+    font-family: var(--hub-font) !important;
+    font-size: var(--hub-size-body) !important;
     line-height: var(--hub-leading-snug);
     letter-spacing: var(--hub-tracking-normal);
     background: var(--hub-canvas);
@@ -267,7 +267,7 @@ html[data-chathub-theme][data-chathub-density="comfortable"] {
 
 html[data-chathub-theme] body {
     font-family: var(--hub-font) !important;
-    font-size: var(--hub-size-body);
+    font-size: var(--hub-size-body) !important;
     line-height: var(--hub-leading-snug);
     letter-spacing: var(--hub-tracking-normal);
     background-color: var(--hub-canvas) !important;
@@ -285,7 +285,7 @@ html[data-chathub-theme] :is(code, pre) {
 
 html[data-chathub-theme] :is(input, textarea, [contenteditable="true"]) {
     font-family: var(--hub-font) !important;
-    font-size: var(--hub-size-message);
+    font-size: var(--hub-size-message) !important;
     line-height: var(--hub-leading-message);
     letter-spacing: var(--hub-tracking-normal);
     caret-color: var(--hub-link);

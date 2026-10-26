@@ -190,3 +190,22 @@ test('scrollbar styles and tokens are unified across all supported services', ()
         assert.ok(style.textContent.includes('::-webkit-scrollbar-thumb'), `sets webkit scrollbar thumb for ${service}`);
     }
 });
+
+test('typography and text scaling are synchronized across all supported services', () => {
+    for (const service of ['zalo', 'telegram', 'messenger']) {
+        const p = page({ service });
+        const style = p.elements.get('chathub-native-appearance-v1');
+        assert.ok(style, `style injected for ${service}`);
+        assert.ok(style.textContent.includes('--hub-size-header:'), `defines header size token for ${service}`);
+        assert.ok(style.textContent.includes('--hub-size-message:'), `defines message size token for ${service}`);
+        assert.ok(style.textContent.includes('--hub-size-row-title:'), `defines row title token for ${service}`);
+        assert.ok(style.textContent.includes('--hub-size-row-snippet:'), `defines snippet token for ${service}`);
+        assert.ok(style.textContent.includes('var(--hub-size-row-title) !important'), `applies row title size for ${service}`);
+        assert.ok(style.textContent.includes('var(--hub-size-message) !important'), `applies message size for ${service}`);
+
+        p.update({ textScale: 'large' });
+        assert.equal(p.attributes.get('data-chathub-text-scale'), 'large');
+        p.update({ textScale: 'small' });
+        assert.equal(p.attributes.get('data-chathub-text-scale'), 'small');
+    }
+});

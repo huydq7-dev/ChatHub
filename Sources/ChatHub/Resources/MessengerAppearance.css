@@ -124,6 +124,11 @@ html[data-chathub-service="messenger"] :is(
     --chat-incoming-message-bubble-border-radius: var(--hub-radius-bubble) !important;
     --chat-outgoing-message-bubble-border-radius: var(--hub-radius-bubble) !important;
     --chat-bubble-border-radius: var(--hub-radius-bubble) !important;
+    --chat-bubble-font-size: var(--hub-size-message) !important;
+    --chat-incoming-message-bubble-font-size: var(--hub-size-message) !important;
+    --chat-outgoing-message-bubble-font-size: var(--hub-size-message) !important;
+    --chat-composer-font-size: var(--hub-size-message) !important;
+    --chat-thread-header-title-font-size: var(--hub-size-header) !important;
 }
 
 /* Flatten M5 floating card layout ("bubble" cards) into full-bleed split panes */
@@ -214,13 +219,52 @@ html[data-chathub-service="messenger"] :is([aria-current="page"], [aria-selected
     border-left: none !important;
 }
 
+/* Unified conversation row typography */
+html[data-chathub-service="messenger"] [role="navigation"] :is([role="row"], [role="listitem"], a[role="link"]) :is(
+    span.x1lliihq:first-of-type,
+    div:has(> span):first-child > span,
+    [role="gridcell"] > div > div:first-child span,
+    h3, h4
+) {
+    font-family: var(--hub-font) !important;
+    font-size: var(--hub-size-row-title) !important;
+    font-weight: var(--hub-weight-semibold) !important;
+    line-height: var(--hub-leading-tight) !important;
+    letter-spacing: var(--hub-tracking-tight) !important;
+    color: var(--hub-text) !important;
+}
+html[data-chathub-service="messenger"] [role="navigation"] :is([role="row"], [role="listitem"], a[role="link"]) :is(
+    span.x193iq5w,
+    .x1lliihq:not(:first-of-type),
+    [role="gridcell"] > div > div:last-child span,
+    .x1odjw0f span
+) {
+    font-family: var(--hub-font) !important;
+    font-size: var(--hub-size-row-snippet) !important;
+    font-weight: var(--hub-weight-regular) !important;
+    line-height: var(--hub-leading-snug) !important;
+    color: var(--hub-secondary) !important;
+}
+html[data-chathub-service="messenger"] [role="navigation"] :is([role="row"], [role="listitem"], a[role="link"]) :is(
+    time, abbr, [aria-label*=":"]
+) {
+    font-size: var(--hub-size-meta) !important;
+    font-weight: var(--hub-weight-medium) !important;
+    font-variant-numeric: tabular-nums !important;
+    color: var(--hub-secondary) !important;
+}
+
 /* Thread header & message stream */
 html[data-chathub-service="messenger"] [role="main"] {
     background-color: var(--hub-canvas) !important;
     border-radius: 0 !important;
     margin: 0 !important;
 }
-html[data-chathub-service="messenger"] [role="main"] :is(h1, h2) {
+html[data-chathub-service="messenger"] [role="main"] :is(
+    h1, h2, h3,
+    [role="banner"] span[dir="auto"]:first-of-type,
+    div[aria-label]:not([role="grid"]) > div > span:first-child
+) {
     font-family: var(--hub-font) !important;
     font-size: var(--hub-size-header) !important;
     font-weight: var(--hub-weight-semibold) !important;
@@ -228,14 +272,36 @@ html[data-chathub-service="messenger"] [role="main"] :is(h1, h2) {
     letter-spacing: var(--hub-tracking-tight) !important;
     color: var(--hub-text) !important;
 }
-html[data-chathub-service="messenger"] [role="main"] [role="grid"] [dir="auto"] {
+html[data-chathub-service="messenger"] [role="main"] :is(
+    [role="banner"] span[dir="auto"]:last-of-type,
+    div[aria-label]:not([role="grid"]) > div > span:last-child
+) {
+    font-size: var(--hub-size-caption) !important;
+    font-weight: var(--hub-weight-regular) !important;
+    color: var(--hub-secondary) !important;
+}
+html[data-chathub-service="messenger"] [role="main"] :is(
+    [role="grid"],
+    [data-scope="messages_table"],
+    [aria-label="Messages"],
+    [aria-label="Tin nhắn"],
+    [data-testid="message-container"],
+    [data-testid="mw_message_list"],
+    .x1n2onr6
+) :is(
+    [dir="auto"],
+    [data-testid="message_text"],
+    .x1gslohp,
+    .x11i5rnm,
+    .x126k92a
+) {
     font-family: var(--hub-font) !important;
     font-size: var(--hub-size-message) !important;
     font-weight: var(--hub-weight-regular) !important;
     line-height: var(--hub-leading-message) !important;
     letter-spacing: var(--hub-tracking-normal) !important;
 }
-html[data-chathub-service="messenger"] [role="main"] :is(time, abbr, h4) {
+html[data-chathub-service="messenger"] [role="main"] :is(time, abbr, h4, .x14zfl5b, [aria-label*=":"]) {
     font-size: var(--hub-size-meta) !important;
     font-weight: var(--hub-weight-medium) !important;
     font-variant-numeric: tabular-nums !important;

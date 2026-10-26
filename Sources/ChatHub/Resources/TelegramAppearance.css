@@ -374,11 +374,27 @@ html[data-chathub-service="telegram"] .Message .message-content:is(.media, .cust
     background: transparent !important;
     background-color: transparent !important;
 }
-html[data-chathub-service="telegram"] .Message .text-content {
+html[data-chathub-service="telegram"] .Message :is(
+    .text-content,
+    .media-caption,
+    .transcription,
+    .message-text,
+    .web-page-story,
+    .web-page-description
+) {
     font-size: var(--hub-size-message) !important;
     font-weight: var(--hub-weight-regular) !important;
     line-height: var(--hub-leading-message) !important;
     letter-spacing: var(--hub-tracking-normal) !important;
+}
+html[data-chathub-service="telegram"] .Message :is(.message-title, .sender-title, .forward-title) {
+    font-size: var(--hub-size-caption) !important;
+    font-weight: var(--hub-weight-semibold) !important;
+    line-height: var(--hub-leading-tight) !important;
+}
+html[data-chathub-service="telegram"] .Message :is(.reply-title, .reply-subtitle, .reply-text) {
+    font-size: var(--hub-size-caption) !important;
+    line-height: var(--hub-leading-snug) !important;
 }
 html[data-chathub-service="telegram"] .Message .MessageMeta,
 html[data-chathub-service="telegram"] .Message .MessageMeta .message-time {
