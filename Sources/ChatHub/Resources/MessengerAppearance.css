@@ -340,16 +340,10 @@ html[data-chathub-service="messenger"] :is(
 
 html[data-chathub-service="messenger"] :is(
     [role="banner"],
-    header,
     [data-pagelet="Bluebar"],
     [data-pagelet="NavBar"],
-    div[data-pagelet*="TopNav"],
-    div:has(> [role="banner"]),
-    div:has(> header),
-    div:has(> a[aria-label="Facebook"]),
-    div:has(> a[aria-label="Trang chủ Facebook"]),
-    div:has(> a[href="/"][aria-label]),
-    div:has(> a[href="https://www.facebook.com/"][aria-label])
+    [role="navigation"]:has(+ [role="navigation"]),
+    [role="navigation"]:has(a[href*="/marketplace/"])
 ) {
     display: none !important;
     visibility: hidden !important;
@@ -357,98 +351,30 @@ html[data-chathub-service="messenger"] :is(
     height: 0 !important;
     min-height: 0 !important;
     max-height: 0 !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    border: none !important;
     overflow: hidden !important;
     pointer-events: none !important;
 }
 
-/* Hide Facebook global left navigation rail (Feed, Marketplace, Watch, etc.) */
-html[data-chathub-service="messenger"] :is(
-    [role="navigation"]:has(a[href*="/marketplace/"]),
-    [role="navigation"]:has(a[href*="/watch/"]),
-    [role="navigation"]:has(a[aria-label*="Facebook"]),
-    [role="navigation"]:has(a[aria-label*="Trang chủ"]),
-    div:has(> [role="navigation"]:has(a[aria-label*="Facebook"])),
-    div:has(> [role="navigation"]:has(a[href*="/marketplace/"])),
-    [role="navigation"]:has(+ [role="navigation"])
-) {
-    display: none !important;
-    width: 0 !important;
-    height: 0 !important;
-    min-height: 0 !important;
-    max-height: 0 !important;
-    overflow: hidden !important;
-    pointer-events: none !important;
-}
-
-/* Reclaim full height for layout containers */
-html[data-chathub-service="messenger"] :is(
-    .x1bc3s5a,
-    .x85a59c,
-    .x1og2svy,
-    .xtp0wl1,
-    div[data-pagelet="root"],
-    div:has(> [role="main"])
-) {
+html[data-chathub-service="messenger"] :is(.x1bc3s5a, .x85a59c, .x1og2svy, .xtp0wl1) {
     height: 100vh !important;
     min-height: 100vh !important;
     max-height: 100vh !important;
 }
 
-/* Focused mode: hide right-hand conversation information sidebar if focus mode is active */
-html[data-chathub-service="messenger"][data-chathub-focus="true"] :is(
-    [aria-label*="Thông tin đoạn chat"],
-    [aria-label*="Conversation information"],
-    [aria-label*="Thread details"],
-    [role="complementary"]
-) {
+/* Focused mode: hide redundant secondary panels when focus mode is active */
+html[data-chathub-service="messenger"][data-chathub-focus="true"] [role="complementary"] {
     display: none !important;
     width: 0 !important;
     height: 0 !important;
 }
 
-/* Thread list width synchronization */
-html[data-chathub-service="messenger"] [role="navigation"]:not([style*="display: none"]) {
-    flex: 0 0 var(--hub-list-width) !important;
-    width: var(--hub-list-width) !important;
-    min-width: var(--hub-list-width) !important;
-    max-width: var(--hub-list-width) !important;
-}
-
-/* Message bubbles synchronization */
-html[data-chathub-service="messenger"] [role="main"] :is(
-    [data-testid="incoming_message"] div:has(> [data-testid="message_text"]),
-    [data-testid="incoming_message"] [data-testid="message_text"]
-) {
-    background-color: var(--hub-raised) !important;
-    color: var(--hub-text) !important;
-    border-radius: var(--hub-radius-bubble) !important;
-}
-
-html[data-chathub-service="messenger"] [role="main"] :is(
-    [data-testid="outgoing_message"] div:has(> [data-testid="message_text"]),
-    [data-testid="outgoing_message"] [data-testid="message_text"]
-) {
-    background-color: var(--hub-outgoing) !important;
-    color: var(--hub-text) !important;
-    border-radius: var(--hub-radius-bubble) !important;
-}
-
-/* Chat header inside [role="main"] */
-html[data-chathub-service="messenger"] [role="main"] > div:first-child:has([role="button"], a[role="link"]:has(img)),
-html[data-chathub-service="messenger"] [role="main"] [data-pagelet*="Header"] {
-    min-height: var(--hub-header-height) !important;
-    background: var(--hub-surface) !important;
-    border-bottom: 1px solid var(--hub-border) !important;
-}
-
-/* Chat composer footer */
-html[data-chathub-service="messenger"] [role="main"] form,
-html[data-chathub-service="messenger"] [role="main"] div:has(> [role="textbox"][contenteditable="true"]) {
-    border-top: 1px solid var(--hub-border) !important;
-    background: var(--hub-surface) !important;
+@media (min-width: 900px) {
+    html[data-chathub-service="messenger"] [role="navigation"]:not(:has(+ [role="navigation"])) {
+        flex: 0 0 var(--hub-list-width) !important;
+        width: var(--hub-list-width) !important;
+        min-width: var(--hub-list-width) !important;
+        max-width: var(--hub-list-width) !important;
+    }
 }
 
 html[data-chathub-service="messenger"] [role="main"] [style*="--chat-composer-button-color"] {
