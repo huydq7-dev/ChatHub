@@ -363,7 +363,15 @@ struct HubBadge: View {
             .foregroundStyle(prominent ? .white : HubStyle.textSecondary)
             .padding(.horizontal, 7)
             .padding(.vertical, 3)
-            .liquidGlassCapsule(tint: prominent ? HubStyle.accent : nil)
+            .background(
+                prominent ? HubStyle.accent : Color.primary.opacity(0.06),
+                in: Capsule()
+            )
+            .overlay {
+                if !prominent {
+                    Capsule().strokeBorder(Color.primary.opacity(0.08), lineWidth: 0.5)
+                }
+            }
             .fixedSize(horizontal: true, vertical: false)
     }
 }
