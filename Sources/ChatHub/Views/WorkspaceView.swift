@@ -44,6 +44,7 @@ struct WorkspaceView: View {
             .background(HubStyle.canvas)
             .layoutPriority(1)
         }
+        .ignoresSafeArea()
         .animation(reduceMotion ? nil : .easeInOut(duration: 0.18), value: layout.isExpanded)
         .tint(HubStyle.accentColor(for: currentAccent))
         .onAppear {
@@ -151,9 +152,6 @@ private struct WorkspaceSidebar: View {
         @Bindable var store = store
         GeometryReader { geometry in
             VStack(spacing: 0) {
-                Color.clear
-                    .frame(height: 28)
-
                 branding
 
                 if layout.isExpanded {
@@ -302,7 +300,7 @@ private struct WorkspaceSidebar: View {
             }
         }
         .frame(maxWidth: .infinity)
-        .padding(.top, HubSpace.xs)
+        .padding(.top, 24)
         .padding(.bottom, HubSpace.sm)
     }
 
@@ -349,7 +347,7 @@ private struct WorkspaceSidebar: View {
                         AppearanceStudioPopover(supportsServiceTools: supportsAppearance)
                     }
 
-                    if let session = browsers.selectedSession, supportsAppearance && nativeThemeEnabled {
+                    if browsers.selectedSession != nil, supportsAppearance && nativeThemeEnabled {
                         Button {
                             showServiceTools.toggle()
                         } label: {

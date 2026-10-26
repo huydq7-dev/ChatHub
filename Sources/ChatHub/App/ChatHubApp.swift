@@ -15,6 +15,7 @@ struct ChatHubApp: App {
     var body: some Scene {
         Window(tr("ChatHub"), id: "workspace") {
             WorkspaceView()
+                .ignoresSafeArea()
                 .environment(store)
                 .environment(browsers)
                 .environment(layout)
