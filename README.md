@@ -131,3 +131,12 @@ toolbar actions. The sliders button in the native window toolbar (**Show extra
 service tools**) restores contacts, provider settings and the full chat toolbar
 without a reload. The same preference is in Settings. Turning off appearance
 matching restores the original provider interface.
+
+### Update notifications (0.3.0+)
+
+ChatHub automatically checks GitHub Releases every six hours while running and
+shows a workspace banner when a newer stable installer is available. Use
+**ChatHub → Check for Updates…** for an immediate check. Settings includes an
+opt-out. Downloads use the official versioned DMG/ZIP; installation remains
+manual. Users of older builds need to install a version containing this checker
+once. See [update behavior and release steps](docs/UPDATES.md).

@@ -5,6 +5,7 @@ cd "$(dirname "$0")/.."
 bash scripts/build.sh Release
 
 app_path="build/Build/Products/Release/ChatHub.app"
+python3 scripts/validate-release.py --app "$app_path"
 dist_dir="dist"
 staging_dir="$dist_dir/dmg-staging"
 zip_path="$dist_dir/ChatHub-macOS.zip"

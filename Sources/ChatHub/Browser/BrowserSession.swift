@@ -216,6 +216,15 @@ private final class NotificationScriptHandler: NSObject, WKScriptMessageHandler 
     }
 }
 
+// The SwiftPM WebKit overlay and Xcode's explicit Clang importer expose
+// different actor annotations for the void alert callback on this SDK.
+// Match each imported protocol type; BrowserSession invokes both on the main actor.
+#if SWIFT_PACKAGE
+    typealias JavaScriptAlertCompletion = @MainActor @Sendable () -> Void
+#else
+    typealias JavaScriptAlertCompletion = @Sendable () -> Void
+#endif
+
 @MainActor @Observable
 final class BrowserSession: NSObject {
     enum State: Equatable {
@@ -976,7 +985,7 @@ extension BrowserSession: WKUIDelegate {
 
     func webView(
         _ webView: WKWebView, runJavaScriptAlertPanelWithMessage message: String,
-        initiatedByFrame frame: WKFrameInfo, completionHandler: @escaping @MainActor @Sendable () -> Void
+        initiatedByFrame frame: WKFrameInfo, completionHandler: @escaping JavaScriptAlertCompletion
     ) {
         let alert = NSAlert()
         alert.messageText = frame.securityOrigin.host

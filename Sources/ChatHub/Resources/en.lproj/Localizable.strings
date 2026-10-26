@@ -39,3 +39,41 @@
 "Send Test Notification" = "Send Test Notification";
 "Make sure notifications are enabled for ChatHub in macOS System Settings > Notifications." = "Make sure notifications are enabled for ChatHub in macOS System Settings > Notifications.";
 "Test notification: your system notifications are working properly." = "Test notification: your system notifications are working properly.";
+
+"Check for Updates…" = "Check for Updates…";
+
+"Automatically check for updates" = "Automatically check for updates";
+
+"Checking for updates…" = "Checking for updates…";
+
+"Last checked" = "Last checked";
+
+"Updates" = "Updates";
+
+"Couldn’t check for updates" = "Couldn’t check for updates";
+
+"Check your connection and try again later. You can also visit the releases page." = "Check your connection and try again later. You can also visit the releases page.";
+
+"Open Releases" = "Open Releases";
+
+"ChatHub %@ is available." = "ChatHub %@ is available.";
+
+"Download the new installer, quit ChatHub, then replace it in Applications. Your local workspace is kept." = "Download the new installer, quit ChatHub, then replace it in Applications. Your local workspace is kept.";
+
+"Download Update" = "Download Update";
+
+"Later" = "Later";
+
+"Release Notes" = "Release Notes";
+
+"You’re up to date" = "You’re up to date";
+
+"You’re using ChatHub %@." = "You’re using ChatHub %@.";
+
+"Remind Me Later" = "Remind Me Later";
+
+"Skip This Version" = "Skip This Version";
+
+"Update options" = "Update options";
+
+"ChatHub checks GitHub Releases every six hours. New versions appear in the workspace. Installation is manual; your chats and account profiles stay in place." = "ChatHub checks GitHub Releases every six hours. New versions appear in the workspace. Installation is manual; your chats and account profiles stay in place.";

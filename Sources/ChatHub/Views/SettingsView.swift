@@ -8,6 +8,7 @@ struct SettingsView: View {
     @Environment(WorkspaceStore.self) private var store
     @Environment(BrowserPool.self) private var browsers
     @Environment(WorkspaceLayout.self) private var layout
+    @Environment(AppUpdater.self) private var updater
     @AppStorage("appearance") private var appearance = "system"
     @AppStorage(ChatAppearancePreferences.themeKey) private var nativeThemeEnabled = true
     @AppStorage(ChatAppearancePreferences.toolsKey) private var showServiceTools = false
@@ -19,6 +20,7 @@ struct SettingsView: View {
 
     var body: some View {
         @Bindable var layout = layout
+        @Bindable var updater = updater
         Form {
             Section {
                 HStack(spacing: HubSpace.md) {
@@ -130,6 +132,28 @@ struct SettingsView: View {
                 Text(
                     tr(
                         "Make sure notifications are enabled for ChatHub in macOS System Settings > Notifications."
+                    ))
+            }
+            Section {
+                Toggle(tr("Automatically check for updates"), isOn: $updater.automaticChecksEnabled)
+                HStack {
+                    if updater.isChecking {
+                        ProgressView().controlSize(.small)
+                        Text(tr("Checking for updates…")).font(HubFont.caption)
+                    } else if let date = updater.lastChecked {
+                        Text(tr("Last checked"))
+                        Text(date, style: .relative).foregroundStyle(HubStyle.textSecondary)
+                    }
+                    Spacer()
+                    Button(tr("Check for Updates…")) { updater.checkManually() }
+                        .disabled(updater.isChecking)
+                }
+            } header: {
+                Text(tr("Updates"))
+            } footer: {
+                Text(
+                    tr(
+                        "ChatHub checks GitHub Releases every six hours. New versions appear in the workspace. Installation is manual; your chats and account profiles stay in place."
                     ))
             }
             Section {

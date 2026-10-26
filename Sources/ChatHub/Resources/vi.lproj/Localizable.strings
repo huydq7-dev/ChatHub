@@ -158,3 +158,41 @@
 "Send Test Notification" = "Gửi thông báo thử";
 "Make sure notifications are enabled for ChatHub in macOS System Settings > Notifications." = "Đảm bảo thông báo cho ChatHub đã được bật trong Cài đặt hệ thống macOS > Thông báo.";
 "Test notification: your system notifications are working properly." = "Thông báo thử: tính năng thông báo hệ thống đang hoạt động tốt.";
+
+"Check for Updates…" = "Kiểm tra cập nhật…";
+
+"Automatically check for updates" = "Tự động kiểm tra cập nhật";
+
+"Checking for updates…" = "Đang kiểm tra cập nhật…";
+
+"Last checked" = "Lần kiểm tra gần nhất";
+
+"Updates" = "Cập nhật";
+
+"Couldn’t check for updates" = "Không thể kiểm tra cập nhật";
+
+"Check your connection and try again later. You can also visit the releases page." = "Kiểm tra kết nối rồi thử lại sau. Bạn cũng có thể mở trang phát hành.";
+
+"Open Releases" = "Mở trang phát hành";
+
+"ChatHub %@ is available." = "Đã có ChatHub %@.";
+
+"Download the new installer, quit ChatHub, then replace it in Applications. Your local workspace is kept." = "Tải bộ cài mới, thoát ChatHub rồi thay thế app trong Applications. Workspace cục bộ của bạn được giữ lại.";
+
+"Download Update" = "Tải bản cập nhật";
+
+"Later" = "Để sau";
+
+"Release Notes" = "Có gì mới";
+
+"You’re up to date" = "Bạn đang dùng bản mới nhất";
+
+"You’re using ChatHub %@." = "Bạn đang dùng ChatHub %@.";
+
+"Remind Me Later" = "Nhắc lại sau";
+
+"Skip This Version" = "Bỏ qua phiên bản này";
+
+"Update options" = "Tùy chọn cập nhật";
+
+"ChatHub checks GitHub Releases every six hours. New versions appear in the workspace. Installation is manual; your chats and account profiles stay in place." = "ChatHub kiểm tra GitHub Releases mỗi 6 giờ và báo bản mới trong workspace. Bạn cài đặt thủ công; dữ liệu chat và profile tài khoản vẫn được giữ lại.";

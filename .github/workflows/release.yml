@@ -15,8 +15,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Validate release version
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: python3 scripts/validate-release.py --tag "$RELEASE_TAG"
+
       - name: Run Web & Swift Tests
         run: |
+          python3 scripts/test-release.py
           node --test scripts/test-web.mjs
           bash scripts/test.sh
 
