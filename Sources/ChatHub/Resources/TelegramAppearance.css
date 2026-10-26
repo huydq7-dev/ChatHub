@@ -392,8 +392,23 @@ html[data-chathub-service="telegram"] .Message :is(.message-title, .sender-title
     font-weight: var(--hub-weight-semibold) !important;
     line-height: var(--hub-leading-tight) !important;
 }
-html[data-chathub-service="telegram"] .Message :is(.reply-title, .reply-subtitle, .reply-text) {
+html[data-chathub-service="telegram"] :is(.Message, .Composer) :is(.EmbeddedMessage, .ComposerEmbeddedMessage, .embedded-message, .reply) {
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+}
+html[data-chathub-service="telegram"] :is(.Message, .Composer) :is(.EmbeddedMessage, .ComposerEmbeddedMessage, .embedded-message, .reply) :is(.EmbeddedMessage-content, .reply-content) {
+    height: auto !important;
+    overflow: visible !important;
+}
+html[data-chathub-service="telegram"] :is(.Message, .Composer) :is(.EmbeddedMessage, .ComposerEmbeddedMessage, .embedded-message, .reply) :is(.message-title, .sender-title, .reply-title) {
     font-size: var(--hub-size-caption) !important;
+    font-weight: var(--hub-weight-semibold) !important;
+    line-height: var(--hub-leading-tight) !important;
+}
+html[data-chathub-service="telegram"] :is(.Message, .Composer) :is(.EmbeddedMessage, .ComposerEmbeddedMessage, .embedded-message, .reply) :is(.message-text, .reply-text, .reply-subtitle) {
+    font-size: var(--hub-size-caption) !important;
+    font-weight: var(--hub-weight-regular) !important;
     line-height: var(--hub-leading-snug) !important;
 }
 html[data-chathub-service="telegram"] .Message .MessageMeta,

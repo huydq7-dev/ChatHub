@@ -358,10 +358,13 @@ struct HubBadge: View {
         Text(text)
             .font(HubFont.badge)
             .monospacedDigit()
+            .lineLimit(1)
+            .fixedSize(horizontal: true, vertical: false)
             .foregroundStyle(prominent ? .white : HubStyle.textSecondary)
-            .padding(.horizontal, HubSpace.xs)
+            .padding(.horizontal, 7)
             .padding(.vertical, 3)
             .liquidGlassCapsule(tint: prominent ? HubStyle.accent : nil)
+            .fixedSize(horizontal: true, vertical: false)
     }
 }
 
