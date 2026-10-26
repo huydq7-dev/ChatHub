@@ -42,7 +42,13 @@ struct WorkspaceToolbar: ToolbarContent {
                         .foregroundStyle(HubStyle.textPrimary)
                         .lineLimit(1)
                         .truncationMode(.tail)
-                    HubBadge(text: account.subtitle.isEmpty ? account.service.name : account.subtitle)
+                    Text("·")
+                        .font(HubFont.button)
+                        .foregroundStyle(HubStyle.textSecondary)
+                        .fixedSize()
+                    Text(account.subtitle.isEmpty ? account.service.name : account.subtitle)
+                        .font(HubFont.captionMedium)
+                        .foregroundStyle(HubStyle.accentText)
                         .fixedSize()
                         .layoutPriority(1)
                 } else {
@@ -56,7 +62,13 @@ struct WorkspaceToolbar: ToolbarContent {
             }
             .padding(.horizontal, HubSpace.sm)
             .padding(.vertical, 5)
-            .liquidGlassCapsule(interactive: true)
+            .background(
+                HubStyle.raised,
+                in: Capsule()
+            )
+            .overlay(
+                Capsule().strokeBorder(HubStyle.border, lineWidth: 1)
+            )
             .accessibilityElement(children: .combine)
         }
         ToolbarItemGroup(placement: .primaryAction) {
