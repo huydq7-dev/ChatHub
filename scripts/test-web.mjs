@@ -153,6 +153,20 @@ for (const service of ['telegram', 'messenger']) {
     });
 }
 
+test('messenger: supports web.facebook.com, root domain and encrypted routes', () => {
+    for (const options of [
+        { service: 'messenger', host: 'web.facebook.com', path: '/messages/' },
+        { service: 'messenger', host: 'facebook.com', path: '/messages/t/456' },
+        { service: 'messenger', host: 'www.messenger.com', path: '/e2ee/t/789' },
+        { service: 'messenger', host: 'messenger.com', path: '/' },
+    ]) {
+        const p = page(options);
+        assert.equal(p.attributes.get('data-chathub-service'), 'messenger');
+        assert.equal(p.attributes.get('data-chathub-theme'), 'dark');
+        assert.ok(p.elements.has('chathub-native-appearance-v1'));
+    }
+});
+
 test('cross-service registrations cannot theme other origins, authentication or unrelated paths', () => {
     for (const options of [
         {service:'telegram',host:'web.telegram.org.evil.example'},

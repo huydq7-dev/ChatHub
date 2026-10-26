@@ -29,7 +29,11 @@ struct WebAppearancePolicyTests {
         (ChatService.telegram, "https://web.telegram.org/a/#123"),
         (.messenger, "https://www.facebook.com/messages/"),
         (.messenger, "https://www.facebook.com/messages/e2ee/t/123"),
+        (.messenger, "https://web.facebook.com/messages/"),
+        (.messenger, "https://facebook.com/messages/t/456"),
         (.messenger, "https://www.messenger.com/t/123"),
+        (.messenger, "https://www.messenger.com/e2ee/t/123"),
+        (.messenger, "https://messenger.com/"),
     ])
     func supportedChatRoutesReceiveTheirOwnAdapter(service: ChatService, address: String) {
         #expect(WebAppearancePolicy.supportsTheme(service: service, url: URL(string: address)))

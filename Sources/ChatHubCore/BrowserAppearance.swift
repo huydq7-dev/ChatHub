@@ -61,13 +61,13 @@ public enum WebAppearancePolicy {
         case .telegram:
             return host == "web.telegram.org" && ["/a", "/a/"].contains(url.path)
         case .messenger:
-            if ["www.facebook.com", "www.messenger.com", "messenger.com"].contains(host),
-                url.path == "/messages" || url.path.hasPrefix("/messages/")
-            {
-                return true
+            let isMessengerHost = ["messenger.com", "www.messenger.com"].contains(host)
+            let isFacebookHost = ["facebook.com", "www.facebook.com", "web.facebook.com"].contains(host)
+            guard isMessengerHost || isFacebookHost else { return false }
+            if isFacebookHost {
+                return url.path == "/messages" || url.path.hasPrefix("/messages/")
             }
-            return ["www.messenger.com", "messenger.com"].contains(host)
-                && (url.path == "/" || url.path.isEmpty || url.path.hasPrefix("/t/"))
+            return url.path == "/" || url.path.isEmpty || url.path.hasPrefix("/t/") || url.path.hasPrefix("/e2ee/")
         default:
             return false
         }
