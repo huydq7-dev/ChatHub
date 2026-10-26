@@ -44,6 +44,7 @@ struct WorkspaceView: View {
             .background(HubStyle.canvas)
             .layoutPriority(1)
         }
+        .background(WindowAccessor())
         .ignoresSafeArea()
         .animation(reduceMotion ? nil : .easeInOut(duration: 0.18), value: layout.isExpanded)
         .tint(HubStyle.accentColor(for: currentAccent))
@@ -676,5 +677,31 @@ private struct SidebarButtonSurface<Content: View>: View {
                 in: RoundedRectangle(cornerRadius: HubRadius.row, style: .continuous)
             )
             .onHover { hovered = $0 }
+    }
+}
+
+private struct WindowAccessor: NSViewRepresentable {
+    func makeNSView(context: Context) -> WindowAccessingView { WindowAccessingView() }
+    func updateNSView(_ nsView: WindowAccessingView, context: Context) { nsView.configure() }
+
+    @MainActor
+    final class WindowAccessingView: NSView {
+        override func viewDidMoveToWindow() {
+            super.viewDidMoveToWindow()
+            configure()
+        }
+
+        func configure() {
+            guard let window else { return }
+            window.titleVisibility = .hidden
+            window.titlebarAppearsTransparent = true
+            window.titlebarSeparatorStyle = .none
+            window.isMovableByWindowBackground = true
+            window.toolbar = nil
+            if !window.styleMask.contains(.fullSizeContentView) {
+                window.styleMask.insert(.fullSizeContentView)
+            }
+            window.layoutIfNeeded()
+        }
     }
 }

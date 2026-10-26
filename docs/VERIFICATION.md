@@ -137,3 +137,33 @@ The optional theme can be disabled in Settings or the Zalo account menu. It is
 limited to the top-level chat application and falls back to the provider's
 original appearance when the expected application shell is missing. It does not
 turn the provider interface into native controls or add message access APIs.
+
+## Update notifications — 0.3.0
+
+- Universal Release (arm64 + x86_64): passed with Swift warnings treated as errors,
+  using `/private/tmp/chathub-updates-validation` to avoid another active build's
+  shared build database. A locked shared database was not counted as a pass.
+- 46 Swift tests in 11 suites passed, including release parsing/selection,
+  canonical installer URLs, stable-only updates, opt-out, skip/future versions,
+  persisted scheduling and error backoff. No final Swift source warnings.
+- 16 JavaScript tests and 3 release-validation script tests passed.
+- Strict Swift lint, localization/plist validation, diff whitespace validation and
+  the update-source secret-signature scan passed.
+- The built 0.3.0 / build 3 metadata matched `project.yml` and tag `v0.3.0`;
+  deep/strict code-signature verification passed.
+- Real HTTPS smoke check using the shipped GitHub client, simulating installed
+  version 0.1.0, detected the public stable 0.2.0 release and selected its exact
+  version-pinned official DMG URL. It did not download/install that DMG or modify
+  application preferences.
+- The WebKit void-alert callback's actor annotation differs between SwiftPM's
+  overlay and Xcode's explicit importer on this SDK. A build-mode type alias
+  matches each imported requirement while invocation stays on the main actor.
+- Native menu/notification visual inspection was interrupted by the concurrent
+  user-action guard. The running app was not quit or replaced during this pass.
+  Source integration and compiled UI are verified; a visible new-release banner
+  in the user's session is not claimed as independently inspected.
+
+The update feature only detects/releases notifications and opens a canonical
+GitHub installer URL after a user action. Automatic installation/Sparkle are not
+implemented. No release or tag was published by this task. People using a build
+without the checker need one manual installation first. See `UPDATES.md`.

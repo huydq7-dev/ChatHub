@@ -81,6 +81,45 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         NSApplication.shared.setActivationPolicy(.regular)
         NSApplication.shared.activate(ignoringOtherApps: true)
         HubNotificationCenter.shared.configure()
+
+        for window in NSApplication.shared.windows {
+            configureWindow(window)
+        }
+        NotificationCenter.default.addObserver(
+            forName: NSWindow.didBecomeKeyNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            MainActor.assumeIsolated {
+                for window in NSApplication.shared.windows {
+                    self?.configureWindow(window)
+                }
+            }
+        }
+        NotificationCenter.default.addObserver(
+            forName: NSWindow.didBecomeMainNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            MainActor.assumeIsolated {
+                for window in NSApplication.shared.windows {
+                    self?.configureWindow(window)
+                }
+            }
+        }
+    }
+
+    func configureWindow(_ window: NSWindow) {
+        guard window.identifier?.rawValue == "workspace" || window.canBecomeMain else { return }
+        window.titleVisibility = .hidden
+        window.titlebarAppearsTransparent = true
+        window.titlebarSeparatorStyle = .none
+        window.isMovableByWindowBackground = true
+        window.toolbar = nil
+        if !window.styleMask.contains(.fullSizeContentView) {
+            window.styleMask.insert(.fullSizeContentView)
+        }
+        window.layoutIfNeeded()
     }
 
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { false }
