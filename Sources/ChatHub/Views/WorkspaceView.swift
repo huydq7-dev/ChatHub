@@ -24,6 +24,7 @@ struct WorkspaceView: View {
         @Bindable var store = store
         HSplitView {
             WorkspaceSidebar()
+                .ignoresSafeArea()
                 .background(
                     SidebarPositionRestorer(
                         expanded: layout.isExpanded,
@@ -40,6 +41,7 @@ struct WorkspaceView: View {
                 detail
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
+            .ignoresSafeArea()
             .frame(minWidth: 600, maxWidth: .infinity, maxHeight: .infinity)
             .background(HubStyle.canvas)
             .layoutPriority(1)
@@ -698,9 +700,11 @@ private struct WindowAccessor: NSViewRepresentable {
             window.titlebarSeparatorStyle = .none
             window.isMovableByWindowBackground = true
             window.toolbar = nil
+            window.backgroundColor = NSColor(Color(HubStyle.rail))
             if !window.styleMask.contains(.fullSizeContentView) {
                 window.styleMask.insert(.fullSizeContentView)
             }
+            window.contentView?.needsLayout = true
             window.layoutIfNeeded()
         }
     }

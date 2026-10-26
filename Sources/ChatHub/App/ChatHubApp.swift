@@ -110,15 +110,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func configureWindow(_ window: NSWindow) {
-        guard window.identifier?.rawValue == "workspace" || window.canBecomeMain else { return }
         window.titleVisibility = .hidden
         window.titlebarAppearsTransparent = true
         window.titlebarSeparatorStyle = .none
         window.isMovableByWindowBackground = true
         window.toolbar = nil
+        window.backgroundColor = NSColor(Color(HubStyle.rail))
         if !window.styleMask.contains(.fullSizeContentView) {
             window.styleMask.insert(.fullSizeContentView)
         }
+        window.contentView?.needsLayout = true
         window.layoutIfNeeded()
     }
 
