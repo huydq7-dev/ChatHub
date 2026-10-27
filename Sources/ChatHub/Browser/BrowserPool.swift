@@ -11,6 +11,7 @@ final class BrowserPool {
     private(set) var sessions: [UUID: BrowserSession] = [:]
     private(set) var selectedID: UUID?
     private(set) var isOnline = true
+    private static let preloadSpacing = 1.5
     @ObservationIgnored private var appearance = BrowserAppearance()
     @ObservationIgnored private let monitor = NWPathMonitor()
 
@@ -40,6 +41,18 @@ final class BrowserPool {
         sessions[account.id]?.updateAppearance(appearance)
         sessions[account.id]?.startIfNeeded()
         sessions[account.id]?.didActivate()
+    }
+
+    /// Starts each saved account's session one at a time, so unread counts and notifications work
+    /// before the user opens every account. Spaced out to avoid a CPU and network spike at launch.
+    func preload(_ accounts: [ChatAccount]) async {
+        for account in accounts where sessions[account.id] == nil {
+            guard !Task.isCancelled else { return }
+            let session = BrowserSession(account: account, appearance: appearance)
+            sessions[account.id] = session
+            session.startIfNeeded()
+            try? await Task.sleep(for: .seconds(Self.preloadSpacing))
+        }
     }
 
     func updateAppearance(_ appearance: BrowserAppearance) {

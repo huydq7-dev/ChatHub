@@ -111,6 +111,9 @@ struct WorkspaceToolbar: ToolbarContent {
                     Button(tr("Go to Service Home")) { session.loadHome() }
                     Divider()
                     if let account = store.selectedAccount {
+                        Button(tr(account.notificationsMuted ? "Unmute Notifications" : "Mute Notifications")) {
+                            store.setMuted(account, !account.notificationsMuted)
+                        }
                         Button(tr("Edit Account…")) { store.editingAccount = account }
                         Button(tr("Remove Account…"), role: .destructive) { store.removingAccount = account }
                     }

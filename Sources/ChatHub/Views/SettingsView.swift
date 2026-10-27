@@ -14,6 +14,7 @@ struct SettingsView: View {
     @AppStorage(ChatAppearancePreferences.accentKey) private var accentRaw = HubAccent.iris.rawValue
     @AppStorage(ChatAppearancePreferences.densityKey) private var densityRaw = HubDensity.standard.rawValue
     @AppStorage(ChatAppearancePreferences.textScaleKey) private var textScaleRaw = HubTextScale.standard.rawValue
+    @AppStorage(ChatAppearancePreferences.keepConnectedKey) private var keepConnected = true
 
     private var selectedAccent: HubAccent { HubAccent(rawValue: accentRaw) ?? .iris }
 
@@ -104,6 +105,16 @@ struct SettingsView: View {
                 Text(
                     tr(
                         "One ChatHub appearance for Telegram, Messenger and Zalo. Colors, typography and chat surfaces follow the appearance above. Show extra tools to access service-specific controls. Turn off to restore the original interfaces."
+                    ))
+            }
+            Section {
+                Toggle(tr("Keep accounts connected in the background"), isOn: $keepConnected)
+            } header: {
+                Text(tr("Notifications"))
+            } footer: {
+                Text(
+                    tr(
+                        "Loads every account after launch so unread badges and notifications work before you open it. Uses more memory. Takes effect next launch when turned off. Mute individual accounts from their context menu."
                     ))
             }
             Section {

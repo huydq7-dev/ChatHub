@@ -105,6 +105,19 @@ final class WorkspaceStore {
         return true
     }
 
+    func isMuted(_ id: UUID) -> Bool { accounts.first { $0.id == id }?.notificationsMuted ?? false }
+
+    @discardableResult
+    func setMuted(_ account: ChatAccount, _ muted: Bool) -> Bool {
+        guard let index = accounts.firstIndex(where: { $0.id == account.id }) else { return false }
+        var updated = accounts
+        updated[index].notificationsMuted = muted
+        guard commit(accounts: updated, selectedID: selectedID) else { return false }
+        accounts = updated
+        HubNotificationCenter.shared.refreshBadge()
+        return true
+    }
+
     func revealWorkspace() { NSWorkspace.shared.selectFile(repository.fileURL.path, inFileViewerRootedAtPath: "") }
 
     private func commit(accounts: [ChatAccount], selectedID: UUID?) -> Bool {
