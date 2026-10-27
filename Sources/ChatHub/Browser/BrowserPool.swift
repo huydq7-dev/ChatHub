@@ -31,8 +31,8 @@ final class BrowserPool {
         }
         monitor.start(queue: DispatchQueue(label: "app.chathub.reachability"))
 
-        HubNotificationCenter.shared.onNotificationClick = { [weak self] accountID, tag in
-            self?.sessions[accountID]?.handleNotificationClick(tag: tag)
+        HubNotificationCenter.shared.onNotificationClick = { [weak self] accountID, callbackID in
+            self?.sessions[accountID]?.handleNotificationClick(callbackID: callbackID)
         }
 
         let center = NotificationCenter.default

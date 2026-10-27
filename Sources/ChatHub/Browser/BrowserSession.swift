@@ -99,7 +99,9 @@ final class HubNotificationCenter: NSObject, UNUserNotificationCenterDelegate {
         NSApplication.shared.dockTile.badgeLabel = total > 0 ? (total > 99 ? "99+" : "\(total)") : nil
     }
 
-    func postNotification(account: ChatAccount, title: String, body: String, tag: String = "") {
+    func postNotification(
+        account: ChatAccount, title: String, body: String, tag: String = "", callbackID: String = ""
+    ) {
         let cleanTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
         let cleanBody = body.trimmingCharacters(in: .whitespacesAndNewlines)
         let effectiveTitle =
@@ -135,7 +137,7 @@ final class HubNotificationCenter: NSObject, UNUserNotificationCenterDelegate {
         content.title = effectiveTitle
         content.body = effectiveBody
         content.sound = .default
-        content.userInfo = ["accountID": account.id.uuidString, "tag": tag]
+        content.userInfo = ["accountID": account.id.uuidString, "tag": tag, "callbackID": callbackID]
         let identifier =
             tag.isEmpty
             ? "chathub.\(account.id.uuidString).\(UUID().uuidString)"
@@ -181,7 +183,7 @@ final class HubNotificationCenter: NSObject, UNUserNotificationCenterDelegate {
         withCompletionHandler completionHandler: @escaping () -> Void
     ) {
         let accountIDString = response.notification.request.content.userInfo["accountID"] as? String
-        let tag = response.notification.request.content.userInfo["tag"] as? String
+        let callbackID = response.notification.request.content.userInfo["callbackID"] as? String
         Task { @MainActor in
             NSApplication.shared.activate(ignoringOtherApps: true)
             if let window = NSApplication.shared.windows.first(where: { $0.identifier?.rawValue == "workspace" })
@@ -191,7 +193,7 @@ final class HubNotificationCenter: NSObject, UNUserNotificationCenterDelegate {
             }
             if let accountIDString, let uuid = UUID(uuidString: accountIDString) {
                 HubNotificationCenter.shared.onSelectAccount?(uuid)
-                HubNotificationCenter.shared.onNotificationClick?(uuid, tag ?? "")
+                HubNotificationCenter.shared.onNotificationClick?(uuid, callbackID ?? "")
             }
         }
         completionHandler()
@@ -241,7 +243,7 @@ final class BrowserSession: NSObject {
                 try { window.webkit?.messageHandlers?.chatHubNotify?.postMessage(payload); } catch (_) {}
             };
 
-            window.__chatHubIsFocused = false;
+            window.__chatHubIsFocused = Boolean(window.__chatHubIsFocused);
             window.__chatHubSetFocused = function(val) {
                 const active = Boolean(val);
                 if (window.__chatHubIsFocused === active) return;
@@ -270,26 +272,22 @@ final class BrowserSession: NSObject {
             } catch (_) {}
 
             const notiRegistry = new Map();
+            const documentID = window.crypto?.randomUUID?.()
+                || (Date.now().toString(36) + "_" + Math.random().toString(36).slice(2));
+            let nextNotificationID = 0;
             window.__chatHubNotificationRegistry = notiRegistry;
-            window.__chatHubTriggerNotificationClick = function(tag) {
+            window.__chatHubTriggerNotificationClick = function(callbackID) {
                 try {
-                    if (tag && notiRegistry.has(tag)) {
-                        const noti = notiRegistry.get(tag);
-                        const ev = new Event("click");
-                        noti.dispatchEvent(ev);
-                        if (typeof noti.onclick === "function") noti.onclick(ev);
-                        return;
-                    }
-                    for (const noti of notiRegistry.values()) {
-                        const ev = new Event("click");
-                        noti.dispatchEvent(ev);
-                        if (typeof noti.onclick === "function") noti.onclick(ev);
-                        break;
-                    }
+                    const noti = notiRegistry.get(callbackID);
+                    if (!noti) return;
+                    const ev = new Event("click");
+                    noti.dispatchEvent(ev);
+                    if (typeof noti.onclick === "function") noti.onclick(ev);
                 } catch (_) {}
             };
 
             class ChatHubNotification extends EventTarget {
+                #callbackID;
                 static get permission() { return "granted"; }
                 static requestPermission(cb) {
                     if (typeof cb === "function") cb("granted");
@@ -306,8 +304,8 @@ final class BrowserSession: NSObject {
                     this.onshow = null;
                     this.onerror = null;
 
-                    const tagKey = this.tag || ("noti_" + Date.now() + "_" + Math.random().toString(36).slice(2, 7));
-                    notiRegistry.set(tagKey, this);
+                    this.#callbackID = documentID + "_" + (++nextNotificationID);
+                    notiRegistry.set(this.#callbackID, this);
                     if (notiRegistry.size > 20) {
                         const firstKey = notiRegistry.keys().next().value;
                         notiRegistry.delete(firstKey);
@@ -317,7 +315,8 @@ final class BrowserSession: NSObject {
                         kind: "notify",
                         title: this.title.slice(0, 160),
                         body: this.body.slice(0, 300),
-                        tag: this.tag.slice(0, 80)
+                        tag: this.tag.slice(0, 80),
+                        callbackID: this.#callbackID
                     });
 
                     setTimeout(() => {
@@ -327,6 +326,7 @@ final class BrowserSession: NSObject {
                     }, 0);
                 }
                 close() {
+                    notiRegistry.delete(this.#callbackID);
                     const ev = new Event("close");
                     this.dispatchEvent(ev);
                     if (typeof this.onclose === "function") this.onclose(ev);
@@ -606,6 +606,7 @@ final class BrowserSession: NSObject {
     @ObservationIgnored private var started = false
     @ObservationIgnored private var hasLoadedPage = false
     @ObservationIgnored private var hasInstalledScripts = false
+    @ObservationIgnored private var hubIsFocused = false
     @ObservationIgnored private var appearance: BrowserAppearance
 
     init(account: ChatAccount, appearance initialAppearance: BrowserAppearance = BrowserAppearance()) {
@@ -679,8 +680,9 @@ final class BrowserSession: NSObject {
             let title = (payload["title"] as? String) ?? ""
             let body = (payload["body"] as? String) ?? ""
             let tag = (payload["tag"] as? String) ?? ""
+            let callbackID = (payload["callbackID"] as? String) ?? ""
             HubNotificationCenter.shared.postNotification(
-                account: account, title: title, body: body, tag: tag
+                account: account, title: title, body: body, tag: tag, callbackID: callbackID
             )
         case "badge":
             if let count = payload["count"] as? Int {
@@ -729,7 +731,8 @@ final class BrowserSession: NSObject {
         controller.removeAllUserScripts()
         controller.addUserScript(
             WKUserScript(
-                source: Self.notificationBridgeScript,
+                source: "window.__chatHubIsFocused = \(hubIsFocused ? "true" : "false");\n"
+                    + Self.notificationBridgeScript,
                 injectionTime: .atDocumentStart,
                 forMainFrameOnly: true,
                 in: .page
@@ -773,18 +776,26 @@ final class BrowserSession: NSObject {
     }
 
     func setHubFocus(active: Bool) {
+        if hubIsFocused != active {
+            hubIsFocused = active
+            // Future documents need the latest native state before provider scripts run.
+            installUserScripts()
+        }
+        syncHubFocus()
+    }
+
+    private func syncHubFocus() {
         webView.evaluateJavaScript(
-            "window.__chatHubSetFocused?.(\(active ? "true" : "false"));",
+            "window.__chatHubSetFocused?.(\(hubIsFocused ? "true" : "false"));",
             completionHandler: nil
         )
     }
 
-    func handleNotificationClick(tag: String) {
-        let escapedTag =
-            tag.replacingOccurrences(of: "\\", with: "\\\\")
-            .replacingOccurrences(of: "\"", with: "\\\"")
-        webView.evaluateJavaScript(
-            "window.__chatHubTriggerNotificationClick?.(\"\(escapedTag)\");",
+    func handleNotificationClick(callbackID: String) {
+        guard !callbackID.isEmpty else { return }
+        webView.callAsyncJavaScript(
+            "window.__chatHubTriggerNotificationClick?.(callbackID); return true;",
+            arguments: ["callbackID": callbackID], in: nil, in: .page,
             completionHandler: nil
         )
     }
@@ -871,12 +882,17 @@ extension BrowserSession: WKNavigationDelegate {
         externalURL = nil
     }
 
+    func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
+        syncHubFocus()
+    }
+
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         hasLoadedPage = true
         state = .loaded
         canGoBack = webView.canGoBack
         canGoForward = webView.canGoForward
         updateAppearance(appearance)
+        syncHubFocus()
         didActivate()
     }
 
