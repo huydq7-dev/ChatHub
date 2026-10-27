@@ -9,6 +9,7 @@ struct WorkspaceView: View {
     @Environment(BrowserPool.self) private var browsers
     @Environment(WorkspaceLayout.self) private var layout
     @Environment(AppUpdater.self) private var updater
+    @Environment(AppLock.self) private var lock
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @AppStorage("appearance") private var appearanceMode = "system"
@@ -22,8 +23,19 @@ struct WorkspaceView: View {
     /// The privacy banner floats over the conversation header, so it only shows briefly
     /// after enabling; the toolbar eye icon keeps indicating the active state.
     @State private var showPrivacyBanner = false
+    @AppStorage(ChatAppearancePreferences.keepConnectedKey) private var keepConnected = true
+    @AppStorage(ChatAppearancePreferences.sleepIdleHoursKey) private var sleepIdleHours = 1
 
     private var currentAccent: HubAccent { HubAccent(rawValue: accentRaw) ?? .iris }
+    private var preloadIDs: [UUID] { keepConnected && store.loadError == nil ? store.accounts.map(\.id) : [] }
+    private var mutedIDs: Set<UUID> { Set(store.accounts.filter(\.notificationsMuted).map(\.id)) }
+
+    private static let sleepCheckInterval = 300.0
+
+    private struct PreloadKey: Hashable {
+        let ids: [UUID]
+        let sleeping: Set<UUID>
+    }
 
     var body: some View {
         @Bindable var store = store
@@ -64,18 +76,52 @@ struct WorkspaceView: View {
             }
             return .ignored
         }
+        .accessibilityHidden(lock.isLocked)
+        .overlay {
+            if lock.isLocked { LockScreenView() }
+        }
         .onAppear {
             updater.start()
             HubNotificationCenter.shared.onSelectAccount = { id in
                 store.select(id)
             }
-            browsers.preload(store.accounts)
-        }
-        .onChange(of: store.accounts) { _, accounts in
-            browsers.preload(accounts)
+            HubNotificationCenter.shared.isMuted = { id in store.isMuted(id) }
+            HubNotificationCenter.shared.isViewing = { id in store.visibleIDs.contains(id) }
+            LinkOpener.browserID = { id in store.accounts.first { $0.id == id }?.linkBrowserID }
+            HubNotificationCenter.shared.isSnoozed = { id in store.isSnoozed(id) }
+            DockMenuSource.entries = {
+                guard !lock.isLocked else { return [] }
+                let unread = browsers.unreadCounts
+                return AccountNavigation.unreadFirst(store.accounts, unread: unread).prefix(9).map {
+                    DockMenuEntry(id: $0.id, title: accountMenuTitle($0, unread: unread[$0.id] ?? 0))
+                }
+            }
+            DockMenuSource.select = { id in store.select(id) }
+            browsers.onSignInChange = { id, required in
+                guard store.recordSignInState(for: id, signInRequired: required),
+                    let account = store.accounts.first(where: { $0.id == id })
+                else { return }
+                HubNotificationCenter.shared.postSignInNeeded(account: account)
+            }
         }
         .onChange(of: browserAppearance, initial: true) { _, appearance in browsers.updateAppearance(appearance) }
         .onChange(of: store.selectedID, initial: true) { _, _ in browsers.activate(store.selectedAccount) }
+        .task(id: PreloadKey(ids: preloadIDs, sleeping: browsers.sleeping)) {
+            guard !preloadIDs.isEmpty else { return }
+            await browsers.preload(store.accounts)
+        }
+        .onChange(of: store.secondaryID, initial: true) { _, _ in browsers.show(store.secondaryAccount) }
+        .onChange(of: mutedIDs) { old, new in
+            for id in old.subtracting(new) { browsers.wake(id) }
+        }
+        .task(id: sleepIdleHours) {
+            while !Task.isCancelled {
+                try? await Task.sleep(for: .seconds(Self.sleepCheckInterval))
+                browsers.sleepIdle(
+                    accounts: store.accounts, after: TimeInterval(sleepIdleHours) * 3_600,
+                    keeping: store.visibleIDs)
+            }
+        }
         .sheet(isPresented: $store.isAddingAccount) { AccountEditor(service: store.suggestedService) }
         .sheet(
             isPresented: $store.isSwitchingAccount,
@@ -139,13 +185,24 @@ struct WorkspaceView: View {
         } else {
             ZStack(alignment: .top) {
                 if let account = store.selectedAccount, let session = browsers.sessions[account.id] {
-                    ConversationView(account: account, session: session)
+                    if let secondary = store.secondaryAccount, let secondarySession = browsers.sessions[secondary.id] {
+                        SplitConversationView(
+                            primary: account, primarySession: session,
+                            secondary: secondary, secondarySession: secondarySession)
+                    } else {
+                        ConversationView(account: account, session: session)
+                    }
                 } else {
-                    ServiceWebView(containerView: browsers.containerView, session: nil)
+                    ServiceWebView(containerView: browsers.containerView, session: nil, isLocked: lock.isLocked)
                         .frame(width: 0, height: 0)
                         .opacity(0)
                         .allowsHitTesting(false)
-                    OverviewView()
+                    if store.selectedAccount != nil {
+                        // The selected account's session is being created; avoid flashing the overview.
+                        HubStyle.canvas
+                    } else {
+                        OverviewView()
+                    }
                 }
 
                 if privacyShieldEnabled && showPrivacyBanner {
@@ -206,6 +263,8 @@ private struct WorkspaceSidebar: View {
     @AppStorage("privacyShieldEnabled") private var privacyShieldEnabled = false
     @AppStorage("alwaysOnTopEnabled") private var alwaysOnTopEnabled = false
     @State private var showingAppearanceStudio = false
+    @State private var showingDownloads = false
+    private let downloads = DownloadCenter.shared
 
     private var supportsAppearance: Bool {
         store.selectedAccount.map { WebAppearancePolicy.supportsService($0.service) } ?? false
@@ -304,6 +363,14 @@ private struct WorkspaceSidebar: View {
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding(HubSpace.sm)
                         }
+                        // Dropping below the last account sends the dragged one to the end of the list.
+                        Color.clear
+                            .frame(height: HubSpace.lg)
+                            .contentShape(Rectangle())
+                            .dropDestination(for: String.self) { items, _ in
+                                guard let id = store.draggedAccountID(from: items) else { return false }
+                                return store.moveAccountToEnd(id)
+                            }
                     }
                     .padding(.horizontal, horizontalPadding)
                     .padding(.vertical, HubSpace.xxs)
@@ -374,6 +441,31 @@ private struct WorkspaceSidebar: View {
         .padding(.bottom, HubSpace.sm)
     }
 
+    /// Shown once a file has been saved; opens the list of this launch's downloads.
+    @ViewBuilder
+    private func downloadsButton<Style: ButtonStyle>(size: CGFloat, symbolSize: CGFloat, style: Style) -> some View {
+        if !downloads.history.records.isEmpty {
+            Button {
+                showingDownloads.toggle()
+            } label: {
+                Image(
+                    systemName: downloads.history.inProgressCount > 0
+                        ? "arrow.down.circle.fill" : "arrow.down.circle"
+                )
+                .font(.system(size: symbolSize, weight: .medium))
+                .frame(width: size, height: size)
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(style)
+            .foregroundStyle(
+                downloads.history.inProgressCount > 0 ? HubStyle.accentText : HubStyle.textSecondary
+            )
+            .help(tr("Downloads"))
+            .accessibilityLabel(tr("Downloads"))
+            .popover(isPresented: $showingDownloads, arrowEdge: .trailing) { DownloadsPopover() }
+        }
+    }
+
     private var footer: some View {
         VStack(spacing: 0) {
             Divider()
@@ -413,6 +505,8 @@ private struct WorkspaceSidebar: View {
                     .foregroundStyle(privacyShieldEnabled ? HubStyle.accentText : HubStyle.textSecondary)
                     .help(tr(privacyShieldEnabled ? "Disable Privacy Shield" : "Enable Privacy Shield") + " · ⌘⇧P")
                     .accessibilityLabel(tr(privacyShieldEnabled ? "Disable Privacy Shield" : "Enable Privacy Shield"))
+
+                    downloadsButton(size: 28, symbolSize: 13, style: SidebarSmallButtonStyle())
 
                     Button {
                         alwaysOnTopEnabled.toggle()
@@ -519,6 +613,8 @@ private struct WorkspaceSidebar: View {
                     .foregroundStyle(privacyShieldEnabled ? HubStyle.accentText : HubStyle.textSecondary)
                     .help(tr(privacyShieldEnabled ? "Disable Privacy Shield" : "Enable Privacy Shield") + " · ⌘⇧P")
                     .accessibilityLabel(tr(privacyShieldEnabled ? "Disable Privacy Shield" : "Enable Privacy Shield"))
+
+                    downloadsButton(size: 34, symbolSize: 14, style: SidebarButtonStyle())
 
                     Button {
                         alwaysOnTopEnabled.toggle()
@@ -649,6 +745,7 @@ private struct AccountSidebarRow: View {
     @Environment(WorkspaceLayout.self) private var layout
     @AppStorage(ChatAppearancePreferences.accentKey) private var accentRaw = HubAccent.iris.rawValue
     let account: ChatAccount
+    @State private var isDropTarget = false
 
     private var accent: HubAccent { HubAccent(rawValue: accentRaw) ?? .iris }
     private var selected: Bool { store.selectedID == account.id }
@@ -681,7 +778,13 @@ private struct AccountSidebarRow: View {
                         }
                     }
                     .overlay(alignment: .bottomTrailing) {
-                        if let session {
+                        if store.signedOut.contains(account.id) {
+                            Image(systemName: "person.crop.circle.badge.exclamationmark.fill")
+                                .font(.system(size: 12))
+                                .foregroundStyle(.orange)
+                                .background(HubStyle.rail, in: Circle())
+                                .offset(x: 3, y: 3)
+                        } else if let session {
                             if session.hasFailed {
                                 Image(systemName: "exclamationmark.circle.fill")
                                     .font(.system(size: 12))
@@ -715,6 +818,35 @@ private struct AccountSidebarRow: View {
                             .lineLimit(1)
                     }
                     Spacer(minLength: 0)
+                    if store.signedOut.contains(account.id) {
+                        Image(systemName: "person.crop.circle.badge.exclamationmark.fill")
+                            .font(.system(size: 12))
+                            .foregroundStyle(.orange)
+                            .help(tr("Signed out. Open this account to sign in again."))
+                    }
+                    if account.isPinned {
+                        Image(systemName: "pin.fill")
+                            .font(.system(size: 10))
+                            .foregroundStyle(HubStyle.textSecondary)
+                            .help(tr("Pinned"))
+                    }
+                    if browsers.sleeping.contains(account.id) {
+                        Image(systemName: "moon.zzz.fill")
+                            .font(.system(size: 11))
+                            .foregroundStyle(HubStyle.textSecondary)
+                            .help(tr("Sleeping to save memory. Opens when selected."))
+                    }
+                    if account.notificationsMuted {
+                        Image(systemName: "bell.slash.fill")
+                            .font(.system(size: 11))
+                            .foregroundStyle(HubStyle.textSecondary)
+                            .help(tr("Notifications muted"))
+                    } else if account.isSnoozed() {
+                        Image(systemName: "timer")
+                            .font(.system(size: 11))
+                            .foregroundStyle(HubStyle.textSecondary)
+                            .help(tr("Notifications snoozed"))
+                    }
                     if let session, session.unreadCount > 0 {
                         HubBadge(
                             text: session.unreadCount > 99 ? "99+" : "\(session.unreadCount)",
@@ -742,10 +874,37 @@ private struct AccountSidebarRow: View {
             account.name + (account.subtitle.isEmpty ? "" : " · " + account.subtitle)
                 + (shortcut.isEmpty ? "" : " · " + shortcut)
         )
-        .accessibilityLabel(account.name + ", " + account.service.name)
+        .accessibilityLabel(
+            [
+                account.name, account.service.name,
+                account.notificationsMuted ? tr("Notifications muted") : nil,
+                store.signedOut.contains(account.id) ? tr("Signed out") : nil,
+            ]
+            .compactMap { $0 }
+            .joined(separator: ", ")
+        )
         .accessibilityAddTraits(selected ? .isSelected : [])
+        .draggable(account.id.uuidString)
+        .dropDestination(for: String.self) { items, _ in
+            guard let id = store.draggedAccountID(from: items) else { return false }
+            return store.moveAccount(id, before: account.id)
+        } isTargeted: {
+            isDropTarget = $0
+        }
+        .overlay(alignment: .top) {
+            if isDropTarget {
+                Capsule()
+                    .fill(HubStyle.accentColor(for: accent))
+                    .frame(height: 2)
+                    .padding(.horizontal, HubSpace.xs)
+            }
+        }
         .contextMenu {
             Button(tr("Edit Account…")) { store.editingAccount = account }
+            Button(tr("Open Side by Side")) { store.openSideBySide(account.id) }
+                .disabled(store.selectedID == account.id)
+            Button(tr(account.isPinned ? "Unpin" : "Pin to Top")) { store.setPinned(account, !account.isPinned) }
+            AccountNotificationMenu(account: account)
             if store.canMove(account, by: -1) {
                 Button(tr("Move Up")) { store.move(account, by: -1) }
             }
@@ -755,7 +914,7 @@ private struct AccountSidebarRow: View {
             if let session = browsers.sessions[account.id] {
                 Button(tr("Reload Service")) { session.reload() }
             }
-            Button(tr("Open in Browser")) { if let url = account.url { NSWorkspace.shared.open(url) } }
+            Button(tr("Open in Browser")) { if let url = account.url { LinkOpener.open(url, for: account.id) } }
             Divider()
             Button(tr("Remove Account…"), role: .destructive) { store.removingAccount = account }
         }

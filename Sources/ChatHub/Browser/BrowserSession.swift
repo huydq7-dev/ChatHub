@@ -12,6 +12,9 @@ final class HubNotificationCenter: NSObject, UNUserNotificationCenterDelegate {
     static let shared = HubNotificationCenter()
     var onSelectAccount: ((UUID) -> Void)?
     var onNotificationClick: ((UUID, String) -> Void)?
+    var isMuted: (UUID) -> Bool = { _ in false }
+    var isViewing: (UUID) -> Bool = { _ in false }
+    var isSnoozed: (UUID) -> Bool = { _ in false }
     private var unreadByAccount: [UUID: Int] = [:]
     private var initializedAccounts: Set<UUID> = []
     private var lastNotificationTime: [UUID: Date] = [:]
@@ -94,13 +97,26 @@ final class HubNotificationCenter: NSObject, UNUserNotificationCenterDelegate {
         }
     }
 
+    /// Recompute the Dock badge, e.g. after an account is muted or unmuted. Muted accounts stay out of it.
+    func refreshBadge() { updateDockBadge() }
+
     private func updateDockBadge() {
-        let total = unreadByAccount.values.reduce(0, +)
-        NSApplication.shared.dockTile.badgeLabel = total > 0 ? (total > 99 ? "99+" : "\(total)") : nil
+        let muted = Set(unreadByAccount.keys.filter(isMuted))
+        let total = NotificationPolicy.dockTotal(unread: unreadByAccount, muted: muted)
+        NSApplication.shared.dockTile.badgeLabel = NotificationPolicy.badgeLabel(total: total)
+    }
+
+    /// The service asked the user to sign in again. The text is ChatHub's own, so previews never hide it.
+    func postSignInNeeded(account: ChatAccount) {
+        postNotification(
+            account: account, title: account.name,
+            body: String(format: tr("Signed out of %@. Open ChatHub to sign in again."), account.service.name),
+            tag: "signed-out", isServiceContent: false)
     }
 
     func postNotification(
-        account: ChatAccount, title: String, body: String, tag: String = "", callbackID: String = ""
+        account: ChatAccount, title: String, body: String, tag: String = "", callbackID: String = "",
+        isServiceContent: Bool = true
     ) {
         let cleanTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
         let cleanBody = body.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -127,6 +143,17 @@ final class HubNotificationCenter: NSObject, UNUserNotificationCenterDelegate {
             pendingBadgeFallbackTasks[account.id]?.cancel()
         }
 
+        // Muted or snoozed accounts, quiet hours and the conversation being viewed never interrupt.
+        guard
+            NotificationPolicy.shouldAlert(
+                isMuted: isMuted(account.id),
+                isViewing: NSApplication.shared.isActive && isViewing(account.id),
+                isSnoozed: isSnoozed(account.id),
+                isQuietHours: ChatAppearancePreferences.quietHours().contains(Date()))
+        else { return }
+        let hidePreviews =
+            isServiceContent && UserDefaults.standard.bool(forKey: ChatAppearancePreferences.hidePreviewsKey)
+
         if !NSApplication.shared.isActive {
             NSApplication.shared.requestUserAttention(.informationalRequest)
         }
@@ -134,8 +161,8 @@ final class HubNotificationCenter: NSObject, UNUserNotificationCenterDelegate {
         configure()
         let center = UNUserNotificationCenter.current()
         let content = UNMutableNotificationContent()
-        content.title = effectiveTitle
-        content.body = effectiveBody
+        content.title = hidePreviews ? account.name : effectiveTitle
+        content.body = hidePreviews ? tr("New message received") : effectiveBody
         content.sound = .default
         content.userInfo = ["accountID": account.id.uuidString, "tag": tag, "callbackID": callbackID]
         let identifier =
@@ -467,15 +494,35 @@ final class BrowserSession: NSObject {
                 }
             }
 
+            // Telegram shows its sign-in screen on the same address, so the app shell is the signed-in signal.
+            // Only which screen is showing is read, never conversation content. Neither present: still loading.
+            let lastAuthRequired = null;
+            function reportAuthState() {
+                if (location.hostname !== "web.telegram.org") return;
+                let required = null;
+                if (document.querySelector("#auth-qr-form, #auth-phone-number-form, #auth-code-form, #auth-password-form, #auth-registration-form")) {
+                    required = true;
+                } else if (document.getElementById("Main") && document.getElementById("LeftColumn")) {
+                    required = false;
+                }
+                if (required === null || required === lastAuthRequired) return;
+                lastAuthRequired = required;
+                post({ kind: "auth", required });
+            }
+
             function computeBadgeCount() {
                 badgeTimer = null;
+                reportAuthState();
                 checkTitleBlink();
                 const titleMatch = document.title.match(/\\((\\d+)\\+?\\)|\\[(\\d+)\\+?\\]/);
                 if (titleMatch) {
                     const n = parseInt(titleMatch[1] || titleMatch[2], 10);
-                    if (!Number.isNaN(n) && n !== lastBadgeCount) {
-                        lastBadgeCount = n;
-                        post({ kind: "badge", count: n });
+                    // A count in the title is authoritative; never fall through to DOM counting.
+                    if (!Number.isNaN(n)) {
+                        if (n !== lastBadgeCount) {
+                            lastBadgeCount = n;
+                            post({ kind: "badge", count: n });
+                        }
                         return;
                     }
                 }
@@ -544,6 +591,8 @@ final class BrowserSession: NSObject {
     var isFinding = false
     var findQuery = ""
     var findHasNoMatches = false
+    @ObservationIgnored var onSignInChange: ((UUID, Bool) -> Void)?
+    @ObservationIgnored private var lastSignInRequired: Bool?
     @ObservationIgnored let webView: WKWebView
     @ObservationIgnored private var observations: [NSKeyValueObservation] = []
     @ObservationIgnored private var popups: [BrowserPopup] = []
@@ -560,7 +609,8 @@ final class BrowserSession: NSObject {
         self.appearance = initialAppearance
         self.appearanceBootstrap = ServiceTheme.bootstrap(service: account.service, appearance: initialAppearance)
         let configuration = WKWebViewConfiguration()
-        configuration.applicationNameForUserAgent = "Version/18.0 Safari/605.1.15 ChatHub/0.2.0"
+        let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "0.3.3"
+        configuration.applicationNameForUserAgent = "Version/18.0 Safari/605.1.15 ChatHub/\(version)"
         configuration.websiteDataStore = WKWebsiteDataStore(forIdentifier: account.id)
         configuration.preferences.javaScriptCanOpenWindowsAutomatically = false
         configuration.mediaTypesRequiringUserActionForPlayback = .all
@@ -604,10 +654,13 @@ final class BrowserSession: NSObject {
                     canGoBack = webView.canGoBack
                     canGoForward = webView.canGoForward
                     syncPageAppearance()
+                    if hasLoadedPage { reportURLSignIn() }
                 }
             },
         ]
     }
+
+    var hasActiveDownloads: Bool { !downloads.isEmpty }
 
     var hasFailed: Bool {
         if case .failed = state { return true }
@@ -637,9 +690,25 @@ final class BrowserSession: NSObject {
             if let count = payload["count"] as? Int {
                 applyUnreadCount(count)
             }
+        case "auth":
+            if SignInDetector.usesPageSignal(account.service), let required = payload["required"] as? Bool {
+                reportSignIn(required: required)
+            }
         default:
             break
         }
+    }
+
+    /// Reports each change once; the workspace decides whether it means an expired session.
+    private func reportSignIn(required: Bool) {
+        guard lastSignInRequired != required else { return }
+        lastSignInRequired = required
+        onSignInChange?(account.id, required)
+    }
+
+    private func reportURLSignIn() {
+        guard SignInDetector.usesURLSignal(account.service), let url = webView.url else { return }
+        reportSignIn(required: SignInDetector.isSignInPage(service: account.service, url: url))
     }
 
     private func applyUnreadCount(_ count: Int) {
@@ -747,7 +816,7 @@ final class BrowserSession: NSObject {
 
     func openInBrowser() {
         guard let url = currentURL ?? account.url else { return }
-        NSWorkspace.shared.open(url)
+        LinkOpener.open(url, for: account.id)
     }
 
     func showFind() {
@@ -821,6 +890,7 @@ extension BrowserSession: WKNavigationDelegate {
         state = .loaded
         canGoBack = webView.canGoBack
         canGoForward = webView.canGoForward
+        reportURLSignIn()
         updateAppearance(appearance)
         syncPageAppearance()
         syncHubFocus()
@@ -860,7 +930,7 @@ extension BrowserSession: WKNavigationDelegate {
             decisionHandler(.cancel)
             state = hasLoadedPage ? .loaded : .idle
             if navigationAction.navigationType == .linkActivated {
-                NSWorkspace.shared.open(url)
+                LinkOpener.open(url, for: account.id)
             } else if navigationAction.targetFrame != nil {
                 externalURL = url
                 notice = tr("This service needs to open another website to continue.")
@@ -889,7 +959,8 @@ extension BrowserSession: WKNavigationDelegate {
 
     private func retainDownload(_ download: WKDownload) {
         let id = ObjectIdentifier(download)
-        let handler = DownloadHandler(download: download, window: webView.window) { [weak self] error in
+        let handler = DownloadHandler(download: download, window: webView.window, accountName: account.name) {
+            [weak self] error in
             self?.downloads.removeValue(forKey: id)
             if let error { self?.notice = error.localizedDescription }
         }
@@ -905,7 +976,7 @@ extension BrowserSession: WKUIDelegate {
     ) -> WKWebView? {
         guard let url = navigationAction.request.url else { return nil }
         guard NavigationPolicy(account: account).disposition(for: url) == .inApp else {
-            if ["https", "http"].contains(url.scheme?.lowercased() ?? "") { NSWorkspace.shared.open(url) }
+            if ["https", "http"].contains(url.scheme?.lowercased() ?? "") { LinkOpener.open(url, for: account.id) }
             return nil
         }
         let popup = BrowserPopup(configuration: configuration, initialURL: url)

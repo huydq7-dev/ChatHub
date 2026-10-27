@@ -5,12 +5,24 @@ import SwiftUI
     import ChatHubCore
 #endif
 
+/// "Name · 3" for accounts with unread messages, just the name otherwise.
+func accountMenuTitle(_ account: ChatAccount, unread: Int) -> String {
+    guard unread > 0, !account.notificationsMuted else { return account.name }
+    return "\(account.name) · \(unread > 99 ? "99+" : "\(unread)")"
+}
+
+/// Unread messages in accounts that are allowed to interrupt; muted accounts stay out of the total.
+@MainActor
+private func unreadTotal(store: WorkspaceStore, browsers: BrowserPool) -> Int {
+    let muted = Set(store.accounts.filter(\.notificationsMuted).map(\.id))
+    return NotificationPolicy.dockTotal(unread: browsers.unreadCounts, muted: muted)
+}
+
 struct ChatHubMenuBarLabel: View {
+    @Environment(WorkspaceStore.self) private var store
     @Environment(BrowserPool.self) private var browsers
 
-    private var totalUnread: Int {
-        browsers.sessions.values.reduce(0) { $0 + $1.unreadCount }
-    }
+    private var totalUnread: Int { unreadTotal(store: store, browsers: browsers) }
 
     var body: some View {
         HStack(spacing: 3) {
@@ -27,16 +39,17 @@ struct ChatHubMenuBarLabel: View {
 struct ChatHubMenuBarMenu: View {
     @Environment(WorkspaceStore.self) private var store
     @Environment(BrowserPool.self) private var browsers
+    @Environment(AppLock.self) private var lock
     @Binding var privacyShieldEnabled: Bool
     @Binding var alwaysOnTopEnabled: Bool
 
-    private var totalUnread: Int {
-        browsers.sessions.values.reduce(0) { $0 + $1.unreadCount }
-    }
+    private var totalUnread: Int { unreadTotal(store: store, browsers: browsers) }
 
     var body: some View {
         VStack {
-            if totalUnread > 0 {
+            if lock.isLocked {
+                Text(tr("ChatHub is locked"))
+            } else if totalUnread > 0 {
                 Text(String(format: tr("%d unread messages"), totalUnread))
             } else {
                 Text(tr("All caught up"))
@@ -44,17 +57,15 @@ struct ChatHubMenuBarMenu: View {
 
             Divider()
 
-            ForEach(store.accounts) { account in
-                let count = browsers.sessions[account.id]?.unreadCount ?? 0
-                Button {
-                    openAccount(account)
-                } label: {
-                    HStack {
-                        Image(systemName: account.service.symbol)
-                        Text(account.name)
-                        if count > 0 {
-                            Spacer()
-                            Text("(\(count))")
+            if !lock.isLocked {
+                let unread = browsers.unreadCounts
+                ForEach(AccountNavigation.unreadFirst(store.accounts, unread: unread)) { account in
+                    Button {
+                        openAccount(account)
+                    } label: {
+                        HStack {
+                            Image(systemName: account.service.symbol)
+                            Text(accountMenuTitle(account, unread: unread[account.id] ?? 0))
                         }
                     }
                 }

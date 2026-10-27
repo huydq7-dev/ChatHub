@@ -110,18 +110,27 @@ struct OverviewView: View {
                     .foregroundStyle(HubStyle.textPrimary)
                 HubBadge(text: "\(store.accounts.count)")
                 Spacer()
-                Text(tr("Pick up where you left off"))
+                Text(tr("Unread first"))
                     .font(HubFont.caption)
                     .foregroundStyle(HubStyle.textSecondary)
             }
             HubGlassContainer(spacing: HubSpace.md) {
                 LazyVGrid(columns: columns, spacing: HubSpace.md) {
-                    ForEach(store.accounts) { account in
-                        AccountOverviewCard(account: account, session: browsers.sessions[account.id]) {
+                    ForEach(AccountNavigation.unreadFirst(store.accounts, unread: browsers.unreadCounts)) { account in
+                        AccountOverviewCard(
+                            account: account, session: browsers.sessions[account.id],
+                            signedOut: store.signedOut.contains(account.id)
+                        ) {
                             store.select(account.id)
                         }
                         .contextMenu {
                             Button(tr("Edit Account…")) { store.editingAccount = account }
+                            Button(tr("Open Side by Side")) { store.openSideBySide(account.id) }
+                                .disabled(store.selectedID == account.id)
+                            Button(tr(account.isPinned ? "Unpin" : "Pin to Top")) {
+                                store.setPinned(account, !account.isPinned)
+                            }
+                            AccountNotificationMenu(account: account)
                             if store.canMove(account, by: -1) {
                                 Button(tr("Move Up")) { store.move(account, by: -1) }
                             }
@@ -180,6 +189,7 @@ struct OverviewView: View {
 private struct AccountOverviewCard: View {
     let account: ChatAccount
     let session: BrowserSession?
+    let signedOut: Bool
     let action: () -> Void
     @State private var hovered = false
 
@@ -188,7 +198,14 @@ private struct AccountOverviewCard: View {
             HStack(spacing: HubSpace.sm) {
                 ServiceIcon(service: account.service, size: 40)
                     .overlay(alignment: .bottomTrailing) {
-                        if let session {
+                        if signedOut {
+                            Image(systemName: "person.crop.circle.badge.exclamationmark.fill")
+                                .font(.system(size: 12))
+                                .foregroundStyle(.orange)
+                                .background(HubStyle.surface, in: Circle())
+                                .offset(x: 3, y: 3)
+                                .help(tr("Signed out. Open this account to sign in again."))
+                        } else if let session {
                             if session.hasFailed {
                                 Image(systemName: "exclamationmark.circle.fill")
                                     .font(.system(size: 12))
@@ -215,6 +232,17 @@ private struct AccountOverviewCard: View {
                         .lineLimit(1)
                 }
                 Spacer(minLength: 0)
+                if account.notificationsMuted {
+                    Image(systemName: "bell.slash.fill")
+                        .font(.system(size: 11))
+                        .foregroundStyle(HubStyle.textSecondary)
+                        .help(tr("Notifications muted"))
+                } else if account.isSnoozed() {
+                    Image(systemName: "timer")
+                        .font(.system(size: 11))
+                        .foregroundStyle(HubStyle.textSecondary)
+                        .help(tr("Notifications snoozed"))
+                }
                 if let session, session.unreadCount > 0 {
                     HubBadge(
                         text: session.unreadCount > 99 ? "99+" : "\(session.unreadCount)",

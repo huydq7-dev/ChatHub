@@ -8,6 +8,7 @@ struct ChatHubApp: App {
     @State private var browsers = BrowserPool()
     @State private var layout = WorkspaceLayout()
     @State private var updater = AppUpdater()
+    @State private var lock = AppLock()
     @AppStorage("appearance") private var appearance = "system"
     @AppStorage("showMenuBarExtra") private var showMenuBarExtra = true
     @AppStorage("privacyShieldEnabled") private var privacyShieldEnabled = false
@@ -23,6 +24,7 @@ struct ChatHubApp: App {
                 .environment(browsers)
                 .environment(layout)
                 .environment(updater)
+                .environment(lock)
                 .preferredColorScheme(appearance == "system" ? nil : appearance == "dark" ? .dark : .light)
                 .frame(minWidth: 860, minHeight: 600)
         }
@@ -42,6 +44,18 @@ struct ChatHubApp: App {
                     .keyboardShortcut("k", modifiers: .command)
                 Button(tr("Toggle Sidebar")) { layout.toggle() }
                     .keyboardShortcut("s", modifiers: [.command, .control])
+                Button(tr("Next Unread Account")) {
+                    if !store.selectNextUnread(unread: browsers.unreadCounts) { NSSound.beep() }
+                }
+                .keyboardShortcut("j", modifiers: .command)
+                Button(tr("Swap Split Panes")) { store.swapPanes() }
+                    .disabled(store.secondaryID == nil)
+                Button(tr("Close Split View")) { store.closeSecondary() }
+                    .disabled(store.secondaryID == nil)
+                Button(tr("Lock ChatHub")) {
+                    if !lock.lock() { NSSound.beep() }
+                }
+                .keyboardShortcut("l", modifiers: [.command, .control])
                 Divider()
                 Button(privacyShieldEnabled ? tr("Disable Privacy Shield") : tr("Enable Privacy Shield")) {
                     privacyShieldEnabled.toggle()
@@ -83,8 +97,10 @@ struct ChatHubApp: App {
             )
             .environment(store)
             .environment(browsers)
+            .environment(lock)
         } label: {
             ChatHubMenuBarLabel()
+                .environment(store)
                 .environment(browsers)
         }
 
@@ -99,8 +115,40 @@ struct ChatHubApp: App {
     }
 }
 
+struct DockMenuEntry {
+    let id: UUID
+    let title: String
+}
+
+/// Feeds the Dock menu; the workspace view installs the closures once it appears.
+@MainActor
+enum DockMenuSource {
+    static var entries: () -> [DockMenuEntry] = { [] }
+    static var select: (UUID) -> Void = { _ in }
+}
+
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
+    func applicationDockMenu(_ sender: NSApplication) -> NSMenu? {
+        let entries = DockMenuSource.entries()
+        guard !entries.isEmpty else { return nil }
+        let menu = NSMenu()
+        for entry in entries {
+            let item = NSMenuItem(title: entry.title, action: #selector(openAccountFromDock(_:)), keyEquivalent: "")
+            item.target = self
+            item.representedObject = entry.id
+            menu.addItem(item)
+        }
+        return menu
+    }
+
+    @objc private func openAccountFromDock(_ sender: NSMenuItem) {
+        guard let id = sender.representedObject as? UUID else { return }
+        DockMenuSource.select(id)
+        _ = applicationShouldHandleReopen(NSApplication.shared, hasVisibleWindows: false)
+        NSApplication.shared.activate(ignoringOtherApps: true)
+    }
+
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApplication.shared.setActivationPolicy(.regular)
         NSApplication.shared.activate(ignoringOtherApps: true)
