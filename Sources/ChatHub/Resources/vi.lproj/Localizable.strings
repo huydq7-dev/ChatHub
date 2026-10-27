@@ -152,3 +152,142 @@
 "You have 1 unread message." = "Bạn có 1 tin nhắn chưa đọc.";
 "You have %d unread messages." = "Bạn có %d tin nhắn chưa đọc.";
 "New message received" = "Có tin nhắn mới";
+"Notifications" = "Thông báo";
+"System Notifications" = "Thông báo hệ thống";
+"Receive notifications for new messages across your active and background accounts." = "Nhận thông báo khi có tin nhắn mới trên cả tài khoản đang mở và tài khoản chạy nền.";
+"Send Test Notification" = "Gửi thông báo thử";
+"Make sure notifications are enabled for ChatHub in macOS System Settings > Notifications." = "Đảm bảo thông báo cho ChatHub đã được bật trong Cài đặt hệ thống macOS > Thông báo.";
+"Test notification: your system notifications are working properly." = "Thông báo thử: tính năng thông báo hệ thống đang hoạt động tốt.";
+
+"Check for Updates…" = "Kiểm tra cập nhật…";
+
+"Automatically check for updates" = "Tự động kiểm tra cập nhật";
+
+"Checking for updates…" = "Đang kiểm tra cập nhật…";
+
+"Last checked" = "Lần kiểm tra gần nhất";
+
+"Updates" = "Cập nhật";
+
+"Couldn’t check for updates" = "Không thể kiểm tra cập nhật";
+
+"Check your connection and try again later. You can also visit the releases page." = "Kiểm tra kết nối rồi thử lại sau. Bạn cũng có thể mở trang phát hành.";
+
+"Open Releases" = "Mở trang phát hành";
+
+"ChatHub %@ is available." = "Đã có ChatHub %@.";
+
+"Download the new installer, quit ChatHub, then replace it in Applications. Your local workspace is kept." = "Tải bộ cài mới, thoát ChatHub rồi thay thế app trong Applications. Workspace cục bộ của bạn được giữ lại.";
+
+"Download Update" = "Tải bản cập nhật";
+
+"Later" = "Để sau";
+
+"Release Notes" = "Có gì mới";
+
+"You’re up to date" = "Bạn đang dùng bản mới nhất";
+
+"You’re using ChatHub %@." = "Bạn đang dùng ChatHub %@.";
+
+"Remind Me Later" = "Nhắc lại sau";
+
+"Skip This Version" = "Bỏ qua phiên bản này";
+
+"Update options" = "Tùy chọn cập nhật";
+
+"ChatHub checks GitHub Releases every six hours. New versions appear in the workspace. Installation is manual; your chats and account profiles stay in place." = "ChatHub kiểm tra GitHub Releases mỗi 6 giờ và báo bản mới trong workspace. Bạn cài đặt thủ công; dữ liệu chat và profile tài khoản vẫn được giữ lại.";
+
+"Command Palette…" = "Bảng lệnh…";
+"Enable Privacy Shield" = "Bật Màn chắn Riêng tư";
+"Disable Privacy Shield" = "Tắt Màn chắn Riêng tư";
+"Keep Window on Top" = "Ghim cửa sổ trên cùng";
+"Disable Always on Top" = "Bỏ ghim cửa sổ";
+"Privacy Shield Active (Hover to peek)" = "Đang che tin nhắn (Rê chuột để xem nhanh)";
+"Turn Off" = "Tắt";
+"Show Menu Bar Icon" = "Hiện biểu tượng Menu Bar";
+"Privacy Shield (Blur messages)" = "Màn chắn Riêng tư (Làm mờ tin nhắn)";
+"Keep window always on top" = "Luôn ghim cửa sổ trên cùng";
+"Workspace & Privacy" = "Không gian & Riêng tư";
+"Privacy Shield blurs chat content in Telegram, Messenger and Zalo, including when appearance matching is off. Hover to peek while ChatHub is active. Always on Top keeps ChatHub above other windows." = "Màn chắn Riêng tư làm mờ nội dung chat trong Telegram, Messenger và Zalo, kể cả khi tắt đồng bộ giao diện. Rê chuột để xem nhanh khi ChatHub đang hoạt động. Ghim trên cùng giữ ChatHub phía trên các cửa sổ khác.";
+"%d unread messages" = "%d tin nhắn chưa đọc";
+"All caught up" = "Không có tin mới";
+"Open ChatHub" = "Mở ChatHub";
+"Quit ChatHub" = "Thoát ChatHub";
+"Search accounts or type a command…" = "Tìm tài khoản hoặc gõ lệnh…";
+"Actions" = "Tác vụ";
+"Blur messages with hover peek" = "Làm mờ tin nhắn, rê chuột để xem nhanh";
+"Float window above other apps" = "Giữ cửa sổ nổi trên các ứng dụng khác";
+"Connect Telegram, Messenger, Zalo…" = "Kết nối Telegram, Messenger, Zalo…";
+"Refresh current conversation" = "Tải lại cuộc trò chuyện hiện tại";
+"Search text in current chat" = "Tìm kiếm văn bản trong đoạn chat";
+"Open in Safari or default browser" = "Mở bằng Safari hoặc trình duyệt mặc định";
+"Toggle Dark / Light Mode" = "Đổi giao diện Sáng / Tối";
+"Switch between dark and light appearance" = "Chuyển đổi giữa chế độ sáng và tối";
+"Preferences, theme and data" = "Tùy chọn, giao diện và dữ liệu";
+"↑↓ to navigate · ↩ to select · esc to close" = "↑↓ Di chuyển · ↩ Chọn · esc Đóng";
+
+"Mute Notifications" = "Tắt thông báo";
+"Unmute Notifications" = "Bật lại thông báo";
+"Notifications muted" = "Đã tắt thông báo";
+"Next Unread Account" = "Tài khoản chưa đọc tiếp theo";
+"Downloads" = "Tải xuống";
+"Clear Finished" = "Xóa mục đã xong";
+"Files you save from your accounts appear here." = "Các file bạn lưu từ tài khoản sẽ hiện ở đây.";
+"Downloading…" = "Đang tải…";
+"Moved or deleted" = "Đã di chuyển hoặc xóa";
+"Open" = "Mở";
+"Show in Finder" = "Hiện trong Finder";
+"Remove from list" = "Xóa khỏi danh sách";
+"Cancelled" = "Đã hủy";
+"Open links in" = "Mở liên kết bằng";
+"Default browser" = "Trình duyệt mặc định";
+"Links to other websites open in this browser instead of the system default." = "Liên kết tới trang web khác sẽ mở bằng trình duyệt này thay vì mặc định của hệ thống.";
+"Open Side by Side" = "Mở song song";
+"Swap sides" = "Đổi bên";
+"Swap Split Panes" = "Đổi bên hai khung";
+"Close Split View" = "Đóng chia đôi màn hình";
+"Pin to Top" = "Ghim lên đầu";
+"Unpin" = "Bỏ ghim";
+"Pinned" = "Đã ghim";
+"Signed out" = "Đã đăng xuất";
+"Signed out. Open this account to sign in again." = "Đã đăng xuất. Mở tài khoản này để đăng nhập lại.";
+"Signed out of %@. Open ChatHub to sign in again." = "Đã đăng xuất khỏi %@. Mở ChatHub để đăng nhập lại.";
+"Snooze Notifications" = "Tạm hoãn thông báo";
+"Resume Notifications" = "Tiếp tục thông báo";
+"For 1 Hour" = "Trong 1 giờ";
+"Until 8 AM" = "Đến 8 giờ sáng";
+"Notifications snoozed" = "Đang tạm hoãn thông báo";
+"Quiet hours" = "Giờ yên lặng";
+"From" = "Từ";
+"To" = "Đến";
+"Do not disturb" = "Không làm phiền";
+"No sounds, banners or Dock bounce during quiet hours. Unread badges keep updating. Snooze a single account from its context menu." = "Không âm thanh, banner hay nảy Dock trong giờ yên lặng. Huy hiệu chưa đọc vẫn cập nhật. Có thể tạm hoãn riêng từng tài khoản bằng menu chuột phải.";
+"Privacy" = "Quyền riêng tư";
+"Require Touch ID or password" = "Yêu cầu Touch ID hoặc mật khẩu";
+"Lock after leaving ChatHub for" = "Khóa sau khi rời ChatHub";
+"Immediately" = "Ngay lập tức";
+"1 minute" = "1 phút";
+"%d minutes" = "%d phút";
+"Hide message previews in notifications" = "Ẩn nội dung tin nhắn trong thông báo";
+"ChatHub also locks when your Mac sleeps or the screen locks. Conversations stay hidden until you unlock." = "ChatHub cũng khóa khi máy ngủ hoặc khóa màn hình. Cuộc trò chuyện được ẩn cho đến khi bạn mở khóa.";
+"Set a password or Touch ID on this Mac to use the lock." = "Hãy đặt mật khẩu hoặc Touch ID cho máy Mac này để dùng tính năng khóa.";
+"Lock ChatHub" = "Khóa ChatHub";
+"ChatHub is locked" = "ChatHub đã khóa";
+"Use Touch ID or your password to see your conversations." = "Dùng Touch ID hoặc mật khẩu để xem các cuộc trò chuyện.";
+"Unlock" = "Mở khóa";
+"Unlock ChatHub to see your conversations." = "Mở khóa ChatHub để xem các cuộc trò chuyện.";
+"Unread first" = "Chưa đọc lên đầu";
+"No accounts yet" = "Chưa có tài khoản";
+"Sleeping to save memory. Opens when selected." = "Đang ngủ để tiết kiệm bộ nhớ. Sẽ mở lại khi bạn chọn.";
+"Sleep muted accounts after" = "Cho ngủ tài khoản đã tắt thông báo sau";
+"Never" = "Không bao giờ";
+"1 hour" = "1 giờ";
+"%d hours" = "%d giờ";
+"Muted accounts that sit idle release their memory and reopen when selected. Accounts with notifications stay awake." = "Tài khoản đã tắt thông báo mà để không dùng sẽ giải phóng bộ nhớ và mở lại khi bạn chọn. Tài khoản có thông báo luôn thức.";
+"Open ChatHub at login" = "Mở ChatHub khi đăng nhập máy";
+"Approve ChatHub in System Settings → General → Login Items." = "Hãy cho phép ChatHub trong Cài đặt hệ thống → Chung → Mục đăng nhập.";
+"Keep accounts connected in the background" = "Giữ các tài khoản kết nối nền";
+"Loads every account after launch so unread badges and notifications work before you open it. Uses more memory. Takes effect next launch when turned off. Mute individual accounts from their context menu." = "Tải mọi tài khoản sau khi mở app để huy hiệu chưa đọc và thông báo hoạt động trước khi bạn mở từng tài khoản. Tốn thêm bộ nhớ. Khi tắt, có hiệu lực ở lần mở sau. Tắt thông báo từng tài khoản bằng menu chuột phải.";
+"Startup" = "Khởi động";
+"Find on this page…" = "Tìm trong trang này…";
+"Settings…" = "Cài đặt…";

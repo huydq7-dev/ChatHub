@@ -44,7 +44,7 @@ struct OverviewView: View {
                     .font(HubFont.bodyMedium)
                     .foregroundStyle(HubStyle.textPrimary)
                     .padding(HubSpace.lg)
-                    .modifier(CardSurface())
+                    .liquidGlassCard(cornerRadius: HubRadius.card)
                 }
                 footer
             }
@@ -95,17 +95,9 @@ struct OverviewView: View {
         }
         .padding(HubSpace.xl)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background {
-            RoundedRectangle(cornerRadius: HubRadius.hero, style: .continuous)
-                .fill(HubStyle.surface)
-                .overlay {
-                    RoundedRectangle(cornerRadius: HubRadius.hero, style: .continuous)
-                        .fill(HubStyle.accentColor(for: currentAccent).opacity(0.06).gradient)
-                }
-        }
-        .overlay(
-            RoundedRectangle(cornerRadius: HubRadius.hero, style: .continuous)
-                .strokeBorder(HubStyle.border, lineWidth: 1)
+        .liquidGlassCard(
+            cornerRadius: HubRadius.hero,
+            tint: HubStyle.accentColor(for: currentAccent).opacity(0.08)
         )
     }
 
@@ -118,24 +110,35 @@ struct OverviewView: View {
                     .foregroundStyle(HubStyle.textPrimary)
                 HubBadge(text: "\(store.accounts.count)")
                 Spacer()
-                Text(tr("Pick up where you left off"))
+                Text(tr("Unread first"))
                     .font(HubFont.caption)
                     .foregroundStyle(HubStyle.textSecondary)
             }
-            LazyVGrid(columns: columns, spacing: HubSpace.md) {
-                ForEach(store.accounts) { account in
-                    AccountOverviewCard(account: account, session: browsers.sessions[account.id]) {
-                        store.select(account.id)
-                    }
-                    .contextMenu {
-                        Button(tr("Edit Account…")) { store.editingAccount = account }
-                        if store.canMove(account, by: -1) {
-                            Button(tr("Move Up")) { store.move(account, by: -1) }
+            HubGlassContainer(spacing: HubSpace.md) {
+                LazyVGrid(columns: columns, spacing: HubSpace.md) {
+                    ForEach(AccountNavigation.unreadFirst(store.accounts, unread: browsers.unreadCounts)) { account in
+                        AccountOverviewCard(
+                            account: account, session: browsers.sessions[account.id],
+                            signedOut: store.signedOut.contains(account.id)
+                        ) {
+                            store.select(account.id)
                         }
-                        if store.canMove(account, by: 1) {
-                            Button(tr("Move Down")) { store.move(account, by: 1) }
+                        .contextMenu {
+                            Button(tr("Edit Account…")) { store.editingAccount = account }
+                            Button(tr("Open Side by Side")) { store.openSideBySide(account.id) }
+                                .disabled(store.selectedID == account.id)
+                            Button(tr(account.isPinned ? "Unpin" : "Pin to Top")) {
+                                store.setPinned(account, !account.isPinned)
+                            }
+                            AccountNotificationMenu(account: account)
+                            if store.canMove(account, by: -1) {
+                                Button(tr("Move Up")) { store.move(account, by: -1) }
+                            }
+                            if store.canMove(account, by: 1) {
+                                Button(tr("Move Down")) { store.move(account, by: 1) }
+                            }
+                            Button(tr("Remove Account…"), role: .destructive) { store.removingAccount = account }
                         }
-                        Button(tr("Remove Account…"), role: .destructive) { store.removingAccount = account }
                     }
                 }
             }
@@ -154,9 +157,11 @@ struct OverviewView: View {
                     .font(HubFont.caption)
                     .foregroundStyle(HubStyle.textSecondary)
             }
-            LazyVGrid(columns: columns, spacing: HubSpace.md) {
-                ForEach(ChatService.allCases) { service in
-                    ServiceCard(service: service) { store.add(service: service) }
+            HubGlassContainer(spacing: HubSpace.md) {
+                LazyVGrid(columns: columns, spacing: HubSpace.md) {
+                    ForEach(ChatService.allCases) { service in
+                        ServiceCard(service: service) { store.add(service: service) }
+                    }
                 }
             }
         }
@@ -184,6 +189,7 @@ struct OverviewView: View {
 private struct AccountOverviewCard: View {
     let account: ChatAccount
     let session: BrowserSession?
+    let signedOut: Bool
     let action: () -> Void
     @State private var hovered = false
 
@@ -192,7 +198,14 @@ private struct AccountOverviewCard: View {
             HStack(spacing: HubSpace.sm) {
                 ServiceIcon(service: account.service, size: 40)
                     .overlay(alignment: .bottomTrailing) {
-                        if let session {
+                        if signedOut {
+                            Image(systemName: "person.crop.circle.badge.exclamationmark.fill")
+                                .font(.system(size: 12))
+                                .foregroundStyle(.orange)
+                                .background(HubStyle.surface, in: Circle())
+                                .offset(x: 3, y: 3)
+                                .help(tr("Signed out. Open this account to sign in again."))
+                        } else if let session {
                             if session.hasFailed {
                                 Image(systemName: "exclamationmark.circle.fill")
                                     .font(.system(size: 12))
@@ -219,6 +232,17 @@ private struct AccountOverviewCard: View {
                         .lineLimit(1)
                 }
                 Spacer(minLength: 0)
+                if account.notificationsMuted {
+                    Image(systemName: "bell.slash.fill")
+                        .font(.system(size: 11))
+                        .foregroundStyle(HubStyle.textSecondary)
+                        .help(tr("Notifications muted"))
+                } else if account.isSnoozed() {
+                    Image(systemName: "timer")
+                        .font(.system(size: 11))
+                        .foregroundStyle(HubStyle.textSecondary)
+                        .help(tr("Notifications snoozed"))
+                }
                 if let session, session.unreadCount > 0 {
                     HubBadge(
                         text: session.unreadCount > 99 ? "99+" : "\(session.unreadCount)",
@@ -231,17 +255,11 @@ private struct AccountOverviewCard: View {
             }
             .padding(HubSpace.md)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(
-                hovered ? HubStyle.raised : HubStyle.surface,
-                in: RoundedRectangle(cornerRadius: HubRadius.card, style: .continuous)
+            .liquidGlassCard(
+                cornerRadius: HubRadius.card,
+                tint: hovered ? HubStyle.accent.opacity(0.12) : nil,
+                interactive: true
             )
-            .overlay {
-                RoundedRectangle(cornerRadius: HubRadius.card, style: .continuous)
-                    .strokeBorder(
-                        hovered ? HubStyle.accent.opacity(0.35) : HubStyle.border,
-                        lineWidth: 1
-                    )
-            }
             .contentShape(RoundedRectangle(cornerRadius: HubRadius.card, style: .continuous))
         }
         .buttonStyle(.plain)
@@ -277,16 +295,11 @@ struct ServiceCard: View {
             }
             .padding(HubSpace.md)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(
-                isSelected ? HubStyle.selected : (hovered ? HubStyle.raised : HubStyle.surface),
-                in: RoundedRectangle(cornerRadius: HubRadius.card, style: .continuous)
+            .liquidGlassCard(
+                cornerRadius: HubRadius.card,
+                tint: isSelected ? HubStyle.accent.opacity(0.18) : (hovered ? service.color.opacity(0.12) : nil),
+                interactive: true
             )
-            .overlay {
-                RoundedRectangle(cornerRadius: HubRadius.card, style: .continuous)
-                    .strokeBorder(
-                        isSelected ? HubStyle.accent : (hovered ? HubStyle.accent.opacity(0.35) : HubStyle.border),
-                        lineWidth: 1)
-            }
             .contentShape(RoundedRectangle(cornerRadius: HubRadius.card, style: .continuous))
         }
         .buttonStyle(.plain)

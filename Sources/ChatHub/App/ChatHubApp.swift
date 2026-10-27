@@ -7,32 +7,64 @@ struct ChatHubApp: App {
     @State private var store = WorkspaceStore()
     @State private var browsers = BrowserPool()
     @State private var layout = WorkspaceLayout()
+    @State private var updater = AppUpdater()
+    @State private var lock = AppLock()
     @AppStorage("appearance") private var appearance = "system"
+    @AppStorage("showMenuBarExtra") private var showMenuBarExtra = true
+    @AppStorage("privacyShieldEnabled") private var privacyShieldEnabled = false
+    @AppStorage("alwaysOnTopEnabled") private var alwaysOnTopEnabled = false
 
     init() { ChatAppearancePreferences.migrate() }
 
     var body: some Scene {
         Window(tr("ChatHub"), id: "workspace") {
             WorkspaceView()
+                .ignoresSafeArea()
                 .environment(store)
                 .environment(browsers)
                 .environment(layout)
+                .environment(updater)
+                .environment(lock)
                 .preferredColorScheme(appearance == "system" ? nil : appearance == "dark" ? .dark : .light)
                 .frame(minWidth: 860, minHeight: 600)
         }
         .defaultSize(width: 1280, height: 840)
         .windowStyle(.hiddenTitleBar)
-        .windowToolbarStyle(.unified)
         .commands {
+            CommandGroup(after: .appInfo) {
+                Button(tr("Check for Updates…")) { updater.checkManually() }
+                    .disabled(updater.isChecking)
+            }
             CommandGroup(replacing: .newItem) {
                 Button(tr("Add Account…")) { store.add() }
                     .keyboardShortcut("n", modifiers: .command)
             }
             CommandMenu(tr("Workspace")) {
-                Button(tr("Switch Account…")) { store.isSwitchingAccount = true }
+                Button(tr("Command Palette…")) { store.isSwitchingAccount = true }
                     .keyboardShortcut("k", modifiers: .command)
                 Button(tr("Toggle Sidebar")) { layout.toggle() }
                     .keyboardShortcut("s", modifiers: [.command, .control])
+                Button(tr("Next Unread Account")) {
+                    if !store.selectNextUnread(unread: browsers.unreadCounts) { NSSound.beep() }
+                }
+                .keyboardShortcut("j", modifiers: .command)
+                Button(tr("Swap Split Panes")) { store.swapPanes() }
+                    .disabled(store.secondaryID == nil)
+                Button(tr("Close Split View")) { store.closeSecondary() }
+                    .disabled(store.secondaryID == nil)
+                Button(tr("Lock ChatHub")) {
+                    if !lock.lock() { NSSound.beep() }
+                }
+                .keyboardShortcut("l", modifiers: [.command, .control])
+                Divider()
+                Button(privacyShieldEnabled ? tr("Disable Privacy Shield") : tr("Enable Privacy Shield")) {
+                    privacyShieldEnabled.toggle()
+                }
+                .keyboardShortcut("p", modifiers: [.command, .shift])
+                Button(alwaysOnTopEnabled ? tr("Disable Always on Top") : tr("Keep Window on Top")) {
+                    alwaysOnTopEnabled.toggle()
+                }
+                .keyboardShortcut("t", modifiers: [.command, .shift])
                 Divider()
                 Button(tr("Overview")) { store.select(nil) }
                     .keyboardShortcut("0", modifiers: .command)
@@ -58,22 +90,98 @@ struct ChatHubApp: App {
             }
         }
 
+        MenuBarExtra(isInserted: $showMenuBarExtra) {
+            ChatHubMenuBarMenu(
+                privacyShieldEnabled: $privacyShieldEnabled,
+                alwaysOnTopEnabled: $alwaysOnTopEnabled
+            )
+            .environment(store)
+            .environment(browsers)
+            .environment(lock)
+        } label: {
+            ChatHubMenuBarLabel()
+                .environment(store)
+                .environment(browsers)
+        }
+
         Settings {
             SettingsView()
                 .environment(store)
                 .environment(browsers)
                 .environment(layout)
+                .environment(updater)
                 .preferredColorScheme(appearance == "system" ? nil : appearance == "dark" ? .dark : .light)
         }
     }
 }
 
+struct DockMenuEntry {
+    let id: UUID
+    let title: String
+}
+
+/// Feeds the Dock menu; the workspace view installs the closures once it appears.
+@MainActor
+enum DockMenuSource {
+    static var entries: () -> [DockMenuEntry] = { [] }
+    static var select: (UUID) -> Void = { _ in }
+}
+
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
+    func applicationDockMenu(_ sender: NSApplication) -> NSMenu? {
+        let entries = DockMenuSource.entries()
+        guard !entries.isEmpty else { return nil }
+        let menu = NSMenu()
+        for entry in entries {
+            let item = NSMenuItem(title: entry.title, action: #selector(openAccountFromDock(_:)), keyEquivalent: "")
+            item.target = self
+            item.representedObject = entry.id
+            menu.addItem(item)
+        }
+        return menu
+    }
+
+    @objc private func openAccountFromDock(_ sender: NSMenuItem) {
+        guard let id = sender.representedObject as? UUID else { return }
+        DockMenuSource.select(id)
+        _ = applicationShouldHandleReopen(NSApplication.shared, hasVisibleWindows: false)
+        NSApplication.shared.activate(ignoringOtherApps: true)
+    }
+
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApplication.shared.setActivationPolicy(.regular)
         NSApplication.shared.activate(ignoringOtherApps: true)
         HubNotificationCenter.shared.configure()
+
+        for window in NSApplication.shared.windows {
+            configureWindow(window)
+        }
+        NotificationCenter.default.addObserver(
+            forName: NSWindow.didBecomeKeyNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] notification in
+            guard let window = notification.object as? NSWindow else { return }
+            MainActor.assumeIsolated {
+                self?.configureWindow(window)
+            }
+        }
+        NotificationCenter.default.addObserver(
+            forName: NSWindow.didBecomeMainNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] notification in
+            guard let window = notification.object as? NSWindow else { return }
+            MainActor.assumeIsolated {
+                self?.configureWindow(window)
+            }
+        }
+    }
+
+    func configureWindow(_ window: NSWindow) {
+        let alwaysOnTop = UserDefaults.standard.bool(forKey: "alwaysOnTopEnabled")
+        WorkspaceWindowStyle.apply(to: window, alwaysOnTop: alwaysOnTop)
     }
 
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { false }

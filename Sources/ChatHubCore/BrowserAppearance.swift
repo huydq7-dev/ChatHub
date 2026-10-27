@@ -26,6 +26,7 @@ public struct BrowserAppearance: Equatable, Sendable {
     public var accent: HubAccent
     public var density: HubDensity
     public var textScale: HubTextScale
+    public var privacyShield: Bool
 
     public init(
         isDark: Bool = false,
@@ -34,7 +35,8 @@ public struct BrowserAppearance: Equatable, Sendable {
         showServiceTools: Bool = false,
         accent: HubAccent = .iris,
         density: HubDensity = .standard,
-        textScale: HubTextScale = .standard
+        textScale: HubTextScale = .standard,
+        privacyShield: Bool = false
     ) {
         self.isDark = isDark
         self.themeEnabled = themeEnabled
@@ -43,6 +45,7 @@ public struct BrowserAppearance: Equatable, Sendable {
         self.accent = accent
         self.density = density
         self.textScale = textScale
+        self.privacyShield = privacyShield
     }
 }
 
@@ -59,15 +62,20 @@ public enum WebAppearancePolicy {
         case .zalo:
             return host == "chat.zalo.me" && (url.path == "/" || url.path.isEmpty)
         case .telegram:
-            return host == "web.telegram.org" && ["/a", "/a/"].contains(url.path)
+            let isTelegramHost =
+                host == "web.telegram.org" || host == "weba.telegram.org" || host == "webk.telegram.org"
+                || host == "webz.telegram.org"
+            guard isTelegramHost else { return false }
+            return url.path == "/" || url.path.isEmpty || url.path.hasPrefix("/a") || url.path.hasPrefix("/k")
+                || url.path.hasPrefix("/z")
         case .messenger:
-            if ["www.facebook.com", "www.messenger.com", "messenger.com"].contains(host),
-                url.path == "/messages" || url.path.hasPrefix("/messages/")
-            {
-                return true
+            let isMessengerHost = ["messenger.com", "www.messenger.com"].contains(host)
+            let isFacebookHost = ["facebook.com", "www.facebook.com", "web.facebook.com"].contains(host)
+            guard isMessengerHost || isFacebookHost else { return false }
+            if isFacebookHost {
+                return url.path == "/messages" || url.path.hasPrefix("/messages/")
             }
-            return ["www.messenger.com", "messenger.com"].contains(host)
-                && (url.path == "/" || url.path.isEmpty || url.path.hasPrefix("/t/"))
+            return url.path == "/" || url.path.isEmpty || url.path.hasPrefix("/t/") || url.path.hasPrefix("/e2ee/")
         default:
             return false
         }

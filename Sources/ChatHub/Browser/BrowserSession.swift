@@ -1,6 +1,6 @@
 import AppKit
 import Observation
-import UserNotifications
+@preconcurrency import UserNotifications
 import WebKit
 
 #if SWIFT_PACKAGE
@@ -11,8 +11,16 @@ import WebKit
 final class HubNotificationCenter: NSObject, UNUserNotificationCenterDelegate {
     static let shared = HubNotificationCenter()
     var onSelectAccount: ((UUID) -> Void)?
+    var onNotificationClick: ((UUID, String) -> Void)?
+    var isMuted: (UUID) -> Bool = { _ in false }
+    var isViewing: (UUID) -> Bool = { _ in false }
+    var isSnoozed: (UUID) -> Bool = { _ in false }
     private var unreadByAccount: [UUID: Int] = [:]
+    private var initializedAccounts: Set<UUID> = []
     private var lastNotificationTime: [UUID: Date] = [:]
+    private var lastRichNotificationTime: [UUID: Date] = [:]
+    private var recentNotificationFingerprints: [String: Date] = [:]
+    private var pendingBadgeFallbackTasks: [UUID: Task<Void, Never>] = [:]
     private var isConfigured = false
 
     private var canUseUserNotifications: Bool {
@@ -28,56 +36,160 @@ final class HubNotificationCenter: NSObject, UNUserNotificationCenterDelegate {
     }
 
     func updateUnreadCount(_ count: Int, for account: ChatAccount) {
+        let isFirstReport = !initializedAccounts.contains(account.id)
+        if isFirstReport {
+            initializedAccounts.insert(account.id)
+        }
         let clamped = max(0, count)
         let previous = unreadByAccount[account.id] ?? 0
-        guard clamped != previous else { return }
+        guard clamped != previous || isFirstReport else { return }
         unreadByAccount[account.id] = clamped
         updateDockBadge()
-        if clamped > previous {
-            let now = Date()
-            if let last = lastNotificationTime[account.id], now.timeIntervalSince(last) < 3.0 {
-                return
+
+        if clamped == 0 {
+            clearDeliveredNotifications(for: account.id)
+            pendingBadgeFallbackTasks[account.id]?.cancel()
+            pendingBadgeFallbackTasks.removeValue(forKey: account.id)
+            return
+        }
+
+        if !isFirstReport && clamped > previous {
+            pendingBadgeFallbackTasks[account.id]?.cancel()
+            pendingBadgeFallbackTasks[account.id] = Task { [weak self] in
+                try? await Task.sleep(nanoseconds: 700_000_000)
+                guard !Task.isCancelled, let self else { return }
+                let now = Date()
+                if let lastRich = lastRichNotificationTime[account.id], now.timeIntervalSince(lastRich) < 2.5 {
+                    return
+                }
+                if let lastFallback = lastNotificationTime[account.id], now.timeIntervalSince(lastFallback) < 3.0 {
+                    return
+                }
+                let body =
+                    clamped == 1
+                    ? tr("You have 1 unread message.")
+                    : String(format: tr("You have %d unread messages."), clamped)
+                postNotification(account: account, title: account.name, body: body)
             }
-            let body =
-                clamped == 1
-                ? tr("You have 1 unread message.")
-                : String(format: tr("You have %d unread messages."), clamped)
-            postNotification(account: account, title: account.name, body: body)
         }
     }
 
     func removeAccount(_ accountID: UUID) {
+        initializedAccounts.remove(accountID)
         unreadByAccount.removeValue(forKey: accountID)
         lastNotificationTime.removeValue(forKey: accountID)
+        lastRichNotificationTime.removeValue(forKey: accountID)
+        pendingBadgeFallbackTasks[accountID]?.cancel()
+        pendingBadgeFallbackTasks.removeValue(forKey: accountID)
+        clearDeliveredNotifications(for: accountID)
         updateDockBadge()
     }
 
-    private func updateDockBadge() {
-        let total = unreadByAccount.values.reduce(0, +)
-        NSApplication.shared.dockTile.badgeLabel = total > 0 ? (total > 99 ? "99+" : "\(total)") : nil
+    private func clearDeliveredNotifications(for accountID: UUID) {
+        guard canUseUserNotifications else { return }
+        UNUserNotificationCenter.current().getDeliveredNotifications { notifications in
+            let ids = notifications.filter {
+                ($0.request.content.userInfo["accountID"] as? String) == accountID.uuidString
+            }.map(\.request.identifier)
+            if !ids.isEmpty {
+                UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: ids)
+            }
+        }
     }
 
-    func postNotification(account: ChatAccount, title: String, body: String) {
-        lastNotificationTime[account.id] = Date()
+    /// Recompute the Dock badge, e.g. after an account is muted or unmuted. Muted accounts stay out of it.
+    func refreshBadge() { updateDockBadge() }
+
+    private func updateDockBadge() {
+        let muted = Set(unreadByAccount.keys.filter(isMuted))
+        let total = NotificationPolicy.dockTotal(unread: unreadByAccount, muted: muted)
+        NSApplication.shared.dockTile.badgeLabel = NotificationPolicy.badgeLabel(total: total)
+    }
+
+    /// The service asked the user to sign in again. The text is ChatHub's own, so previews never hide it.
+    func postSignInNeeded(account: ChatAccount) {
+        postNotification(
+            account: account, title: account.name,
+            body: String(format: tr("Signed out of %@. Open ChatHub to sign in again."), account.service.name),
+            tag: "signed-out", isServiceContent: false)
+    }
+
+    func postNotification(
+        account: ChatAccount, title: String, body: String, tag: String = "", callbackID: String = "",
+        isServiceContent: Bool = true
+    ) {
+        let cleanTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
+        let cleanBody = body.trimmingCharacters(in: .whitespacesAndNewlines)
+        let effectiveTitle =
+            (cleanTitle.isEmpty || cleanTitle == account.name)
+            ? account.name : "\(account.name) · \(cleanTitle)"
+        let effectiveBody = cleanBody.isEmpty ? tr("New message received") : cleanBody
+
+        let fingerprint = "\(account.id.uuidString):\(effectiveTitle):\(effectiveBody):\(tag)"
+        let now = Date()
+        if let lastSeen = recentNotificationFingerprints[fingerprint], now.timeIntervalSince(lastSeen) < 4.0 {
+            return
+        }
+        recentNotificationFingerprints[fingerprint] = now
+        if recentNotificationFingerprints.count > 50 {
+            recentNotificationFingerprints = recentNotificationFingerprints.filter {
+                now.timeIntervalSince($0.value) < 10.0
+            }
+        }
+
+        lastNotificationTime[account.id] = now
+        if !tag.isEmpty || cleanBody != tr("You have 1 unread message.") {
+            lastRichNotificationTime[account.id] = now
+            pendingBadgeFallbackTasks[account.id]?.cancel()
+        }
+
+        // Muted or snoozed accounts, quiet hours and the conversation being viewed never interrupt.
+        guard
+            NotificationPolicy.shouldAlert(
+                isMuted: isMuted(account.id),
+                isViewing: NSApplication.shared.isActive && isViewing(account.id),
+                isSnoozed: isSnoozed(account.id),
+                isQuietHours: ChatAppearancePreferences.quietHours().contains(Date()))
+        else { return }
+        let hidePreviews =
+            isServiceContent && UserDefaults.standard.bool(forKey: ChatAppearancePreferences.hidePreviewsKey)
+
         if !NSApplication.shared.isActive {
             NSApplication.shared.requestUserAttention(.informationalRequest)
         }
         guard canUseUserNotifications else { return }
         configure()
         let center = UNUserNotificationCenter.current()
-        let cleanTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
-        let cleanBody = body.trimmingCharacters(in: .whitespacesAndNewlines)
         let content = UNMutableNotificationContent()
-        if cleanTitle.isEmpty || cleanTitle == account.name {
-            content.title = account.name
-        } else {
-            content.title = "\(account.name) · \(cleanTitle)"
-        }
-        content.body = cleanBody.isEmpty ? tr("New message received") : cleanBody
+        content.title = hidePreviews ? account.name : effectiveTitle
+        content.body = hidePreviews ? tr("New message received") : effectiveBody
         content.sound = .default
-        content.userInfo = ["accountID": account.id.uuidString]
+        content.userInfo = ["accountID": account.id.uuidString, "tag": tag, "callbackID": callbackID]
+        let identifier =
+            tag.isEmpty
+            ? "chathub.\(account.id.uuidString).\(UUID().uuidString)"
+            : "chathub.\(account.id.uuidString).\(tag)"
         let request = UNNotificationRequest(
-            identifier: "chathub.\(account.id.uuidString).\(UUID().uuidString)",
+            identifier: identifier,
+            content: content,
+            trigger: nil
+        )
+        center.add(request)
+    }
+
+    func sendTestNotification() {
+        if !NSApplication.shared.isActive {
+            NSApplication.shared.requestUserAttention(.informationalRequest)
+        }
+        guard canUseUserNotifications else { return }
+        configure()
+        let center = UNUserNotificationCenter.current()
+        let content = UNMutableNotificationContent()
+        content.title = "ChatHub"
+        content.body = tr("Test notification: your system notifications are working properly.")
+        content.sound = .default
+        let request = UNNotificationRequest(
+            identifier: "chathub.test.\(UUID().uuidString)",
             content: content,
             trigger: nil
         )
@@ -98,6 +210,7 @@ final class HubNotificationCenter: NSObject, UNUserNotificationCenterDelegate {
         withCompletionHandler completionHandler: @escaping () -> Void
     ) {
         let accountIDString = response.notification.request.content.userInfo["accountID"] as? String
+        let callbackID = response.notification.request.content.userInfo["callbackID"] as? String
         Task { @MainActor in
             NSApplication.shared.activate(ignoringOtherApps: true)
             if let window = NSApplication.shared.windows.first(where: { $0.identifier?.rawValue == "workspace" })
@@ -107,6 +220,7 @@ final class HubNotificationCenter: NSObject, UNUserNotificationCenterDelegate {
             }
             if let accountIDString, let uuid = UUID(uuidString: accountIDString) {
                 HubNotificationCenter.shared.onSelectAccount?(uuid)
+                HubNotificationCenter.shared.onNotificationClick?(uuid, callbackID ?? "")
             }
         }
         completionHandler()
@@ -131,6 +245,15 @@ private final class NotificationScriptHandler: NSObject, WKScriptMessageHandler 
     }
 }
 
+// The SwiftPM WebKit overlay and Xcode's explicit Clang importer expose
+// different actor annotations for the void alert callback on this SDK.
+// Match each imported protocol type; BrowserSession invokes both on the main actor.
+#if SWIFT_PACKAGE
+    typealias JavaScriptAlertCompletion = @MainActor @Sendable () -> Void
+#else
+    typealias JavaScriptAlertCompletion = @Sendable () -> Void
+#endif
+
 @MainActor @Observable
 final class BrowserSession: NSObject {
     enum State: Equatable {
@@ -146,7 +269,52 @@ final class BrowserSession: NSObject {
             const post = (payload) => {
                 try { window.webkit?.messageHandlers?.chatHubNotify?.postMessage(payload); } catch (_) {}
             };
+
+            window.__chatHubIsFocused = Boolean(window.__chatHubIsFocused);
+            window.__chatHubSetFocused = function(val) {
+                const active = Boolean(val);
+                if (window.__chatHubIsFocused === active) return;
+                window.__chatHubIsFocused = active;
+                try {
+                    if (active) {
+                        window.dispatchEvent(new Event("focus"));
+                        document.dispatchEvent(new Event("focus"));
+                    } else {
+                        window.dispatchEvent(new Event("blur"));
+                        document.dispatchEvent(new Event("blur"));
+                    }
+                } catch (_) {}
+            };
+
+            try {
+                const nativeHasFocus = Document.prototype.hasFocus;
+                Document.prototype.hasFocus = function() {
+                    if (!window.__chatHubIsFocused) return false;
+                    try {
+                        return nativeHasFocus.call(this);
+                    } catch (_) {
+                        return true;
+                    }
+                };
+            } catch (_) {}
+
+            const notiRegistry = new Map();
+            const documentID = window.crypto?.randomUUID?.()
+                || (Date.now().toString(36) + "_" + Math.random().toString(36).slice(2));
+            let nextNotificationID = 0;
+            window.__chatHubNotificationRegistry = notiRegistry;
+            window.__chatHubTriggerNotificationClick = function(callbackID) {
+                try {
+                    const noti = notiRegistry.get(callbackID);
+                    if (!noti) return;
+                    const ev = new Event("click");
+                    noti.dispatchEvent(ev);
+                    if (typeof noti.onclick === "function") noti.onclick(ev);
+                } catch (_) {}
+            };
+
             class ChatHubNotification extends EventTarget {
+                #callbackID;
                 static get permission() { return "granted"; }
                 static requestPermission(cb) {
                     if (typeof cb === "function") cb("granted");
@@ -157,16 +325,35 @@ final class BrowserSession: NSObject {
                     this.title = String(title ?? "");
                     this.body = String(options?.body ?? "");
                     this.tag = String(options?.tag ?? "");
+                    this.icon = String(options?.icon ?? "");
                     this.onclick = null;
                     this.onclose = null;
+                    this.onshow = null;
+                    this.onerror = null;
+
+                    this.#callbackID = documentID + "_" + (++nextNotificationID);
+                    notiRegistry.set(this.#callbackID, this);
+                    if (notiRegistry.size > 20) {
+                        const firstKey = notiRegistry.keys().next().value;
+                        notiRegistry.delete(firstKey);
+                    }
+
                     post({
                         kind: "notify",
                         title: this.title.slice(0, 160),
                         body: this.body.slice(0, 300),
-                        tag: this.tag.slice(0, 80)
+                        tag: this.tag.slice(0, 80),
+                        callbackID: this.#callbackID
                     });
+
+                    setTimeout(() => {
+                        const ev = new Event("show");
+                        this.dispatchEvent(ev);
+                        if (typeof this.onshow === "function") this.onshow(ev);
+                    }, 0);
                 }
                 close() {
+                    notiRegistry.delete(this.#callbackID);
                     const ev = new Event("close");
                     this.dispatchEvent(ev);
                     if (typeof this.onclose === "function") this.onclose(ev);
@@ -176,30 +363,180 @@ final class BrowserSession: NSObject {
                 window.Notification = ChatHubNotification;
             } catch (_) {}
 
+            try {
+                delete window.PushManager;
+                window.PushManager = undefined;
+            } catch (_) {}
+
+            if (typeof ServiceWorkerRegistration !== "undefined" && ServiceWorkerRegistration.prototype) {
+                try {
+                    const origShow = ServiceWorkerRegistration.prototype.showNotification;
+                    ServiceWorkerRegistration.prototype.showNotification = function(title, options) {
+                        post({
+                            kind: "notify",
+                            title: String(title || "").slice(0, 160),
+                            body: String(options?.body || "").slice(0, 300),
+                            tag: String(options?.tag || "").slice(0, 80)
+                        });
+                        return Promise.resolve();
+                    };
+                } catch (_) {}
+            }
+
+            if (typeof ServiceWorker !== "undefined" && ServiceWorker.prototype) {
+                try {
+                    const origPostMessage = ServiceWorker.prototype.postMessage;
+                    ServiceWorker.prototype.postMessage = function(message, transfer) {
+                        if (message && typeof message === "object") {
+                            if (message.type === "showMessageNotification" || message.action === "showNotification") {
+                                const t = message.title || message.payload?.title || "";
+                                const b = message.options?.body || message.body || message.payload?.body || "";
+                                const tag = message.options?.tag || message.tag || "";
+                                post({
+                                    kind: "notify",
+                                    title: String(t).slice(0, 160),
+                                    body: String(b).slice(0, 300),
+                                    tag: String(tag).slice(0, 80)
+                                });
+                            }
+                        }
+                        return origPostMessage.apply(this, arguments);
+                    };
+                } catch (_) {}
+            }
+
+            if (location.hostname === "web.telegram.org" && typeof IDBObjectStore !== "undefined") {
+                try {
+                    const origGet = IDBObjectStore.prototype.get;
+                    IDBObjectStore.prototype.get = function(key) {
+                        const req = origGet.apply(this, arguments);
+                        if (this.name === "tt-global-state") {
+                            req.addEventListener("success", function() {
+                                try {
+                                    const res = req.result;
+                                    if (res && res.settings && res.settings.byKey) {
+                                        res.settings.byKey.hasWebNotifications = true;
+                                        res.settings.byKey.hasPushNotifications = false;
+                                    }
+                                } catch (_) {}
+                            });
+                        }
+                        return req;
+                    };
+                } catch (_) {}
+            }
+
+            if (location.hostname === "chat.zalo.me") {
+                try {
+                    if (typeof Storage !== "undefined") {
+                        const origGetItem = Storage.prototype.getItem;
+                        Storage.prototype.getItem = function(key) {
+                            if (key === "askNoti" || key === "notification_permission") return "1";
+                            return origGetItem.apply(this, arguments);
+                        };
+                    }
+                } catch (_) {}
+                window.$znoti = window.$znoti || {
+                    show: function(title, options) {
+                        new ChatHubNotification(title, options);
+                    }
+                };
+            }
+
+            function parseZaloBadge(el) {
+                if (!el) return 0;
+                const txt = (el.textContent || "").trim();
+                if (txt) {
+                    const n = parseInt(txt, 10);
+                    if (!Number.isNaN(n)) return n;
+                }
+                const classStr = el.className + " " + Array.from(el.children).map(c => c.className).join(" ");
+                const match = classStr.match(/fa-([0-9]+)_|fa-num([0-9]+)/);
+                if (match) {
+                    const num = parseInt(match[1] || match[2], 10);
+                    if (!Number.isNaN(num)) return num;
+                }
+                if (classStr.includes("fa-5_Plus") || classStr.includes("5_Plus") || classStr.includes("plus")) {
+                    return 5;
+                }
+                const label = el.getAttribute("aria-label") || el.getAttribute("title") || "";
+                if (label) {
+                    const n = parseInt(label.replace(/\\D/g, ""), 10);
+                    if (!Number.isNaN(n)) return n;
+                }
+                return 1;
+            }
+
             let lastBadgeCount = -1;
+            let lastTitle = "";
             let badgeTimer = null;
+
+            function checkTitleBlink() {
+                const curTitle = document.title;
+                if (curTitle === lastTitle) return;
+                lastTitle = curTitle;
+                if (window.__chatHubIsFocused) return;
+                if (location.hostname.includes("facebook.com") || location.hostname.includes("messenger.com")) {
+                    const titleMatch = curTitle.match(/^(?:\\(\\d+\\)\\s+)?(.+?):\\s+(.+)$/)
+                        || curTitle.match(/^(?:\\(\\d+\\)\\s+)?(.+?)\\s+(đã gửi|sent\\b)(.*)$/i);
+                    if (titleMatch) {
+                        const sender = (titleMatch[1] || "Messenger").trim();
+                        const body = (titleMatch[2] || titleMatch[3] || "Tin nhắn mới").trim();
+                        if (sender !== "Messenger" && !curTitle.includes("Messenger |") && !curTitle.includes("Facebook")) {
+                            post({
+                                kind: "notify",
+                                title: sender.slice(0, 160),
+                                body: body.slice(0, 300),
+                                tag: "title_blink"
+                            });
+                        }
+                    }
+                }
+            }
+
+            // Telegram shows its sign-in screen on the same address, so the app shell is the signed-in signal.
+            // Only which screen is showing is read, never conversation content. Neither present: still loading.
+            let lastAuthRequired = null;
+            function reportAuthState() {
+                if (location.hostname !== "web.telegram.org") return;
+                let required = null;
+                if (document.querySelector("#auth-qr-form, #auth-phone-number-form, #auth-code-form, #auth-password-form, #auth-registration-form")) {
+                    required = true;
+                } else if (document.getElementById("Main") && document.getElementById("LeftColumn")) {
+                    required = false;
+                }
+                if (required === null || required === lastAuthRequired) return;
+                lastAuthRequired = required;
+                post({ kind: "auth", required });
+            }
+
             function computeBadgeCount() {
                 badgeTimer = null;
+                reportAuthState();
+                checkTitleBlink();
                 const titleMatch = document.title.match(/\\((\\d+)\\+?\\)|\\[(\\d+)\\+?\\]/);
                 if (titleMatch) {
                     const n = parseInt(titleMatch[1] || titleMatch[2], 10);
-                    if (!Number.isNaN(n) && n !== lastBadgeCount) {
-                        lastBadgeCount = n;
-                        post({ kind: "badge", count: n });
+                    // A count in the title is authoritative; never fall through to DOM counting.
+                    if (!Number.isNaN(n)) {
+                        if (n !== lastBadgeCount) {
+                            lastBadgeCount = n;
+                            post({ kind: "badge", count: n });
+                        }
                         return;
                     }
                 }
                 let count = 0;
                 const host = location.hostname;
                 if (host === "chat.zalo.me") {
-                    const navBadge = document.querySelector("#main-tab .z-noti-badge");
-                    const navNum = navBadge ? parseInt(navBadge.textContent || "", 10) : 0;
+                    const navBadge = document.querySelector("#main-tab .z-noti-badge, #sidebarNav .z-noti-badge");
+                    const navNum = parseZaloBadge(navBadge);
                     if (navNum > 0) {
                         count = navNum;
                     } else {
-                        for (const el of document.querySelectorAll(".conv-action__unread .z-noti-badge, .conv-unread")) {
-                            const v = parseInt(el.textContent || "", 10);
-                            count += Number.isNaN(v) ? 1 : v;
+                        for (const el of document.querySelectorAll(".conv-action__unread .z-noti-badge, .conv-unread, .z-noti-badge")) {
+                            if (el.closest("#main-tab") || el.closest("#sidebarNav")) continue;
+                            count += parseZaloBadge(el);
                         }
                     }
                 } else if (host === "web.telegram.org") {
@@ -220,10 +557,21 @@ final class BrowserSession: NSObject {
                 badgeTimer = setTimeout(computeBadgeCount, 1200);
             }
             if (document.documentElement) {
-                new MutationObserver(scheduleBadgeCheck).observe(document.documentElement, {
+                const badgeObserver = new MutationObserver(function(mutations) {
+                    for (let i = 0; i < mutations.length; i++) {
+                        const target = mutations[i].target;
+                        if (target && target.nodeType === 1) {
+                            if (target.closest && target.closest('[contenteditable="true"], [role="textbox"], [role="main"]')) {
+                                continue;
+                            }
+                        }
+                        scheduleBadgeCheck();
+                        break;
+                    }
+                });
+                badgeObserver.observe(document.documentElement, {
                     childList: true,
-                    subtree: true,
-                    characterData: true
+                    subtree: true
                 });
                 setTimeout(computeBadgeCount, 1500);
             }
@@ -243,6 +591,8 @@ final class BrowserSession: NSObject {
     var isFinding = false
     var findQuery = ""
     var findHasNoMatches = false
+    @ObservationIgnored var onSignInChange: ((UUID, Bool) -> Void)?
+    @ObservationIgnored private var lastSignInRequired: Bool?
     @ObservationIgnored let webView: WKWebView
     @ObservationIgnored private var observations: [NSKeyValueObservation] = []
     @ObservationIgnored private var popups: [BrowserPopup] = []
@@ -250,13 +600,17 @@ final class BrowserSession: NSObject {
     @ObservationIgnored private var started = false
     @ObservationIgnored private var hasLoadedPage = false
     @ObservationIgnored private var hasInstalledScripts = false
+    @ObservationIgnored private var hubIsFocused = false
     @ObservationIgnored private var appearance: BrowserAppearance
+    @ObservationIgnored private var appearanceBootstrap: String?
 
     init(account: ChatAccount, appearance initialAppearance: BrowserAppearance = BrowserAppearance()) {
         self.account = account
         self.appearance = initialAppearance
+        self.appearanceBootstrap = ServiceTheme.bootstrap(service: account.service, appearance: initialAppearance)
         let configuration = WKWebViewConfiguration()
-        configuration.applicationNameForUserAgent = "ChatHub/0.2.0"
+        let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "0.3.3"
+        configuration.applicationNameForUserAgent = "Version/18.0 Safari/605.1.15 ChatHub/\(version)"
         configuration.websiteDataStore = WKWebsiteDataStore(forIdentifier: account.id)
         configuration.preferences.javaScriptCanOpenWindowsAutomatically = false
         configuration.mediaTypesRequiringUserActionForPlayback = .all
@@ -272,7 +626,9 @@ final class BrowserSession: NSObject {
         webView.uiDelegate = self
         webView.allowsBackForwardNavigationGestures = true
         webView.allowsMagnification = true
-        webView.isInspectable = false
+        if #available(macOS 13.3, *) {
+            webView.isInspectable = true
+        }
         webView.underPageBackgroundColor = .windowBackgroundColor
         observations = [
             webView.observe(\.estimatedProgress) { [weak self] _, _ in
@@ -298,10 +654,13 @@ final class BrowserSession: NSObject {
                     canGoBack = webView.canGoBack
                     canGoForward = webView.canGoForward
                     syncPageAppearance()
+                    if hasLoadedPage { reportURLSignIn() }
                 }
             },
         ]
     }
+
+    var hasActiveDownloads: Bool { !downloads.isEmpty }
 
     var hasFailed: Bool {
         if case .failed = state { return true }
@@ -322,14 +681,34 @@ final class BrowserSession: NSObject {
         case "notify":
             let title = (payload["title"] as? String) ?? ""
             let body = (payload["body"] as? String) ?? ""
-            HubNotificationCenter.shared.postNotification(account: account, title: title, body: body)
+            let tag = (payload["tag"] as? String) ?? ""
+            let callbackID = (payload["callbackID"] as? String) ?? ""
+            HubNotificationCenter.shared.postNotification(
+                account: account, title: title, body: body, tag: tag, callbackID: callbackID
+            )
         case "badge":
             if let count = payload["count"] as? Int {
                 applyUnreadCount(count)
             }
+        case "auth":
+            if SignInDetector.usesPageSignal(account.service), let required = payload["required"] as? Bool {
+                reportSignIn(required: required)
+            }
         default:
             break
         }
+    }
+
+    /// Reports each change once; the workspace decides whether it means an expired session.
+    private func reportSignIn(required: Bool) {
+        guard lastSignInRequired != required else { return }
+        lastSignInRequired = required
+        onSignInChange?(account.id, required)
+    }
+
+    private func reportURLSignIn() {
+        guard SignInDetector.usesURLSignal(account.service), let url = webView.url else { return }
+        reportSignIn(required: SignInDetector.isSignInPage(service: account.service, url: url))
     }
 
     private func applyUnreadCount(_ count: Int) {
@@ -346,9 +725,10 @@ final class BrowserSession: NSObject {
             webView.appearance = NSAppearance(named: targetName)
         }
         if changed {
+            appearanceBootstrap = ServiceTheme.bootstrap(service: account.service, appearance: newAppearance)
             installUserScripts()
+            syncPageAppearance()
         }
-        syncPageAppearance()
     }
 
     private func syncPageAppearance() {
@@ -370,15 +750,17 @@ final class BrowserSession: NSObject {
         controller.removeAllUserScripts()
         controller.addUserScript(
             WKUserScript(
-                source: Self.notificationBridgeScript,
+                source: "window.__chatHubIsFocused = \(hubIsFocused ? "true" : "false");\n"
+                    + Self.notificationBridgeScript,
                 injectionTime: .atDocumentStart,
                 forMainFrameOnly: true,
                 in: .page
             ))
-        if let source = ServiceTheme.bootstrap(service: account.service, appearance: appearance) {
+        if let source = appearanceBootstrap {
             controller.addUserScript(
                 WKUserScript(
-                    source: source, injectionTime: .atDocumentEnd, forMainFrameOnly: true, in: .defaultClient
+                    source: "globalThis.__chatHubPrivacyFocused = \(hubIsFocused ? "true" : "false");\n" + source,
+                    injectionTime: .atDocumentEnd, forMainFrameOnly: true, in: .defaultClient
                 ))
         }
     }
@@ -392,23 +774,33 @@ final class BrowserSession: NSObject {
     func didActivate() {
         webView.needsDisplay = true
         webView.needsLayout = true
-        guard hasLoadedPage, account.service == .messenger else { return }
+    }
+
+    func setHubFocus(active: Bool) {
+        guard hubIsFocused != active else { return }
+        hubIsFocused = active
+        // Future documents need the latest native state before provider scripts run.
+        installUserScripts()
+        syncHubFocus()
+    }
+
+    private func syncHubFocus() {
         webView.evaluateJavaScript(
-            """
-            (function() {
-                window.dispatchEvent(new Event("resize"));
-                const main = document.querySelector('[role="main"]');
-                if (!main) return;
-                for (const scroller of main.querySelectorAll('.x1odjw0f, .x10wlt62, [role="grid"]')) {
-                    if (scroller.scrollHeight > scroller.clientHeight) {
-                        const top = scroller.scrollTop;
-                        scroller.scrollTop = top > 0 ? top - 1 : top + 1;
-                        scroller.scrollTop = top;
-                        scroller.dispatchEvent(new Event("scroll", { bubbles: true }));
-                    }
-                }
-            })();
-            """,
+            "window.__chatHubSetFocused?.(\(hubIsFocused ? "true" : "false"));",
+            completionHandler: nil
+        )
+        webView.callAsyncJavaScript(
+            "globalThis.__chatHubNativeAppearance?.setFocused(active); return true;",
+            arguments: ["active": hubIsFocused], in: nil, in: .defaultClient,
+            completionHandler: nil
+        )
+    }
+
+    func handleNotificationClick(callbackID: String) {
+        guard !callbackID.isEmpty else { return }
+        webView.callAsyncJavaScript(
+            "window.__chatHubTriggerNotificationClick?.(callbackID); return true;",
+            arguments: ["callbackID": callbackID], in: nil, in: .page,
             completionHandler: nil
         )
     }
@@ -430,7 +822,7 @@ final class BrowserSession: NSObject {
 
     func openInBrowser() {
         guard let url = currentURL ?? account.url else { return }
-        NSWorkspace.shared.open(url)
+        LinkOpener.open(url, for: account.id)
     }
 
     func showFind() {
@@ -495,12 +887,19 @@ extension BrowserSession: WKNavigationDelegate {
         externalURL = nil
     }
 
+    func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
+        syncHubFocus()
+    }
+
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         hasLoadedPage = true
         state = .loaded
         canGoBack = webView.canGoBack
         canGoForward = webView.canGoForward
+        reportURLSignIn()
         updateAppearance(appearance)
+        syncPageAppearance()
+        syncHubFocus()
         didActivate()
     }
 
@@ -537,7 +936,7 @@ extension BrowserSession: WKNavigationDelegate {
             decisionHandler(.cancel)
             state = hasLoadedPage ? .loaded : .idle
             if navigationAction.navigationType == .linkActivated {
-                NSWorkspace.shared.open(url)
+                LinkOpener.open(url, for: account.id)
             } else if navigationAction.targetFrame != nil {
                 externalURL = url
                 notice = tr("This service needs to open another website to continue.")
@@ -566,7 +965,8 @@ extension BrowserSession: WKNavigationDelegate {
 
     private func retainDownload(_ download: WKDownload) {
         let id = ObjectIdentifier(download)
-        let handler = DownloadHandler(download: download, window: webView.window) { [weak self] error in
+        let handler = DownloadHandler(download: download, window: webView.window, accountName: account.name) {
+            [weak self] error in
             self?.downloads.removeValue(forKey: id)
             if let error { self?.notice = error.localizedDescription }
         }
@@ -582,7 +982,7 @@ extension BrowserSession: WKUIDelegate {
     ) -> WKWebView? {
         guard let url = navigationAction.request.url else { return nil }
         guard NavigationPolicy(account: account).disposition(for: url) == .inApp else {
-            if ["https", "http"].contains(url.scheme?.lowercased() ?? "") { NSWorkspace.shared.open(url) }
+            if ["https", "http"].contains(url.scheme?.lowercased() ?? "") { LinkOpener.open(url, for: account.id) }
             return nil
         }
         let popup = BrowserPopup(configuration: configuration, initialURL: url)
@@ -609,7 +1009,7 @@ extension BrowserSession: WKUIDelegate {
 
     func webView(
         _ webView: WKWebView, runJavaScriptAlertPanelWithMessage message: String,
-        initiatedByFrame frame: WKFrameInfo, completionHandler: @escaping @MainActor @Sendable () -> Void
+        initiatedByFrame frame: WKFrameInfo, completionHandler: @escaping JavaScriptAlertCompletion
     ) {
         let alert = NSAlert()
         alert.messageText = frame.securityOrigin.host

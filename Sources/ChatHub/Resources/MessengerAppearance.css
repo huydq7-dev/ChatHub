@@ -5,12 +5,8 @@ html[data-chathub-service="messenger"] :is(
     body,
     .__fb-light-mode,
     .__fb-dark-mode,
-    [role="main"],
     [role="navigation"],
-    .xz23t90,
-    [style*="--chat-"],
-    [style*="--mwp-"],
-    [style*="--messenger-"]
+    .xz23t90
 ) {
     --font-family-apple: var(--hub-font) !important;
     --font-family-default: var(--hub-font) !important;
@@ -116,10 +112,31 @@ html[data-chathub-service="messenger"] :is(
     --chat-thread-background-color: var(--hub-canvas) !important;
     --chat-thread-background-image: none !important;
     --chat-thread-background-gradient: none !important;
-    --chat-thread-scrollbar-thumb-color: var(--hub-secondary) !important;
+    --chat-thread-scrollbar-thumb-color: var(--hub-scrollbar) !important;
+    --chat-thread-scrollbar-thumb-hover-color: var(--hub-scrollbar-hover) !important;
+    --chat-thread-scrollbar-thumb-active-color: var(--hub-scrollbar-active) !important;
+    --scroll-thumb: var(--hub-scrollbar) !important;
+    --scroll-thumb-hover: var(--hub-scrollbar-hover) !important;
     --chat-incoming-message-bubble-border-radius: var(--hub-radius-bubble) !important;
     --chat-outgoing-message-bubble-border-radius: var(--hub-radius-bubble) !important;
     --chat-bubble-border-radius: var(--hub-radius-bubble) !important;
+    --chat-bubble-font-size: var(--hub-size-message) !important;
+    --chat-incoming-message-bubble-font-size: var(--hub-size-message) !important;
+    --chat-outgoing-message-bubble-font-size: var(--hub-size-message) !important;
+    --chat-composer-font-size: var(--hub-size-message) !important;
+    --chat-thread-header-title-font-size: var(--hub-size-header) !important;
+}
+
+/* Keep specific bubble colors and thread backgrounds clean when Messenger injects inline styles */
+html[data-chathub-service="messenger"] [style*="--chat-"] {
+    --chat-incoming-message-bubble-background-color: var(--hub-raised) !important;
+    --chat-incoming-message-text-color: var(--hub-text) !important;
+    --chat-outgoing-message-bubble-background-color: var(--hub-outgoing) !important;
+    --chat-outgoing-message-text-color: var(--hub-text) !important;
+    --chat-replied-message-background-color: var(--hub-surface) !important;
+    --chat-quoted-incoming-message-bubble-color: var(--hub-surface) !important;
+    --chat-thread-background-image: none !important;
+    --chat-thread-background-gradient: none !important;
 }
 
 /* Flatten M5 floating card layout ("bubble" cards) into full-bleed split panes */
@@ -210,13 +227,52 @@ html[data-chathub-service="messenger"] :is([aria-current="page"], [aria-selected
     border-left: none !important;
 }
 
+/* Unified conversation row typography */
+html[data-chathub-service="messenger"] [role="navigation"] :is([role="row"], [role="listitem"], a[role="link"]) :is(
+    span.x1lliihq:first-of-type,
+    div:first-child > span,
+    [role="gridcell"] > div > div:first-child span,
+    h3, h4
+) {
+    font-family: var(--hub-font) !important;
+    font-size: var(--hub-size-row-title) !important;
+    font-weight: var(--hub-weight-semibold) !important;
+    line-height: var(--hub-leading-tight) !important;
+    letter-spacing: var(--hub-tracking-tight) !important;
+    color: var(--hub-text) !important;
+}
+html[data-chathub-service="messenger"] [role="navigation"] :is([role="row"], [role="listitem"], a[role="link"]) :is(
+    span.x193iq5w,
+    .x1lliihq:not(:first-of-type),
+    [role="gridcell"] > div > div:last-child span,
+    .x1odjw0f span
+) {
+    font-family: var(--hub-font) !important;
+    font-size: var(--hub-size-row-snippet) !important;
+    font-weight: var(--hub-weight-regular) !important;
+    line-height: var(--hub-leading-snug) !important;
+    color: var(--hub-secondary) !important;
+}
+html[data-chathub-service="messenger"] [role="navigation"] :is([role="row"], [role="listitem"], a[role="link"]) :is(
+    time, abbr, [aria-label*=":"]
+) {
+    font-size: var(--hub-size-meta) !important;
+    font-weight: var(--hub-weight-medium) !important;
+    font-variant-numeric: tabular-nums !important;
+    color: var(--hub-secondary) !important;
+}
+
 /* Thread header & message stream */
 html[data-chathub-service="messenger"] [role="main"] {
     background-color: var(--hub-canvas) !important;
     border-radius: 0 !important;
     margin: 0 !important;
 }
-html[data-chathub-service="messenger"] [role="main"] :is(h1, h2) {
+html[data-chathub-service="messenger"] [role="main"] :is(
+    h1, h2, h3,
+    [role="banner"] span[dir="auto"]:first-of-type,
+    div[aria-label]:not([role="grid"]) > div > span:first-child
+) {
     font-family: var(--hub-font) !important;
     font-size: var(--hub-size-header) !important;
     font-weight: var(--hub-weight-semibold) !important;
@@ -224,14 +280,36 @@ html[data-chathub-service="messenger"] [role="main"] :is(h1, h2) {
     letter-spacing: var(--hub-tracking-tight) !important;
     color: var(--hub-text) !important;
 }
-html[data-chathub-service="messenger"] [role="main"] [role="grid"] [dir="auto"] {
+html[data-chathub-service="messenger"] [role="main"] :is(
+    [role="banner"] span[dir="auto"]:last-of-type,
+    div[aria-label]:not([role="grid"]) > div > span:last-child
+) {
+    font-size: var(--hub-size-caption) !important;
+    font-weight: var(--hub-weight-regular) !important;
+    color: var(--hub-secondary) !important;
+}
+html[data-chathub-service="messenger"] [role="main"] :is(
+    [role="grid"],
+    [data-scope="messages_table"],
+    [aria-label="Messages"],
+    [aria-label="Tin nhắn"],
+    [data-testid="message-container"],
+    [data-testid="mw_message_list"],
+    .x1n2onr6
+) :is(
+    [dir="auto"],
+    [data-testid="message_text"],
+    .x1gslohp,
+    .x11i5rnm,
+    .x126k92a
+) {
     font-family: var(--hub-font) !important;
     font-size: var(--hub-size-message) !important;
     font-weight: var(--hub-weight-regular) !important;
     line-height: var(--hub-leading-message) !important;
     letter-spacing: var(--hub-tracking-normal) !important;
 }
-html[data-chathub-service="messenger"] [role="main"] :is(time, abbr, h4) {
+html[data-chathub-service="messenger"] [role="main"] :is(time, abbr, h4, .x14zfl5b, [aria-label*=":"]) {
     font-size: var(--hub-size-meta) !important;
     font-weight: var(--hub-weight-medium) !important;
     font-variant-numeric: tabular-nums !important;
@@ -245,21 +323,17 @@ html[data-chathub-service="messenger"] [role="main"] [contenteditable="true"] {
     outline: none !important;
     box-shadow: none !important;
     color: var(--hub-text) !important;
-    font-family: var(--hub-font) !important;
-    font-size: var(--hub-size-message) !important;
-    font-weight: var(--hub-weight-regular) !important;
-    line-height: var(--hub-leading-message) !important;
-    letter-spacing: var(--hub-tracking-normal) !important;
+    caret-color: var(--hub-link) !important;
 }
 html[data-chathub-service="messenger"] [role="main"] [role="textbox"]:focus-visible { outline: none !important; }
 
-/* Focused mode: reclaim Facebook's 56px top banner and redundant left switcher rail
-   purely via Comet's CSS variables and landmark attributes (zero subtree :has() cost). */
-html[data-chathub-service="messenger"][data-chathub-focus="true"],
-html[data-chathub-service="messenger"][data-chathub-focus="true"] :is(
+/* Reclaim Facebook's 56px top banner and global rail across all view modes */
+html[data-chathub-service="messenger"],
+html[data-chathub-service="messenger"] :is(
     body,
     .xz23t90,
     [style*="--x---header-height"],
+    [style*="--header-height"],
     [role="main"],
     [role="navigation"]
 ) {
@@ -267,25 +341,132 @@ html[data-chathub-service="messenger"][data-chathub-focus="true"] :is(
     --x---header-height: 0px !important;
     --messenger-sidebar-collapsed-width: 0px !important;
 }
-html[data-chathub-service="messenger"][data-chathub-focus="true"] :is([role="banner"], [role="navigation"]:has(+ [role="navigation"])) {
+
+html[data-chathub-service="messenger"] :is(
+    [role="banner"],
+    [data-pagelet="Bluebar"],
+    [data-pagelet="NavBar"],
+    [role="navigation"]:has(+ [role="navigation"])
+) {
     display: none !important;
+    visibility: hidden !important;
     width: 0 !important;
     height: 0 !important;
     min-height: 0 !important;
+    max-height: 0 !important;
+    overflow: hidden !important;
+    pointer-events: none !important;
 }
-html[data-chathub-service="messenger"][data-chathub-focus="true"] :is(.x1bc3s5a, .x85a59c, .x1og2svy, .xtp0wl1) {
+
+html[data-chathub-service="messenger"] :is(.x1bc3s5a, .x85a59c, .x1og2svy, .xtp0wl1) {
     height: 100vh !important;
     min-height: 100vh !important;
     max-height: 100vh !important;
 }
-@media (min-width: 900px) {
-    html[data-chathub-service="messenger"] [role="navigation"]:not(:has(+ [role="navigation"])) {
-        flex: 0 0 var(--hub-list-width) !important;
-        width: var(--hub-list-width) !important;
-        min-width: var(--hub-list-width) !important;
-        max-width: var(--hub-list-width) !important;
-    }
+
+/* Focused mode: hide redundant secondary panels when focus mode is active */
+html[data-chathub-service="messenger"][data-chathub-focus="true"] [role="complementary"] {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
 }
+
+html[data-chathub-service="messenger"] [role="navigation"]:not(:has(+ [role="navigation"])) {
+    flex: 0 0 var(--hub-list-width) !important;
+    width: var(--hub-list-width) !important;
+    min-width: var(--hub-list-width) !important;
+    max-width: var(--hub-list-width) !important;
+}
+
 html[data-chathub-service="messenger"] [role="main"] [style*="--chat-composer-button-color"] {
     background-image: none !important;
+}
+
+/* Hardware-accelerated smooth scrolling for message virtualizer */
+html[data-chathub-service="messenger"] [role="main"] :is([aria-label="Messages"], [data-virtualized="true"]) {
+    -webkit-overflow-scrolling: touch !important;
+    overflow-anchor: auto !important;
+}
+
+/* Unified Messenger navigation scrollbars */
+html[data-chathub-service="messenger"] :is(
+    [role="navigation"],
+    [role="grid"],
+    .x1odjw0f,
+    .x10wlt62,
+    .x78zum5,
+    .x1n2onr6,
+    [aria-label="Thread list"]
+)::-webkit-scrollbar {
+    width: 6px !important;
+    height: 6px !important;
+    background: transparent !important;
+    background-color: transparent !important;
+}
+
+html[data-chathub-service="messenger"] :is(
+    [role="navigation"],
+    [role="grid"],
+    .x1odjw0f,
+    .x10wlt62,
+    .x78zum5,
+    .x1n2onr6,
+    [aria-label="Thread list"]
+)::-webkit-scrollbar-track {
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+html[data-chathub-service="messenger"] :is(
+    [role="navigation"],
+    [role="grid"],
+    .x1odjw0f,
+    .x10wlt62,
+    .x78zum5,
+    .x1n2onr6,
+    [aria-label="Thread list"]
+)::-webkit-scrollbar-thumb {
+    background: var(--hub-scrollbar) !important;
+    background-color: var(--hub-scrollbar) !important;
+    border-radius: var(--hub-radius-pill) !important;
+    border: none !important;
+    box-shadow: none !important;
+    min-height: 20px;
+}
+
+html[data-chathub-service="messenger"] :is(
+    [role="navigation"],
+    [role="grid"],
+    .x1odjw0f,
+    .x10wlt62,
+    .x78zum5,
+    .x1n2onr6,
+    [aria-label="Thread list"]
+):hover::-webkit-scrollbar-thumb,
+html[data-chathub-service="messenger"] :is(
+    [role="navigation"],
+    [role="grid"],
+    .x1odjw0f,
+    .x10wlt62,
+    .x78zum5,
+    .x1n2onr6,
+    [aria-label="Thread list"]
+)::-webkit-scrollbar-thumb:hover {
+    background: var(--hub-scrollbar-hover) !important;
+    background-color: var(--hub-scrollbar-hover) !important;
+}
+
+html[data-chathub-service="messenger"] :is(
+    [role="navigation"],
+    [role="grid"],
+    .x1odjw0f,
+    .x10wlt62,
+    .x78zum5,
+    .x1n2onr6,
+    [aria-label="Thread list"]
+)::-webkit-scrollbar-thumb:active {
+    background: var(--hub-scrollbar-active) !important;
+    background-color: var(--hub-scrollbar-active) !important;
 }

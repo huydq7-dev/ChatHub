@@ -12,7 +12,9 @@ struct AccountEditor: View {
     @State private var name: String
     @State private var subtitle: String
     @State private var website: String
+    @State private var linkBrowser: String?
     @State private var validationError: String?
+    private let installedBrowsers = LinkOpener.installedBrowsers()
     @FocusState private var nameIsFocused: Bool
 
     init(account: ChatAccount? = nil, service: ChatService? = nil) {
@@ -21,6 +23,7 @@ struct AccountEditor: View {
         _name = State(initialValue: account?.name ?? service?.name ?? "")
         _subtitle = State(initialValue: account?.subtitle ?? "")
         _website = State(initialValue: account?.customURL?.absoluteString ?? "https://")
+        _linkBrowser = State(initialValue: account?.linkBrowserID)
     }
 
     var body: some View {
@@ -144,6 +147,21 @@ struct AccountEditor: View {
                     .font(HubFont.body)
                     .modifier(HubInputFieldSurface())
             }
+            VStack(alignment: .leading, spacing: HubSpace.xs) {
+                Text(tr("Open links in"))
+                    .font(HubFont.captionMedium)
+                    .foregroundStyle(HubStyle.textPrimary)
+                Picker(tr("Open links in"), selection: $linkBrowser) {
+                    Text(tr("Default browser")).tag(String?.none)
+                    ForEach(installedBrowsers) { browser in
+                        Text(browser.name).tag(String?.some(browser.id))
+                    }
+                }
+                .labelsHidden()
+                Text(tr("Links to other websites open in this browser instead of the system default."))
+                    .font(HubFont.meta)
+                    .foregroundStyle(HubStyle.textSecondary)
+            }
             if service == .custom {
                 VStack(alignment: .leading, spacing: HubSpace.xs) {
                     Text(tr("Website address"))
@@ -179,6 +197,7 @@ struct AccountEditor: View {
             var account = existingAccount ?? ChatAccount(service: service, name: name, customURL: url)
             account.name = name
             account.subtitle = subtitle
+            account.linkBrowserID = linkBrowser
             account = try account.validated()
             if store.saveAccount(account) { dismiss() }
         } catch { validationError = tr(error.localizedDescription) }

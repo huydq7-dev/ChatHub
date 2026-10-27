@@ -88,6 +88,8 @@ html[data-chathub-service="telegram"] :is(
     --shadow-message: var(--hub-shadow-card) !important;
     --column-header-height: var(--hub-header-height) !important;
     --middle-header-height: var(--hub-header-height) !important;
+    --color-scrollbar: var(--hub-scrollbar) !important;
+    --scrollbar-width: 6px !important;
 }
 
 /* Left column, header & search bar */
@@ -372,11 +374,42 @@ html[data-chathub-service="telegram"] .Message .message-content:is(.media, .cust
     background: transparent !important;
     background-color: transparent !important;
 }
-html[data-chathub-service="telegram"] .Message .text-content {
+html[data-chathub-service="telegram"] .Message :is(
+    .text-content,
+    .media-caption,
+    .transcription,
+    .message-text,
+    .web-page-story,
+    .web-page-description
+) {
     font-size: var(--hub-size-message) !important;
     font-weight: var(--hub-weight-regular) !important;
     line-height: var(--hub-leading-message) !important;
     letter-spacing: var(--hub-tracking-normal) !important;
+}
+html[data-chathub-service="telegram"] .Message :is(.message-title, .sender-title, .forward-title) {
+    font-size: var(--hub-size-caption) !important;
+    font-weight: var(--hub-weight-semibold) !important;
+    line-height: var(--hub-leading-tight) !important;
+}
+html[data-chathub-service="telegram"] .Composer :is(.EmbeddedMessage, .ComposerEmbeddedMessage, .embedded-message, .reply) {
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+}
+html[data-chathub-service="telegram"] .Composer :is(.EmbeddedMessage, .ComposerEmbeddedMessage, .embedded-message, .reply) :is(.EmbeddedMessage-content, .reply-content) {
+    height: auto !important;
+    overflow: visible !important;
+}
+html[data-chathub-service="telegram"] :is(.Message, .Composer) :is(.EmbeddedMessage, .ComposerEmbeddedMessage, .embedded-message, .reply) :is(.message-title, .sender-title, .reply-title) {
+    font-size: var(--hub-size-caption) !important;
+    font-weight: var(--hub-weight-semibold) !important;
+    line-height: var(--hub-leading-tight) !important;
+}
+html[data-chathub-service="telegram"] :is(.Message, .Composer) :is(.EmbeddedMessage, .ComposerEmbeddedMessage, .embedded-message, .reply) :is(.message-text, .reply-text, .reply-subtitle) {
+    font-size: var(--hub-size-caption) !important;
+    font-weight: var(--hub-weight-regular) !important;
+    line-height: var(--hub-leading-snug) !important;
 }
 html[data-chathub-service="telegram"] .Message .MessageMeta,
 html[data-chathub-service="telegram"] .Message .MessageMeta .message-time {
@@ -442,11 +475,51 @@ html[data-chathub-service="telegram"] .Composer:not(.is-chat-composer) > .Button
     border: 1px solid var(--hub-border) !important;
     box-shadow: var(--hub-shadow-card) !important;
     border-radius: var(--hub-radius-composer) !important;
+    color: var(--hub-link) !important;
 }
 html[data-chathub-service="telegram"] .Composer.is-chat-composer > .Button {
     background: transparent !important;
     border: none !important;
     box-shadow: none !important;
+    color: var(--hub-link) !important;
+}
+html[data-chathub-service="telegram"] .Composer > .Button:is(.main-button, .record, .send, .edit, .schedule):not(.danger):not(.recording) {
+    color: var(--hub-link) !important;
+}
+html[data-chathub-service="telegram"] .Composer > .Button:is(.main-button, .record, .send, .edit, .schedule):not(.danger):not(.recording) :is(
+    .icon,
+    .main-button-state-icon,
+    .main-button-microphone,
+    .icon-round-video,
+    .icon-new-send,
+    .icon-schedule,
+    .icon-check,
+    .icon-forward,
+    [class*="icon-"]
+) {
+    color: var(--hub-link) !important;
+    fill: var(--hub-link) !important;
+}
+html[data-chathub-service="telegram"] .Composer > .Button:is(.main-button, .record, .send, .edit, .schedule):not(.danger):not(.recording):hover {
+    background: var(--hub-hover) !important;
+}
+html[data-chathub-service="telegram"] .Composer > .Button:is(.main-button, .record, .send, .edit, .schedule):not(.danger):not(.recording):hover :is(
+    .icon,
+    .main-button-state-icon,
+    .main-button-microphone,
+    .icon-round-video,
+    .icon-new-send,
+    .icon-schedule,
+    .icon-check,
+    .icon-forward,
+    [class*="icon-"]
+) {
+    color: var(--hub-accent-hover, var(--hub-link)) !important;
+    fill: var(--hub-accent-hover, var(--hub-link)) !important;
+}
+html[data-chathub-service="telegram"] .Composer :is(.main-button-microphone, [class*="icon-microphone"]) {
+    color: var(--hub-link) !important;
+    fill: var(--hub-link) !important;
 }
 @media (min-width: 1276px) {
     html[data-chathub-service="telegram"] #Main.right-column-open #MiddleColumn :is(.middle-column-footer, ._7zgs9ckg, .MiddleHeader) {
@@ -485,4 +558,87 @@ html[data-chathub-service="telegram"] #Main > div:first-child:not([id]):not(.Tra
 html[data-chathub-service="telegram"] #Main > div:first-child:not([id]):not(.Transition)::after {
     opacity: 0 !important;
     background-image: none !important;
+}
+
+/* Unified Telegram scrollbars: keep navigation and picker scrollbars styled, but allow .MessageList and .Transition_slide to use macOS native overlay scrolling to prevent scroll jitter */
+html[data-chathub-service="telegram"] :is(
+    .chat-list,
+    .LeftSearch,
+    .search-content,
+    .settings-content,
+    .picker-list,
+    .media-list
+)::-webkit-scrollbar {
+    width: 6px !important;
+    height: 6px !important;
+    background: transparent !important;
+    background-color: transparent !important;
+}
+
+html[data-chathub-service="telegram"] :is(
+    .chat-list,
+    .LeftSearch,
+    .search-content,
+    .settings-content,
+    .picker-list,
+    .media-list
+)::-webkit-scrollbar-track {
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+html[data-chathub-service="telegram"] :is(
+    .chat-list,
+    .LeftSearch,
+    .search-content,
+    .settings-content,
+    .picker-list,
+    .media-list
+)::-webkit-scrollbar-thumb {
+    background: var(--hub-scrollbar) !important;
+    background-color: var(--hub-scrollbar) !important;
+    border-radius: var(--hub-radius-pill) !important;
+    border: none !important;
+    box-shadow: none !important;
+    min-height: 20px;
+}
+
+html[data-chathub-service="telegram"] :is(
+    .chat-list,
+    .LeftSearch,
+    .search-content,
+    .settings-content,
+    .picker-list,
+    .media-list
+):hover::-webkit-scrollbar-thumb,
+html[data-chathub-service="telegram"] :is(
+    .chat-list,
+    .LeftSearch,
+    .search-content,
+    .settings-content,
+    .picker-list,
+    .media-list
+)::-webkit-scrollbar-thumb:hover {
+    background: var(--hub-scrollbar-hover) !important;
+    background-color: var(--hub-scrollbar-hover) !important;
+}
+
+html[data-chathub-service="telegram"] :is(
+    .chat-list,
+    .LeftSearch,
+    .search-content,
+    .settings-content,
+    .picker-list,
+    .media-list
+)::-webkit-scrollbar-thumb:active {
+    background: var(--hub-scrollbar-active) !important;
+    background-color: var(--hub-scrollbar-active) !important;
+}
+
+/* Allow Telegram's message stream to use native hardware-accelerated overlay scrolling without synthetic webkit-scrollbar reflows */
+html[data-chathub-service="telegram"] :is(.MessageList, .messages-layout, .messages-container) {
+    -webkit-overflow-scrolling: touch !important;
+    overflow-anchor: auto !important;
 }

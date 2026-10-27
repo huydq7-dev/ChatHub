@@ -8,17 +8,49 @@ struct SettingsView: View {
     @Environment(WorkspaceStore.self) private var store
     @Environment(BrowserPool.self) private var browsers
     @Environment(WorkspaceLayout.self) private var layout
+    @Environment(AppUpdater.self) private var updater
     @AppStorage("appearance") private var appearance = "system"
     @AppStorage(ChatAppearancePreferences.themeKey) private var nativeThemeEnabled = true
     @AppStorage(ChatAppearancePreferences.toolsKey) private var showServiceTools = false
     @AppStorage(ChatAppearancePreferences.accentKey) private var accentRaw = HubAccent.iris.rawValue
     @AppStorage(ChatAppearancePreferences.densityKey) private var densityRaw = HubDensity.standard.rawValue
     @AppStorage(ChatAppearancePreferences.textScaleKey) private var textScaleRaw = HubTextScale.standard.rawValue
+    @AppStorage("showMenuBarExtra") private var showMenuBarExtra = true
+    @AppStorage("privacyShieldEnabled") private var privacyShieldEnabled = false
+    @AppStorage("alwaysOnTopEnabled") private var alwaysOnTopEnabled = false
+    @AppStorage(ChatAppearancePreferences.keepConnectedKey) private var keepConnected = true
+    @AppStorage(ChatAppearancePreferences.sleepIdleHoursKey) private var sleepIdleHours = 1
+    @State private var launchAtLogin = LaunchAtLogin.isRegistered
+    @State private var launchError: String?
 
     private var selectedAccent: HubAccent { HubAccent(rawValue: accentRaw) ?? .iris }
 
+    private var launchAtLoginBinding: Binding<Bool> {
+        Binding(
+            get: { launchAtLogin },
+            set: { enabled in
+                do {
+                    try LaunchAtLogin.set(enabled)
+                    launchError = nil
+                } catch {
+                    launchError = error.localizedDescription
+                }
+                launchAtLogin = LaunchAtLogin.isRegistered
+            }
+        )
+    }
+
+    private func idleLabel(_ hours: Int) -> String {
+        switch hours {
+        case 0: tr("Never")
+        case 1: tr("1 hour")
+        default: String(format: tr("%d hours"), hours)
+        }
+    }
+
     var body: some View {
         @Bindable var layout = layout
+        @Bindable var updater = updater
         Form {
             Section {
                 HStack(spacing: HubSpace.md) {
@@ -104,6 +136,91 @@ struct SettingsView: View {
                 Text(
                     tr(
                         "One ChatHub appearance for Telegram, Messenger and Zalo. Colors, typography and chat surfaces follow the appearance above. Show extra tools to access service-specific controls. Turn off to restore the original interfaces."
+                    ))
+            }
+            Section {
+                Toggle(tr("Show Menu Bar Icon"), isOn: $showMenuBarExtra)
+                Toggle(tr("Privacy Shield (Blur messages)"), isOn: $privacyShieldEnabled)
+                Toggle(tr("Keep window always on top"), isOn: $alwaysOnTopEnabled)
+            } header: {
+                Text(tr("Workspace & Privacy"))
+            } footer: {
+                Text(
+                    tr(
+                        "Privacy Shield blurs chat content in Telegram, Messenger and Zalo, including when appearance matching is off. Hover to peek while ChatHub is active. Always on Top keeps ChatHub above other windows."
+                    ))
+            }
+            Section {
+                HStack {
+                    VStack(alignment: .leading, spacing: HubSpace.xxs) {
+                        Text(tr("System Notifications"))
+                            .font(HubFont.body)
+                        Text(
+                            tr(
+                                "Receive notifications for new messages across your active and background accounts."
+                            )
+                        )
+                        .font(HubFont.caption)
+                        .foregroundStyle(HubStyle.textSecondary)
+                    }
+                    Spacer()
+                    Button(tr("Send Test Notification")) {
+                        HubNotificationCenter.shared.sendTestNotification()
+                    }
+                }
+                Toggle(tr("Keep accounts connected in the background"), isOn: $keepConnected)
+                Picker(tr("Sleep muted accounts after"), selection: $sleepIdleHours) {
+                    ForEach(HibernationPolicy.allowedIdleHours, id: \.self) { hours in
+                        Text(idleLabel(hours)).tag(hours)
+                    }
+                }
+            } header: {
+                Text(tr("Notifications"))
+            } footer: {
+                Text(
+                    tr(
+                        "Make sure notifications are enabled for ChatHub in macOS System Settings > Notifications."
+                    ) + " "
+                        + tr(
+                            "Loads every account after launch so unread badges and notifications work before you open it. Uses more memory. Takes effect next launch when turned off. Mute individual accounts from their context menu."
+                        ) + " "
+                        + tr(
+                            "Muted accounts that sit idle release their memory and reopen when selected. Accounts with notifications stay awake."
+                        ))
+            }
+            QuietHoursSettingsSection()
+            PrivacySettingsSection()
+            Section {
+                Toggle(tr("Open ChatHub at login"), isOn: launchAtLoginBinding)
+            } header: {
+                Text(tr("Startup"))
+            } footer: {
+                if let launchError {
+                    Text(launchError).foregroundStyle(.red)
+                } else if LaunchAtLogin.status == .requiresApproval {
+                    Text(tr("Approve ChatHub in System Settings → General → Login Items."))
+                }
+            }
+            Section {
+                Toggle(tr("Automatically check for updates"), isOn: $updater.automaticChecksEnabled)
+                HStack {
+                    if updater.isChecking {
+                        ProgressView().controlSize(.small)
+                        Text(tr("Checking for updates…")).font(HubFont.caption)
+                    } else if let date = updater.lastChecked {
+                        Text(tr("Last checked"))
+                        Text(date, style: .relative).foregroundStyle(HubStyle.textSecondary)
+                    }
+                    Spacer()
+                    Button(tr("Check for Updates…")) { updater.checkManually() }
+                        .disabled(updater.isChecking)
+                }
+            } header: {
+                Text(tr("Updates"))
+            } footer: {
+                Text(
+                    tr(
+                        "ChatHub checks GitHub Releases every six hours. New versions appear in the workspace. Installation is manual; your chats and account profiles stay in place."
                     ))
             }
             Section {

@@ -10,6 +10,8 @@ struct WorkspaceToolbar: ToolbarContent {
     @Environment(WorkspaceLayout.self) private var layout
     @AppStorage(ChatAppearancePreferences.themeKey) private var nativeThemeEnabled = true
     @AppStorage(ChatAppearancePreferences.toolsKey) private var showServiceTools = false
+    @AppStorage("privacyShieldEnabled") private var privacyShieldEnabled = false
+    @AppStorage("alwaysOnTopEnabled") private var alwaysOnTopEnabled = false
     @State private var showingAppearanceStudio = false
 
     private var supportsAppearance: Bool {
@@ -36,11 +38,21 @@ struct WorkspaceToolbar: ToolbarContent {
                     Text("·")
                         .font(HubFont.button)
                         .foregroundStyle(HubStyle.textSecondary)
+                        .fixedSize()
                     Text(account.name)
                         .font(HubFont.bodyMedium)
                         .foregroundStyle(HubStyle.textPrimary)
                         .lineLimit(1)
-                    HubBadge(text: account.subtitle.isEmpty ? account.service.name : account.subtitle)
+                        .truncationMode(.tail)
+                    Text("·")
+                        .font(HubFont.button)
+                        .foregroundStyle(HubStyle.textSecondary)
+                        .fixedSize()
+                    Text(account.subtitle.isEmpty ? account.service.name : account.subtitle)
+                        .font(HubFont.captionMedium)
+                        .foregroundStyle(HubStyle.accentText)
+                        .fixedSize()
+                        .layoutPriority(1)
                 } else {
                     Text("·")
                         .font(HubFont.button)
@@ -67,8 +79,26 @@ struct WorkspaceToolbar: ToolbarContent {
             } label: {
                 Image(systemName: "command")
             }
-            .help(tr("Switch Account…") + " · ⌘K")
-            .accessibilityLabel(tr("Switch Account…"))
+            .help(tr("Command Palette…") + " · ⌘K")
+            .accessibilityLabel(tr("Command Palette…"))
+
+            Button {
+                privacyShieldEnabled.toggle()
+            } label: {
+                Image(systemName: privacyShieldEnabled ? "eye.slash.fill" : "eye.slash")
+                    .foregroundStyle(privacyShieldEnabled ? HubStyle.accentText : HubStyle.textSecondary)
+            }
+            .help(tr(privacyShieldEnabled ? "Disable Privacy Shield" : "Enable Privacy Shield") + " · ⌘⇧P")
+            .accessibilityLabel(tr(privacyShieldEnabled ? "Disable Privacy Shield" : "Enable Privacy Shield"))
+
+            Button {
+                alwaysOnTopEnabled.toggle()
+            } label: {
+                Image(systemName: alwaysOnTopEnabled ? "pin.fill" : "pin")
+                    .foregroundStyle(alwaysOnTopEnabled ? HubStyle.accentText : HubStyle.textSecondary)
+            }
+            .help(tr(alwaysOnTopEnabled ? "Disable Always on Top" : "Keep Window on Top") + " · ⌘⇧T")
+            .accessibilityLabel(tr(alwaysOnTopEnabled ? "Disable Always on Top" : "Keep Window on Top"))
 
             Button {
                 showingAppearanceStudio.toggle()
@@ -133,7 +163,7 @@ struct WorkspaceToolbar: ToolbarContent {
     }
 }
 
-private struct AppearanceStudioPopover: View {
+struct AppearanceStudioPopover: View {
     let supportsServiceTools: Bool
     @AppStorage("appearance") private var appearance = "system"
     @AppStorage(ChatAppearancePreferences.themeKey) private var nativeThemeEnabled = true
@@ -255,7 +285,7 @@ private struct AppearanceStudioPopover: View {
         }
         .padding(HubSpace.md)
         .frame(width: 288)
-        .background(HubStyle.surface)
+        .liquidGlassCard(cornerRadius: 16)
         .tint(HubStyle.accentColor(for: selectedAccent))
     }
 }

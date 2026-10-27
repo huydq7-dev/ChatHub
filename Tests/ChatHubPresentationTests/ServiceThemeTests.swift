@@ -68,6 +68,210 @@ struct ServiceThemeTests {
         #expect(BrowserSession.parseUnreadCount(from: "Zalo Web") == nil)
     }
 
+    @Test(arguments: [ChatService.telegram, .zalo, .messenger])
+    func privacyShieldAppliesBlurAcrossAllServices(service: ChatService) async throws {
+        let configuration = WKWebViewConfiguration()
+        configuration.websiteDataStore = .nonPersistent()
+        let view = WKWebView(frame: CGRect(x: 0, y: 0, width: 1100, height: 800), configuration: configuration)
+        let navigation = ThemeNavigation()
+        view.navigationDelegate = navigation
+        try await navigation.load(view, html: fixture(service), baseURL: service.homeURL)
+        let source = try #require(
+            ServiceTheme.bootstrap(
+                service: service,
+                appearance: BrowserAppearance(privacyShield: true)
+            )
+        )
+        let privacy = try await evaluate(
+            view,
+            body: source + """
+                return {
+                    privacy: document.documentElement.getAttribute('data-chathub-privacy') || '',
+                    filter: privacyFilter(document.getElementById('outgoing'))
+                };
+                """
+        )
+        #expect(privacy["privacy"] == "true")
+        #expect(privacy["filter"]?.contains("blur") == true)
+
+        let disabled = try await evaluate(
+            view,
+            body: """
+                globalThis.__chatHubNativeAppearance.update({privacyShield: false});
+                return {
+                    privacy: document.documentElement.getAttribute('data-chathub-privacy') || '',
+                    filter: privacyFilter(document.getElementById('outgoing'))
+                };
+                """
+        )
+        #expect(disabled["privacy"] == "false")
+        #expect(disabled["filter"] == "none")
+    }
+
+    @Test func zaloPrivacyShieldBlursChatAvatarsAndSenderNames() async throws {
+        let configuration = WKWebViewConfiguration()
+        configuration.websiteDataStore = .nonPersistent()
+        let view = WKWebView(frame: CGRect(x: 0, y: 0, width: 1100, height: 800), configuration: configuration)
+        let navigation = ThemeNavigation()
+        view.navigationDelegate = navigation
+        let html = """
+            <style>.zl-avatar, .avatar {border-radius:50%;overflow:hidden}</style>
+            <div id="sidebarNav">
+                <div id="main-tab"></div>
+                <div class="conv-item"><div class="avatar"><img id="sidebarAvatarImg" src="data:image/png;base64,iVBORw0KGgo="></div></div>
+            </div>
+            <div id="header">
+                <div class="header-info">
+                    <img id="headerAvatarImg" src="data:image/png;base64,iVBORw0KGgo=">
+                    <span id="headerTitle" class="header-title">Group Name</span>
+                </div>
+            </div>
+            <div class="chat-message">
+                <div id="msgAvatar" class="zl-avatar"><img id="msgAvatarImg" src="data:image/png;base64,iVBORw0KGgo="></div>
+                <div class="chat-content">
+                    <div class="card-sender-name" id="senderName">User Name</div>
+                    <div id="outgoing" class="card" style="background:var(--blue-message)">Sample</div>
+                </div>
+            </div>
+            <div class="chat-box-input-container"><div id="editor" contenteditable="true">Draft</div></div>
+            """
+        try await navigation.load(view, html: html, baseURL: ChatService.zalo.homeURL)
+        let source = try #require(
+            ServiceTheme.bootstrap(
+                service: .zalo,
+                appearance: BrowserAppearance(privacyShield: true)
+            )
+        )
+        let privacy = try await evaluate(
+            view,
+            body: source + """
+                return {
+                    privacy: document.documentElement.getAttribute('data-chathub-privacy') || '',
+                    msgAvatarFilter: privacyFilter(document.getElementById('msgAvatarImg')),
+                    msgAvatarRadius: getComputedStyle(document.getElementById('msgAvatar')).borderRadius || '',
+                    senderNameFilter: privacyFilter(document.getElementById('senderName')),
+                    headerAvatarFilter: privacyFilter(document.getElementById('headerAvatarImg')),
+                    headerTitleFilter: privacyFilter(document.getElementById('headerTitle')),
+                    sidebarAvatarFilter: privacyFilter(document.getElementById('sidebarAvatarImg')),
+                    outgoingFilter: privacyFilter(document.getElementById('outgoing'))
+                };
+                """
+        )
+        #expect(privacy["privacy"] == "true")
+        #expect(privacy["msgAvatarFilter"]?.contains("blur") == true)
+        #expect(privacy["msgAvatarRadius"] == "50%")
+        #expect(privacy["senderNameFilter"]?.contains("blur") == true)
+        #expect(privacy["headerAvatarFilter"]?.contains("blur") == true)
+        #expect(privacy["headerTitleFilter"]?.contains("blur") == true)
+        #expect(privacy["sidebarAvatarFilter"]?.contains("blur") == true)
+        #expect(privacy["outgoingFilter"]?.contains("blur") == true)
+
+        let disabled = try await evaluate(
+            view,
+            body: """
+                globalThis.__chatHubNativeAppearance.update({privacyShield: false});
+                return {
+                    privacy: document.documentElement.getAttribute('data-chathub-privacy') || '',
+                    msgAvatarFilter: privacyFilter(document.getElementById('msgAvatarImg')),
+                    senderNameFilter: privacyFilter(document.getElementById('senderName')),
+                    headerAvatarFilter: privacyFilter(document.getElementById('headerAvatarImg')),
+                    outgoingFilter: privacyFilter(document.getElementById('outgoing'))
+                };
+                """
+        )
+        #expect(disabled["privacy"] == "false")
+        #expect(disabled["msgAvatarFilter"] == "none")
+        #expect(disabled["senderNameFilter"] == "none")
+        #expect(disabled["headerAvatarFilter"] == "none")
+        #expect(disabled["outgoingFilter"] == "none")
+    }
+
+    @Test func telegramPrivacyShieldBlursAndRevealsSidebarRow() async throws {
+        let configuration = WKWebViewConfiguration()
+        configuration.websiteDataStore = .nonPersistent()
+        let view = WKWebView(frame: CGRect(x: 0, y: 0, width: 1100, height: 800), configuration: configuration)
+        let navigation = ThemeNavigation()
+        view.navigationDelegate = navigation
+        let html = """
+            <div id="Main">
+                <div id="LeftColumn">
+                    <div class="chat-list">
+                        <div id="chatRow" class="ListItem Chat chat-item-clickable">
+                            <a id="chatBtn" class="ListItem-button" role="button">
+                                <div class="Avatar" id="avatarWrap"><img id="avatarImg" src="data:image/png;base64,iVBORw0KGgo="></div>
+                                <div class="info">
+                                    <div class="title" id="chatTitle"><h3 id="chatH3"><span id="chatName">Friend Name</span></h3></div>
+                                    <div class="subtitle" id="chatSub"><p class="last-message"><span id="chatMsg">Recent message snippet</span></p></div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="Message own"><div id="outgoing" class="message-content">Sample</div></div>
+            </div>
+            """
+        try await navigation.load(view, html: html, baseURL: ChatService.telegram.homeURL)
+        let source = try #require(
+            ServiceTheme.bootstrap(
+                service: .telegram,
+                appearance: BrowserAppearance(privacyShield: true)
+            )
+        )
+        let privacy = try await evaluate(
+            view,
+            body: source + """
+                return {
+                    privacy: document.documentElement.getAttribute('data-chathub-privacy') || '',
+                    nameFilter: privacyFilter(document.getElementById('chatName')),
+                    msgFilter: privacyFilter(document.getElementById('chatMsg')),
+                    titleFilter: privacyFilter(document.getElementById('chatTitle')),
+                    subFilter: privacyFilter(document.getElementById('chatSub')),
+                    avatarFilter: privacyFilter(document.getElementById('avatarImg'))
+                };
+                """
+        )
+        #expect(privacy["privacy"] == "true")
+        #expect(privacy["nameFilter"]?.contains("blur") == true)
+        #expect(privacy["msgFilter"]?.contains("blur") == true)
+        #expect(privacy["titleFilter"]?.contains("blur") == true)
+        #expect(privacy["subFilter"]?.contains("blur") == true)
+        #expect(privacy["avatarFilter"]?.contains("blur") == true)
+
+        let peeked = try await evaluate(
+            view,
+            body: """
+                document.getElementById('chatRow').setAttribute('data-chathub-peek', 'true');
+                return {
+                    nameFilter: privacyFilter(document.getElementById('chatName')),
+                    msgFilter: privacyFilter(document.getElementById('chatMsg')),
+                    titleFilter: privacyFilter(document.getElementById('chatTitle')),
+                    subFilter: privacyFilter(document.getElementById('chatSub')),
+                    avatarFilter: privacyFilter(document.getElementById('avatarImg'))
+                };
+                """
+        )
+        #expect(peeked["nameFilter"] == "none")
+        #expect(peeked["msgFilter"] == "none")
+        #expect(peeked["titleFilter"] == "none")
+        #expect(peeked["subFilter"] == "none")
+        #expect(peeked["avatarFilter"] == "none")
+    }
+
+    @Test func workspaceWindowStyleTogglesFloatingLevel() {
+        let window = NSWindow(
+            contentRect: NSRect(x: 0, y: 0, width: 800, height: 600),
+            styleMask: [.titled, .closable],
+            backing: .buffered,
+            defer: false
+        )
+        WorkspaceWindowStyle.apply(to: window, alwaysOnTop: false)
+        #expect(window.level == .normal)
+        WorkspaceWindowStyle.apply(to: window, alwaysOnTop: true)
+        #expect(window.level == .floating)
+        WorkspaceWindowStyle.apply(to: window, alwaysOnTop: false)
+        #expect(window.level == .normal)
+    }
+
     private var probe: String {
         """
         const editor = document.getElementById('editor'); editor.focus();
@@ -104,7 +308,7 @@ struct ServiceThemeTests {
         default:
             content = """
                 <div role="navigation"></div><div role="grid"></div><div role="main">
-                <div id="outgoing" style="background:var(--chat-outgoing-message-bubble-background-color)">Sample</div>
+                <div id="outgoing" dir="auto" style="background:var(--chat-outgoing-message-bubble-background-color)">Sample</div>
                 <div id="editor" contenteditable="true" role="textbox">Draft</div></div>
                 """
         }
@@ -113,7 +317,18 @@ struct ServiceThemeTests {
 
     private func evaluate(_ view: WKWebView, body: String) async throws -> [String: String] {
         try await withCheckedThrowingContinuation { continuation in
-            view.callAsyncJavaScript(body, arguments: [:], in: nil, in: .defaultClient) { result in
+            let filterProbe = """
+                // Blur applies to the rendered subtree, even when a leaf has filter:none.
+                function privacyFilter(node) {
+                    while (node) {
+                        const filter = getComputedStyle(node).filter;
+                        if (filter.includes('blur')) return filter;
+                        node = node.parentElement;
+                    }
+                    return 'none';
+                }
+                """
+            view.callAsyncJavaScript(filterProbe + body, arguments: [:], in: nil, in: .defaultClient) { result in
                 switch result {
                 case .success(let value): continuation.resume(returning: value as? [String: String] ?? [:])
                 case .failure(let error): continuation.resume(throwing: error)

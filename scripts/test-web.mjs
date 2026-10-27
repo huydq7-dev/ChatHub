@@ -66,6 +66,21 @@ test('disabling restores provider appearance; enabling can reapply', () => {
     assert.equal(p.attributes.get('data-chathub-reduce-motion'), 'true');
 });
 
+for (const service of ['telegram', 'zalo', 'messenger']) {
+    test(`${service}: privacy survives theme disable and restores independently`, () => {
+        const p = page({ service });
+        p.update({ enabled: false, privacyShield: true });
+        assert.equal(p.attributes.get('data-chathub-privacy'), 'true');
+        assert.equal(p.attributes.get('data-chathub-privacy-service'), service);
+        assert.equal(p.attributes.has('data-chathub-theme'), false);
+        assert.equal(p.attributes.has('data-chathub-service'), false);
+        assert.ok(p.elements.has('chathub-native-appearance-v1'));
+        p.update({ enabled: false, privacyShield: false });
+        assert.equal(p.attributes.size, 0);
+        assert.equal(p.elements.has('chathub-native-appearance-v1'), false);
+    });
+}
+
 test('waits for app hydration then disconnects the observer', () => {
     const p = page({ hydrated: false });
     assert.equal(p.attributes.size, 0);
@@ -153,11 +168,25 @@ for (const service of ['telegram', 'messenger']) {
     });
 }
 
+test('messenger: supports web.facebook.com, root domain and encrypted routes', () => {
+    for (const options of [
+        { service: 'messenger', host: 'web.facebook.com', path: '/messages/' },
+        { service: 'messenger', host: 'facebook.com', path: '/messages/t/456' },
+        { service: 'messenger', host: 'www.messenger.com', path: '/e2ee/t/789' },
+        { service: 'messenger', host: 'messenger.com', path: '/' },
+    ]) {
+        const p = page(options);
+        assert.equal(p.attributes.get('data-chathub-service'), 'messenger');
+        assert.equal(p.attributes.get('data-chathub-theme'), 'dark');
+        assert.ok(p.elements.has('chathub-native-appearance-v1'));
+    }
+});
+
 test('cross-service registrations cannot theme other origins, authentication or unrelated paths', () => {
     for (const options of [
         {service:'telegram',host:'web.telegram.org.evil.example'},
         {service:'telegram',host:'chat.zalo.me'},
-        {service:'telegram',path:'/k/'},
+        {service:'telegram',path:'/unsupported/'},
         {service:'messenger',host:'www.facebook.com.evil.example'},
         {service:'messenger',path:'/login/'},
         {service:'messenger',path:'/checkpoint/'},
@@ -176,4 +205,117 @@ test('SPA navigation out of Messenger removes appearance and never observes the 
     p.update({enabled:true});
     assert.equal(p.attributes.size, 0);
     assert.equal(p.observers.length, 0);
+});
+
+test('scrollbar styles and tokens are unified across all supported services', () => {
+    for (const service of ['zalo', 'telegram', 'messenger']) {
+        const p = page({ service });
+        const style = p.elements.get('chathub-native-appearance-v1');
+        assert.ok(style, `style injected for ${service}`);
+        assert.ok(style.textContent.includes('--hub-scrollbar:'), `defines scrollbar token for ${service}`);
+        assert.ok(style.textContent.includes('--hub-scrollbar-hover:'), `defines hover token for ${service}`);
+        assert.ok(style.textContent.includes('--hub-scrollbar-active:'), `defines active token for ${service}`);
+        assert.ok(style.textContent.includes('scrollbar-width: thin !important;'), `sets standard scrollbar-width for ${service}`);
+        assert.ok(style.textContent.includes('::-webkit-scrollbar-thumb'), `sets webkit scrollbar thumb for ${service}`);
+    }
+});
+
+test('typography and text scaling are synchronized across all supported services', () => {
+    for (const service of ['zalo', 'telegram', 'messenger']) {
+        const p = page({ service });
+        const style = p.elements.get('chathub-native-appearance-v1');
+        assert.ok(style, `style injected for ${service}`);
+        assert.ok(style.textContent.includes('--hub-size-header:'), `defines header size token for ${service}`);
+        assert.ok(style.textContent.includes('--hub-size-message:'), `defines message size token for ${service}`);
+        assert.ok(style.textContent.includes('--hub-size-row-title:'), `defines row title token for ${service}`);
+        assert.ok(style.textContent.includes('--hub-size-row-snippet:'), `defines snippet token for ${service}`);
+        assert.ok(style.textContent.includes('var(--hub-size-row-title) !important'), `applies row title size for ${service}`);
+        assert.ok(style.textContent.includes('var(--hub-size-message) !important'), `applies message size for ${service}`);
+
+        p.update({ textScale: 'large' });
+        assert.equal(p.attributes.get('data-chathub-text-scale'), 'large');
+        p.update({ textScale: 'small' });
+        assert.equal(p.attributes.get('data-chathub-text-scale'), 'small');
+    }
+});
+
+// The bridge ships inside BrowserSession.swift; decode Swift's escaped backslashes in regex literals.
+const swiftSource = readFileSync(new URL('../Sources/ChatHub/Browser/BrowserSession.swift', import.meta.url), 'utf8');
+const bridgeSource = swiftSource.split('private static let notificationBridgeScript = """')[1].split('"""')[0].replaceAll('\\\\', '\\');
+
+// Runs the shipped notification bridge against a synthetic page. No provider content.
+function bridge({ host = 'web.whatsapp.com', title = 'WhatsApp', nodes = {} } = {}) {
+    const messages = [];
+    const timers = [];
+    const state = { title };
+    const observer = {};
+    const context = vm.createContext({
+        window: { webkit: { messageHandlers: { chatHubNotify: { postMessage: m => messages.push(JSON.parse(JSON.stringify(m))) } } } },
+        document: {
+            get title() { return state.title; },
+            documentElement: {},
+            querySelector: selector => nodes[selector]?.[0] ?? null,
+            getElementById: id => nodes['#' + id]?.[0] ?? null,
+            querySelectorAll: selector => nodes[selector] ?? [],
+        },
+        location: { hostname: host },
+        MutationObserver: class { constructor(callback) { observer.callback = callback; } observe() {} },
+        EventTarget, Event,
+        setTimeout: callback => { timers.push(callback); return timers.length; },
+    });
+    vm.runInContext(bridgeSource, context);
+    const flush = () => { while (timers.length) timers.shift()(); };
+    const mutate = () => { observer.callback([{ target: { nodeType: 1, closest: () => null } }]); flush(); };
+    flush();
+    return { messages, state, mutate, context };
+}
+
+test('a title count is reported once and never flips to zero on services without DOM selectors', () => {
+    const b = bridge({ title: '(3) WhatsApp' });
+    for (let i = 0; i < 4; i++) b.mutate();
+    assert.deepEqual(b.messages, [{ kind: 'badge', count: 3 }]);
+});
+
+test('clearing the title count reports zero and a new count reports again', () => {
+    const b = bridge({ title: '(3) WhatsApp' });
+    b.state.title = 'WhatsApp';
+    b.mutate();
+    b.state.title = '[7] WhatsApp';
+    b.mutate();
+    assert.deepEqual(b.messages.map(m => m.count), [3, 0, 7]);
+});
+
+test('Zalo falls back to its navigation badge when the title has no count', () => {
+    const b = bridge({ host: 'chat.zalo.me', title: 'Zalo', nodes: { '#main-tab .z-noti-badge, #sidebarNav .z-noti-badge': [{ textContent: '4' }] } });
+    assert.deepEqual(b.messages, [{ kind: 'badge', count: 4 }]);
+});
+
+test('page notifications are forwarded with bounded fields', () => {
+    const b = bridge();
+    vm.runInContext(`new window.Notification('Hi', { body: '${'x'.repeat(400)}' })`, b.context);
+    const notice = b.messages.find(m => m.kind === 'notify');
+    assert.equal(notice.title, 'Hi');
+    assert.equal(notice.body.length, 300);
+});
+
+const TELEGRAM_AUTH = '#auth-qr-form, #auth-phone-number-form, #auth-code-form, #auth-password-form, #auth-registration-form';
+const authMessages = b => b.messages.filter(m => m.kind === 'auth');
+
+test('Telegram reports its sign-in screen and then the signed-in shell, once each', () => {
+    const nodes = { [TELEGRAM_AUTH]: [{}] };
+    const b = bridge({ host: 'web.telegram.org', title: 'Telegram', nodes });
+    b.mutate();
+    assert.deepEqual(authMessages(b), [{ kind: 'auth', required: true }]);
+    delete nodes[TELEGRAM_AUTH];
+    nodes['#Main'] = [{}];
+    nodes['#LeftColumn'] = [{}];
+    b.mutate();
+    b.mutate();
+    assert.deepEqual(authMessages(b), [{ kind: 'auth', required: true }, { kind: 'auth', required: false }]);
+});
+
+test('auth state stays silent while Telegram loads and on other services', () => {
+    assert.deepEqual(authMessages(bridge({ host: 'web.telegram.org', title: 'Telegram' })), []);
+    const zalo = bridge({ host: 'chat.zalo.me', title: 'Zalo', nodes: { [TELEGRAM_AUTH]: [{}] } });
+    assert.deepEqual(authMessages(zalo), []);
 });

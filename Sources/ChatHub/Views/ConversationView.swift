@@ -7,8 +7,11 @@ import SwiftUI
 struct ConversationView: View {
     @Environment(WorkspaceStore.self) private var store
     @Environment(BrowserPool.self) private var browsers
+    @Environment(AppLock.self) private var lock
     let account: ChatAccount
     @Bindable var session: BrowserSession
+    /// The second pane of a split view draws into its own container.
+    var isSecondary = false
 
     var body: some View {
         VStack(spacing: 0) {
@@ -30,7 +33,7 @@ struct ConversationView: View {
                         .fixedSize(horizontal: false, vertical: true)
                     Spacer()
                     if let url = session.externalURL {
-                        Button(tr("Continue in Browser")) { NSWorkspace.shared.open(url) }
+                        Button(tr("Continue in Browser")) { LinkOpener.open(url, for: account.id) }
                             .font(HubFont.captionMedium)
                             .buttonStyle(.link)
                             .help(url.host ?? "")
@@ -55,7 +58,9 @@ struct ConversationView: View {
             }
             if session.isFinding { ServiceFindBar(session: session) }
             ZStack(alignment: .top) {
-                ServiceWebView(session: session)
+                ServiceWebView(
+                    containerView: isSecondary ? browsers.secondaryContainerView : browsers.containerView,
+                    session: session, isLocked: lock.isLocked)
                 if case .loading = session.state {
                     ProgressView(value: session.progress)
                         .progressViewStyle(.linear)

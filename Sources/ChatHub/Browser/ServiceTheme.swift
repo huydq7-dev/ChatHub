@@ -52,10 +52,11 @@ enum ServiceTheme {
             "accent": appearance.accent.rawValue,
             "density": appearance.density.rawValue,
             "textScale": appearance.textScale.rawValue,
+            "privacyShield": appearance.privacyShield,
         ]
     }
 
     private static func settingsLiteral(_ appearance: BrowserAppearance) -> String {
-        "{dark: \(appearance.isDark), enabled: \(appearance.themeEnabled), reduceMotion: \(appearance.reduceMotion), showServiceTools: \(appearance.showServiceTools), accent: \"\(appearance.accent.rawValue)\", density: \"\(appearance.density.rawValue)\", textScale: \"\(appearance.textScale.rawValue)\"}"
+        "{dark: \(appearance.isDark), enabled: \(appearance.themeEnabled), reduceMotion: \(appearance.reduceMotion), showServiceTools: \(appearance.showServiceTools), accent: \"\(appearance.accent.rawValue)\", density: \"\(appearance.density.rawValue)\", textScale: \"\(appearance.textScale.rawValue)\", privacyShield: \(appearance.privacyShield)}"
     }
 }
