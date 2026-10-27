@@ -28,17 +28,22 @@ struct MenuBarLabel: View {
 struct MenuBarContent: View {
     @Environment(WorkspaceStore.self) private var store
     @Environment(BrowserPool.self) private var browsers
+    @Environment(AppLock.self) private var lock
     @Environment(\.openWindow) private var openWindow
 
     var body: some View {
         let unread = browsers.unreadCounts
-        if store.accounts.isEmpty {
+        if lock.isLocked {
+            Text(tr("ChatHub is locked"))
+        } else if store.accounts.isEmpty {
             Text(tr("No accounts yet"))
         }
-        ForEach(AccountNavigation.unreadFirst(store.accounts, unread: unread)) { account in
-            Button(accountMenuTitle(account, unread: unread[account.id] ?? 0)) {
-                store.select(account.id)
-                showWorkspace()
+        if !lock.isLocked {
+            ForEach(AccountNavigation.unreadFirst(store.accounts, unread: unread)) { account in
+                Button(accountMenuTitle(account, unread: unread[account.id] ?? 0)) {
+                    store.select(account.id)
+                    showWorkspace()
+                }
             }
         }
         Divider()

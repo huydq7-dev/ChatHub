@@ -115,15 +115,27 @@ final class WorkspaceStore {
     }
 
     func isMuted(_ id: UUID) -> Bool { accounts.first { $0.id == id }?.notificationsMuted ?? false }
+    func isSnoozed(_ id: UUID) -> Bool { accounts.first { $0.id == id }?.isSnoozed() ?? false }
 
     @discardableResult
     func setMuted(_ account: ChatAccount, _ muted: Bool) -> Bool {
+        let changed = change(account) { $0.notificationsMuted = muted }
+        if changed { HubNotificationCenter.shared.refreshBadge() }
+        return changed
+    }
+
+    /// Silences alerts until `date`, or resumes them right away when `date` is nil.
+    @discardableResult
+    func setSnooze(_ account: ChatAccount, until date: Date?) -> Bool {
+        change(account) { $0.snoozedUntil = date }
+    }
+
+    private func change(_ account: ChatAccount, _ edit: (inout ChatAccount) -> Void) -> Bool {
         guard let index = accounts.firstIndex(where: { $0.id == account.id }) else { return false }
         var updated = accounts
-        updated[index].notificationsMuted = muted
+        edit(&updated[index])
         guard commit(accounts: updated, selectedID: selectedID) else { return false }
         accounts = updated
-        HubNotificationCenter.shared.refreshBadge()
         return true
     }
 

@@ -8,6 +8,7 @@ struct WorkspaceView: View {
     @Environment(WorkspaceStore.self) private var store
     @Environment(BrowserPool.self) private var browsers
     @Environment(WorkspaceLayout.self) private var layout
+    @Environment(AppLock.self) private var lock
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @AppStorage("appearance") private var appearanceMode = "system"
@@ -52,6 +53,10 @@ struct WorkspaceView: View {
         }
         .animation(reduceMotion ? nil : .easeInOut(duration: 0.18), value: layout.isExpanded)
         .tint(HubStyle.accentColor(for: currentAccent))
+        .accessibilityHidden(lock.isLocked)
+        .overlay {
+            if lock.isLocked { LockScreenView() }
+        }
         .toolbar { WorkspaceToolbar() }
         .onAppear {
             HubNotificationCenter.shared.onSelectAccount = { id in
@@ -59,7 +64,9 @@ struct WorkspaceView: View {
             }
             HubNotificationCenter.shared.isMuted = { id in store.isMuted(id) }
             HubNotificationCenter.shared.isViewing = { id in store.selectedID == id }
+            HubNotificationCenter.shared.isSnoozed = { id in store.isSnoozed(id) }
             DockMenuSource.entries = {
+                guard !lock.isLocked else { return [] }
                 let unread = browsers.unreadCounts
                 return AccountNavigation.unreadFirst(store.accounts, unread: unread).prefix(9).map {
                     DockMenuEntry(id: $0.id, title: accountMenuTitle($0, unread: unread[$0.id] ?? 0))
@@ -439,6 +446,11 @@ private struct AccountSidebarRow: View {
                             .font(.system(size: 11))
                             .foregroundStyle(HubStyle.textSecondary)
                             .help(tr("Notifications muted"))
+                    } else if account.isSnoozed() {
+                        Image(systemName: "timer")
+                            .font(.system(size: 11))
+                            .foregroundStyle(HubStyle.textSecondary)
+                            .help(tr("Notifications snoozed"))
                     }
                     if let session, session.unreadCount > 0 {
                         HubBadge(
@@ -474,9 +486,7 @@ private struct AccountSidebarRow: View {
         .accessibilityAddTraits(selected ? .isSelected : [])
         .contextMenu {
             Button(tr("Edit Account…")) { store.editingAccount = account }
-            Button(tr(account.notificationsMuted ? "Unmute Notifications" : "Mute Notifications")) {
-                store.setMuted(account, !account.notificationsMuted)
-            }
+            AccountNotificationMenu(account: account)
             if store.canMove(account, by: -1) {
                 Button(tr("Move Up")) { store.move(account, by: -1) }
             }

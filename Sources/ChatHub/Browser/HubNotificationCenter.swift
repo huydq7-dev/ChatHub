@@ -26,6 +26,7 @@ final class HubNotificationCenter: NSObject, UNUserNotificationCenterDelegate {
     var onSelectAccount: ((UUID) -> Void)?
     var isMuted: (UUID) -> Bool = { _ in false }
     var isViewing: (UUID) -> Bool = { _ in false }
+    var isSnoozed: (UUID) -> Bool = { _ in false }
     private var unreadByAccount: [UUID: Int] = [:]
     private var lastServiceNotification: [UUID: Date] = [:]
     private var fallbackTasks: [UUID: Task<Void, Never>] = [:]
@@ -97,15 +98,18 @@ final class HubNotificationCenter: NSObject, UNUserNotificationCenterDelegate {
         guard
             NotificationPolicy.shouldAlert(
                 isMuted: isMuted(account.id),
-                isViewing: NSApplication.shared.isActive && isViewing(account.id))
+                isViewing: NSApplication.shared.isActive && isViewing(account.id),
+                isSnoozed: isSnoozed(account.id),
+                isQuietHours: ChatAppearancePreferences.quietHours().contains(Date()))
         else { return }
         if !NSApplication.shared.isActive {
             NSApplication.shared.requestUserAttention(.informationalRequest)
         }
         guard canUseUserNotifications else { return }
         configure()
-        let cleanTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
-        let cleanBody = body.trimmingCharacters(in: .whitespacesAndNewlines)
+        let hidePreviews = UserDefaults.standard.bool(forKey: ChatAppearancePreferences.hidePreviewsKey)
+        let cleanTitle = hidePreviews ? "" : title.trimmingCharacters(in: .whitespacesAndNewlines)
+        let cleanBody = hidePreviews ? "" : body.trimmingCharacters(in: .whitespacesAndNewlines)
         let content = UNMutableNotificationContent()
         if cleanTitle.isEmpty || cleanTitle == account.name {
             content.title = account.name

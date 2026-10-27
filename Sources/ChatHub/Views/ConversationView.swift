@@ -7,6 +7,7 @@ import SwiftUI
 struct ConversationView: View {
     @Environment(WorkspaceStore.self) private var store
     @Environment(BrowserPool.self) private var browsers
+    @Environment(AppLock.self) private var lock
     let account: ChatAccount
     @Bindable var session: BrowserSession
 
@@ -55,7 +56,7 @@ struct ConversationView: View {
             }
             if session.isFinding { ServiceFindBar(session: session) }
             ZStack(alignment: .top) {
-                ServiceWebView(session: session)
+                ServiceWebView(session: session, isLocked: lock.isLocked)
                 if case .loading = session.state {
                     ProgressView(value: session.progress)
                         .progressViewStyle(.linear)

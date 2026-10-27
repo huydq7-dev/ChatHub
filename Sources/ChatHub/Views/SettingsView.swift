@@ -152,6 +152,8 @@ struct SettingsView: View {
                             "Muted accounts that sit idle release their memory and reopen when selected. Accounts with notifications stay awake."
                         ))
             }
+            QuietHoursSettingsSection()
+            PrivacySettingsSection()
             Section {
                 Toggle(tr("Show in menu bar"), isOn: $showMenuBar)
                 Toggle(tr("Open ChatHub at login"), isOn: launchAtLoginBinding)
