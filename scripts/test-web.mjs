@@ -192,6 +192,7 @@ function bridge({ host = 'web.whatsapp.com', title = 'WhatsApp', nodes = {} } = 
             get title() { return state.title; },
             documentElement: {},
             querySelector: selector => nodes[selector]?.[0] ?? null,
+            getElementById: id => nodes['#' + id]?.[0] ?? null,
             querySelectorAll: selector => nodes[selector] ?? [],
         },
         location: { hostname: host },
@@ -232,4 +233,26 @@ test('page notifications are forwarded with bounded fields', () => {
     const notice = b.messages.find(m => m.kind === 'notify');
     assert.equal(notice.title, 'Hi');
     assert.equal(notice.body.length, 300);
+});
+
+const TELEGRAM_AUTH = '#auth-qr-form, #auth-phone-number-form, #auth-code-form, #auth-password-form, #auth-registration-form';
+const authMessages = b => b.messages.filter(m => m.kind === 'auth');
+
+test('Telegram reports its sign-in screen and then the signed-in shell, once each', () => {
+    const nodes = { [TELEGRAM_AUTH]: [{}] };
+    const b = bridge({ host: 'web.telegram.org', title: 'Telegram', nodes });
+    b.mutate();
+    assert.deepEqual(authMessages(b), [{ kind: 'auth', required: true }]);
+    delete nodes[TELEGRAM_AUTH];
+    nodes['#Main'] = [{}];
+    nodes['#LeftColumn'] = [{}];
+    b.mutate();
+    b.mutate();
+    assert.deepEqual(authMessages(b), [{ kind: 'auth', required: true }, { kind: 'auth', required: false }]);
+});
+
+test('auth state stays silent while Telegram loads and on other services', () => {
+    assert.deepEqual(authMessages(bridge({ host: 'web.telegram.org', title: 'Telegram' })), []);
+    const zalo = bridge({ host: 'chat.zalo.me', title: 'Zalo', nodes: { [TELEGRAM_AUTH]: [{}] } });
+    assert.deepEqual(authMessages(zalo), []);
 });

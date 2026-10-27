@@ -44,6 +44,8 @@ final class BrowserSession: NSObject {
     var isFinding = false
     var findQuery = ""
     var findHasNoMatches = false
+    @ObservationIgnored var onSignInChange: ((UUID, Bool) -> Void)?
+    @ObservationIgnored private var lastSignInRequired: Bool?
     @ObservationIgnored let webView: WKWebView
     @ObservationIgnored private var observations: [NSKeyValueObservation] = []
     @ObservationIgnored private var popups: [BrowserPopup] = []
@@ -100,6 +102,7 @@ final class BrowserSession: NSObject {
                     canGoBack = webView.canGoBack
                     canGoForward = webView.canGoForward
                     syncPageAppearance()
+                    if hasLoadedPage { reportURLSignIn() }
                 }
             },
         ]
@@ -131,9 +134,25 @@ final class BrowserSession: NSObject {
             if let count = payload["count"] as? Int {
                 applyUnreadCount(count)
             }
+        case "auth":
+            if SignInDetector.usesPageSignal(account.service), let required = payload["required"] as? Bool {
+                reportSignIn(required: required)
+            }
         default:
             break
         }
+    }
+
+    /// Reports each change once; the workspace decides whether it means an expired session.
+    private func reportSignIn(required: Bool) {
+        guard lastSignInRequired != required else { return }
+        lastSignInRequired = required
+        onSignInChange?(account.id, required)
+    }
+
+    private func reportURLSignIn() {
+        guard SignInDetector.usesURLSignal(account.service), let url = webView.url else { return }
+        reportSignIn(required: SignInDetector.isSignInPage(service: account.service, url: url))
     }
 
     private func applyUnreadCount(_ count: Int) {
@@ -301,6 +320,7 @@ extension BrowserSession: WKNavigationDelegate {
         state = .loaded
         canGoBack = webView.canGoBack
         canGoForward = webView.canGoForward
+        reportURLSignIn()
         updateAppearance(appearance)
         didActivate()
     }

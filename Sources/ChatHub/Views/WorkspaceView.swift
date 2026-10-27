@@ -73,6 +73,12 @@ struct WorkspaceView: View {
                 }
             }
             DockMenuSource.select = { id in store.select(id) }
+            browsers.onSignInChange = { id, required in
+                guard store.recordSignInState(for: id, signInRequired: required),
+                    let account = store.accounts.first(where: { $0.id == id })
+                else { return }
+                HubNotificationCenter.shared.postSignInNeeded(account: account)
+            }
         }
         .onChange(of: browserAppearance, initial: true) { _, appearance in browsers.updateAppearance(appearance) }
         .onChange(of: store.selectedID, initial: true) { _, _ in browsers.activate(store.selectedAccount) }
@@ -242,6 +248,14 @@ private struct WorkspaceSidebar: View {
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding(HubSpace.sm)
                         }
+                        // Dropping below the last account sends the dragged one to the end of the list.
+                        Color.clear
+                            .frame(height: HubSpace.lg)
+                            .contentShape(Rectangle())
+                            .dropDestination(for: String.self) { items, _ in
+                                guard let id = store.draggedAccountID(from: items) else { return false }
+                                return store.moveAccountToEnd(id)
+                            }
                     }
                     .padding(.horizontal, horizontalPadding)
                     .padding(.vertical, HubSpace.xxs)
@@ -372,6 +386,7 @@ private struct AccountSidebarRow: View {
     @Environment(WorkspaceLayout.self) private var layout
     @AppStorage(ChatAppearancePreferences.accentKey) private var accentRaw = HubAccent.iris.rawValue
     let account: ChatAccount
+    @State private var isDropTarget = false
 
     private var accent: HubAccent { HubAccent(rawValue: accentRaw) ?? .iris }
     private var selected: Bool { store.selectedID == account.id }
@@ -401,7 +416,13 @@ private struct AccountSidebarRow: View {
                         }
                     }
                     .overlay(alignment: .bottomTrailing) {
-                        if let session {
+                        if store.signedOut.contains(account.id) {
+                            Image(systemName: "person.crop.circle.badge.exclamationmark.fill")
+                                .font(.system(size: 12))
+                                .foregroundStyle(.orange)
+                                .background(HubStyle.rail, in: Circle())
+                                .offset(x: 3, y: 3)
+                        } else if let session {
                             if session.hasFailed {
                                 Image(systemName: "exclamationmark.circle.fill")
                                     .font(.system(size: 12))
@@ -435,6 +456,18 @@ private struct AccountSidebarRow: View {
                             .lineLimit(1)
                     }
                     Spacer(minLength: 0)
+                    if store.signedOut.contains(account.id) {
+                        Image(systemName: "person.crop.circle.badge.exclamationmark.fill")
+                            .font(.system(size: 12))
+                            .foregroundStyle(.orange)
+                            .help(tr("Signed out. Open this account to sign in again."))
+                    }
+                    if account.isPinned {
+                        Image(systemName: "pin.fill")
+                            .font(.system(size: 10))
+                            .foregroundStyle(HubStyle.textSecondary)
+                            .help(tr("Pinned"))
+                    }
                     if browsers.sleeping.contains(account.id) {
                         Image(systemName: "moon.zzz.fill")
                             .font(.system(size: 11))
@@ -479,13 +512,33 @@ private struct AccountSidebarRow: View {
                 + (shortcut.isEmpty ? "" : " · " + shortcut)
         )
         .accessibilityLabel(
-            [account.name, account.service.name, account.notificationsMuted ? tr("Notifications muted") : nil]
-                .compactMap { $0 }
-                .joined(separator: ", ")
+            [
+                account.name, account.service.name,
+                account.notificationsMuted ? tr("Notifications muted") : nil,
+                store.signedOut.contains(account.id) ? tr("Signed out") : nil,
+            ]
+            .compactMap { $0 }
+            .joined(separator: ", ")
         )
         .accessibilityAddTraits(selected ? .isSelected : [])
+        .draggable(account.id.uuidString)
+        .dropDestination(for: String.self) { items, _ in
+            guard let id = store.draggedAccountID(from: items) else { return false }
+            return store.moveAccount(id, before: account.id)
+        } isTargeted: {
+            isDropTarget = $0
+        }
+        .overlay(alignment: .top) {
+            if isDropTarget {
+                Capsule()
+                    .fill(HubStyle.accentColor(for: accent))
+                    .frame(height: 2)
+                    .padding(.horizontal, HubSpace.xs)
+            }
+        }
         .contextMenu {
             Button(tr("Edit Account…")) { store.editingAccount = account }
+            Button(tr(account.isPinned ? "Unpin" : "Pin to Top")) { store.setPinned(account, !account.isPinned) }
             AccountNotificationMenu(account: account)
             if store.canMove(account, by: -1) {
                 Button(tr("Move Up")) { store.move(account, by: -1) }

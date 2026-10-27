@@ -156,6 +156,12 @@
 "Unmute Notifications" = "Bật lại thông báo";
 "Notifications muted" = "Đã tắt thông báo";
 "Next Unread Account" = "Tài khoản chưa đọc tiếp theo";
+"Pin to Top" = "Ghim lên đầu";
+"Unpin" = "Bỏ ghim";
+"Pinned" = "Đã ghim";
+"Signed out" = "Đã đăng xuất";
+"Signed out. Open this account to sign in again." = "Đã đăng xuất. Mở tài khoản này để đăng nhập lại.";
+"Signed out of %@. Open ChatHub to sign in again." = "Đã đăng xuất khỏi %@. Mở ChatHub để đăng nhập lại.";
 "Snooze Notifications" = "Tạm hoãn thông báo";
 "Resume Notifications" = "Tiếp tục thông báo";
 "For 1 Hour" = "Trong 1 giờ";

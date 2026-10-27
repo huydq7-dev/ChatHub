@@ -72,8 +72,25 @@
         return 0;
     }
 
+    // Telegram shows its sign-in screen on the same address, so the app shell is the signed-in signal.
+    // Only which screen is showing is read, never conversation content. Neither present: still loading.
+    let lastAuthRequired = null;
+    function reportAuthState() {
+        if (location.hostname !== "web.telegram.org") return;
+        let required = null;
+        if (document.querySelector("#auth-qr-form, #auth-phone-number-form, #auth-code-form, #auth-password-form, #auth-registration-form")) {
+            required = true;
+        } else if (document.getElementById("Main") && document.getElementById("LeftColumn")) {
+            required = false;
+        }
+        if (required === null || required === lastAuthRequired) return;
+        lastAuthRequired = required;
+        post({ kind: "auth", required });
+    }
+
     function computeBadgeCount() {
         badgeTimer = null;
+        reportAuthState();
         const count = countFromTitle() ?? countFromPage();
         if (count === lastBadgeCount) return;
         lastBadgeCount = count;
