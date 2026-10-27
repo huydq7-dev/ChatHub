@@ -54,6 +54,11 @@ final class WebHostContainerView: NSView {
     override func viewDidMoveToWindow() {
         super.viewDidMoveToWindow()
         syncSubviewFrames()
+        // makeNSView/updateNSView can select a session before SwiftUI attaches
+        // this host. Acquire keyboard focus once on attachment, not on every render.
+        if let activeWebView, let window {
+            window.makeFirstResponder(activeWebView)
+        }
     }
 
     override func layout() {
