@@ -42,8 +42,13 @@ final class AppLock {
         return true
     }
 
+    /// Asks for Touch ID or the password. Does nothing while ChatHub is in the background; the lock
+    /// screen asks again as soon as the app becomes active.
     func unlock() async {
-        guard isLocked, !isAuthenticating else { return }
+        guard
+            AppLockPolicy.shouldPromptForUnlock(
+                isLocked: isLocked, isAppActive: NSApplication.shared.isActive, isAuthenticating: isAuthenticating)
+        else { return }
         isAuthenticating = true
         defer { isAuthenticating = false }
         do {
