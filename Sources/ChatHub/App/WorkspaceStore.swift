@@ -29,7 +29,12 @@ final class WorkspaceStore {
         reloadFromDisk()
     }
 
+    /// The account shown beside the selected one while a split view is open. Not saved.
+    private(set) var secondaryID: UUID?
+
     var selectedAccount: ChatAccount? { accounts.first { $0.id == selectedID } }
+    var secondaryAccount: ChatAccount? { accounts.first { $0.id == secondaryID } }
+    var visibleIDs: Set<UUID> { splitSelection.visibleIDs }
     var filteredAccounts: [ChatAccount] {
         guard !searchText.isEmpty else { return accounts }
         return accounts.filter {
@@ -42,6 +47,7 @@ final class WorkspaceStore {
             let archive = try repository.load()
             accounts = archive.accounts
             selectedID = archive.selectedAccountID
+            secondaryID = nil
             loadError = nil
         } catch {
             loadError = error.localizedDescription
@@ -50,7 +56,24 @@ final class WorkspaceStore {
 
     func select(_ id: UUID?) {
         guard id == nil || accounts.contains(where: { $0.id == id }) else { return }
-        if commit(accounts: accounts, selectedID: id) { selectedID = id }
+        apply(splitSelection.selecting(id))
+    }
+
+    /// Shows an account beside the selected one.
+    func openSideBySide(_ id: UUID) {
+        guard accounts.contains(where: { $0.id == id }) else { return }
+        apply(splitSelection.openingSideBySide(id))
+    }
+
+    func swapPanes() { apply(splitSelection.swapped()) }
+    func closeSecondary() { apply(splitSelection.closingSecondary()) }
+
+    private var splitSelection: SplitSelection { SplitSelection(primary: selectedID, secondary: secondaryID) }
+
+    private func apply(_ selection: SplitSelection) {
+        guard selection != splitSelection, commit(accounts: accounts, selectedID: selection.primary) else { return }
+        selectedID = selection.primary
+        secondaryID = selection.secondary
     }
 
     /// Jumps to the next account with unread messages. Returns false when there is none.
@@ -77,9 +100,11 @@ final class WorkspaceStore {
             } else {
                 updated.append(account)
             }
-            guard commit(accounts: updated, selectedID: account.id) else { return false }
+            let selection = splitSelection.selecting(account.id)
+            guard commit(accounts: updated, selectedID: selection.primary) else { return false }
             accounts = updated
-            selectedID = account.id
+            selectedID = selection.primary
+            secondaryID = selection.secondary
             return true
         } catch {
             errorMessage = error.localizedDescription
@@ -90,10 +115,11 @@ final class WorkspaceStore {
     @discardableResult
     func remove(_ account: ChatAccount) -> Bool {
         let updated = accounts.filter { $0.id != account.id }
-        let selection = selectedID == account.id ? nil : selectedID
-        guard commit(accounts: updated, selectedID: selection) else { return false }
+        let selection = splitSelection.removing(account.id)
+        guard commit(accounts: updated, selectedID: selection.primary) else { return false }
         accounts = updated
-        selectedID = selection
+        selectedID = selection.primary
+        secondaryID = selection.secondary
         signedOut.remove(account.id)
         return true
     }

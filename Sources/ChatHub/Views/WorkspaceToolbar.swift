@@ -11,6 +11,8 @@ struct WorkspaceToolbar: ToolbarContent {
     @AppStorage(ChatAppearancePreferences.themeKey) private var nativeThemeEnabled = true
     @AppStorage(ChatAppearancePreferences.toolsKey) private var showServiceTools = false
     @State private var showingAppearanceStudio = false
+    @State private var showingDownloads = false
+    private let downloads = DownloadCenter.shared
 
     private var supportsAppearance: Bool {
         store.selectedAccount.map { WebAppearancePolicy.supportsService($0.service) } ?? false
@@ -41,6 +43,15 @@ struct WorkspaceToolbar: ToolbarContent {
                         .foregroundStyle(HubStyle.textPrimary)
                         .lineLimit(1)
                     HubBadge(text: account.subtitle.isEmpty ? account.service.name : account.subtitle)
+                    if let secondary = store.secondaryAccount {
+                        Text("+")
+                            .font(HubFont.button)
+                            .foregroundStyle(HubStyle.textSecondary)
+                        Text(secondary.name)
+                            .font(HubFont.bodyMedium)
+                            .foregroundStyle(HubStyle.textPrimary)
+                            .lineLimit(1)
+                    }
                 } else {
                     Text("·")
                         .font(HubFont.button)
@@ -69,6 +80,19 @@ struct WorkspaceToolbar: ToolbarContent {
             }
             .help(tr("Switch Account…") + " · ⌘K")
             .accessibilityLabel(tr("Switch Account…"))
+
+            if !downloads.history.records.isEmpty {
+                Button {
+                    showingDownloads.toggle()
+                } label: {
+                    Image(
+                        systemName: downloads.history.inProgressCount > 0
+                            ? "arrow.down.circle.fill" : "arrow.down.circle")
+                }
+                .help(tr("Downloads"))
+                .accessibilityLabel(tr("Downloads"))
+                .popover(isPresented: $showingDownloads, arrowEdge: .bottom) { DownloadsPopover() }
+            }
 
             Button {
                 showingAppearanceStudio.toggle()
@@ -109,6 +133,9 @@ struct WorkspaceToolbar: ToolbarContent {
                     Button(tr("Back")) { session.webView.goBack() }.disabled(!session.canGoBack)
                     Button(tr("Forward")) { session.webView.goForward() }.disabled(!session.canGoForward)
                     Button(tr("Go to Service Home")) { session.loadHome() }
+                    if store.secondaryAccount != nil {
+                        Button(tr("Close Split View")) { store.closeSecondary() }
+                    }
                     Divider()
                     if let account = store.selectedAccount {
                         AccountNotificationMenu(account: account)

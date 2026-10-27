@@ -63,7 +63,8 @@ struct WorkspaceView: View {
                 store.select(id)
             }
             HubNotificationCenter.shared.isMuted = { id in store.isMuted(id) }
-            HubNotificationCenter.shared.isViewing = { id in store.selectedID == id }
+            HubNotificationCenter.shared.isViewing = { id in store.visibleIDs.contains(id) }
+            LinkOpener.browserID = { id in store.accounts.first { $0.id == id }?.linkBrowserID }
             HubNotificationCenter.shared.isSnoozed = { id in store.isSnoozed(id) }
             DockMenuSource.entries = {
                 guard !lock.isLocked else { return [] }
@@ -86,13 +87,16 @@ struct WorkspaceView: View {
             guard !preloadIDs.isEmpty else { return }
             await browsers.preload(store.accounts)
         }
+        .onChange(of: store.secondaryID, initial: true) { _, _ in browsers.show(store.secondaryAccount) }
         .onChange(of: mutedIDs) { old, new in
             for id in old.subtracting(new) { browsers.wake(id) }
         }
         .task(id: sleepIdleHours) {
             while !Task.isCancelled {
                 try? await Task.sleep(for: .seconds(Self.sleepCheckInterval))
-                browsers.sleepIdle(accounts: store.accounts, after: TimeInterval(sleepIdleHours) * 3_600)
+                browsers.sleepIdle(
+                    accounts: store.accounts, after: TimeInterval(sleepIdleHours) * 3_600,
+                    keeping: store.visibleIDs)
             }
         }
         .sheet(isPresented: $store.isAddingAccount) { AccountEditor(service: store.suggestedService) }
@@ -155,7 +159,13 @@ struct WorkspaceView: View {
                     .buttonStyle(HubButtonStyle(prominent: true))
             }
         } else if let account = store.selectedAccount, let session = browsers.sessions[account.id] {
-            ConversationView(account: account, session: session)
+            if let secondary = store.secondaryAccount, let secondarySession = browsers.sessions[secondary.id] {
+                SplitConversationView(
+                    primary: account, primarySession: session,
+                    secondary: secondary, secondarySession: secondarySession)
+            } else {
+                ConversationView(account: account, session: session)
+            }
         } else if store.selectedAccount != nil {
             // The selected account's session is being created; avoid flashing the overview.
             HubStyle.canvas
@@ -538,6 +548,8 @@ private struct AccountSidebarRow: View {
         }
         .contextMenu {
             Button(tr("Edit Account…")) { store.editingAccount = account }
+            Button(tr("Open Side by Side")) { store.openSideBySide(account.id) }
+                .disabled(store.selectedID == account.id)
             Button(tr(account.isPinned ? "Unpin" : "Pin to Top")) { store.setPinned(account, !account.isPinned) }
             AccountNotificationMenu(account: account)
             if store.canMove(account, by: -1) {
@@ -546,7 +558,7 @@ private struct AccountSidebarRow: View {
             if store.canMove(account, by: 1) {
                 Button(tr("Move Down")) { store.move(account, by: 1) }
             }
-            Button(tr("Open in Browser")) { if let url = account.url { NSWorkspace.shared.open(url) } }
+            Button(tr("Open in Browser")) { if let url = account.url { LinkOpener.open(url, for: account.id) } }
             Divider()
             Button(tr("Remove Account…"), role: .destructive) { store.removingAccount = account }
         }

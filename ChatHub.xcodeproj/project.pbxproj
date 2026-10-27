@@ -13,10 +13,12 @@
 		1269E7A7FE5142307557C28F /* LockScreenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B03514F9D55F9BA91C96A883 /* LockScreenView.swift */; };
 		19B7485C43289238992031B4 /* icon-telegram.png in Resources */ = {isa = PBXBuildFile; fileRef = 906E8DBB1CDA039DB816AD05 /* icon-telegram.png */; };
 		1BBE1D1AC4EF2E07190016D0 /* MenuBarContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D1B23D22D22809EDFE6C042 /* MenuBarContent.swift */; };
+		1BD6D72EA4F3DC91616F50C0 /* DownloadCenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4881D57F4F7C93305679D0C9 /* DownloadCenter.swift */; };
 		2296F68A9C704BE535A68D3F /* icon-discord.png in Resources */ = {isa = PBXBuildFile; fileRef = CFB665C5690AB9A3AF50AFF8 /* icon-discord.png */; };
 		247AF29D141208C8D47DC150 /* TelegramAppearance.css in Resources */ = {isa = PBXBuildFile; fileRef = 3D819505BBB842178CE2B809 /* TelegramAppearance.css */; };
 		249D5424B23F67A4A78F88D4 /* icon-zalo.png in Resources */ = {isa = PBXBuildFile; fileRef = BB02CFF4F87CC1EA9552E53F /* icon-zalo.png */; };
 		252BFF6B55547428CD0E50D2 /* SignInDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F784394E90308BDB0A26A57 /* SignInDetector.swift */; };
+		28280ABDBA3F56987294D181 /* DownloadHistory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FC405E2DCB980BA3C6F97ED /* DownloadHistory.swift */; };
 		32F76B7F5355F9A6BA10F945 /* BrowserPool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB65ECBABE4AE20647C690AB /* BrowserPool.swift */; };
 		38237BF24595D3D9161B4DB2 /* AccountNavigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E618619BFDD11B9F796FED2B /* AccountNavigation.swift */; };
 		41F0FAAE2482EF4B2F9CCA78 /* WorkspaceStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D8604B5158582591AEF800A /* WorkspaceStore.swift */; };
@@ -25,11 +27,14 @@
 		4D2D429B7AB2FB658047F652 /* NavigationPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9ABC46808A44AC5DD7DCF0F9 /* NavigationPolicy.swift */; };
 		5B22040CCF7A541A53C8AC71 /* NotificationPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 422F2512262F6481F8F3E5B9 /* NotificationPolicy.swift */; };
 		5CFE1B595BBF2528C18EA5E9 /* NotificationBridge.js in Resources */ = {isa = PBXBuildFile; fileRef = 54957DCB8BCC4A21DAA148CE /* NotificationBridge.js */; };
+		5D5CED4FDC59AAC914462A19 /* DownloadsPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40EE2C02C1550BA23B000FBE /* DownloadsPopover.swift */; };
 		5E6D0E0FB6883E44DAD9C4E5 /* HubNotificationCenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3514E0B38695D8167E7F803 /* HubNotificationCenter.swift */; };
+		63FDA2AF3C21C8A114D96C41 /* SplitSelection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8731AF80C87E693DAB4D7C16 /* SplitSelection.swift */; };
 		6890E5BB682EBB02E6D5DE3B /* WebAppearance.js in Resources */ = {isa = PBXBuildFile; fileRef = E989AF73A4455FE75013B5B8 /* WebAppearance.js */; };
 		6E6F2E0AFE20D55B1C966C75 /* AppLock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24FC0FB85C0F25577AD4B4B2 /* AppLock.swift */; };
 		7C2AB98A9FC87D0144260EE2 /* BrowserSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = A391E86918F2857937E05619 /* BrowserSession.swift */; };
 		7FBC79616E8A0AFEB932B80F /* WorkspaceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60A07362E7D58CCD1323E9D9 /* WorkspaceView.swift */; };
+		7FE719820DB6C87BDC92912F /* LinkOpener.swift in Sources */ = {isa = PBXBuildFile; fileRef = 464DAA55635E3E2DC779571D /* LinkOpener.swift */; };
 		8A31A424C8179B7F51732C43 /* BrowserAppearance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F328BB0DC986FC8F983B730 /* BrowserAppearance.swift */; };
 		8AAEAF6492079798DA770668 /* ChatAccount.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15169739DF0C2C21D57C70D3 /* ChatAccount.swift */; };
 		93C54A72EF89145A2CEE1851 /* AccountSwitcherView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F4EA6D3D42CDCA5EB2557B4 /* AccountSwitcherView.swift */; };
@@ -55,6 +60,7 @@
 		C06D2C0DCF813870D776F050 /* ConversationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C9E590D59CAAB599A4646ED /* ConversationView.swift */; };
 		C16833482995B8D6C4AA0A19 /* AccountOrdering.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75120F37425BED0A5AB21DD8 /* AccountOrdering.swift */; };
 		C17095604322990289FABF38 /* QuietHours.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31F077B1BF8F8234F36AC24C /* QuietHours.swift */; };
+		C477BB6AA9D573D905865627 /* SplitConversationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E366A693D49F4C8DDD26C02 /* SplitConversationView.swift */; };
 		C66BACB7AE7F2BA76AC35F0A /* Localization.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABD75900051EC04AC08F52F4 /* Localization.swift */; };
 		D84BA9E3D046B967295DB0F0 /* LaunchAtLogin.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE8B1A0848657DD2C67928B8 /* LaunchAtLogin.swift */; };
 		DC27F22385552FBF18C9138E /* SidebarPositionRestorer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5625241992CE58C736AE5B1 /* SidebarPositionRestorer.swift */; };
@@ -81,8 +87,12 @@
 		3AE786BBCFB60C26FB1D65C5 /* AppLockPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLockPolicy.swift; sourceTree = "<group>"; };
 		3C4D1E654169E063E4C3B784 /* vi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = vi; path = vi.lproj/Localizable.strings; sourceTree = "<group>"; };
 		3D819505BBB842178CE2B809 /* TelegramAppearance.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = TelegramAppearance.css; sourceTree = "<group>"; };
+		3FC405E2DCB980BA3C6F97ED /* DownloadHistory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadHistory.swift; sourceTree = "<group>"; };
+		40EE2C02C1550BA23B000FBE /* DownloadsPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadsPopover.swift; sourceTree = "<group>"; };
 		4140B9BD02BCD1A826FA1ED4 /* ServiceWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServiceWebView.swift; sourceTree = "<group>"; };
 		422F2512262F6481F8F3E5B9 /* NotificationPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationPolicy.swift; sourceTree = "<group>"; };
+		464DAA55635E3E2DC779571D /* LinkOpener.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinkOpener.swift; sourceTree = "<group>"; };
+		4881D57F4F7C93305679D0C9 /* DownloadCenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadCenter.swift; sourceTree = "<group>"; };
 		4D8604B5158582591AEF800A /* WorkspaceStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceStore.swift; sourceTree = "<group>"; };
 		54957DCB8BCC4A21DAA148CE /* NotificationBridge.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = NotificationBridge.js; sourceTree = "<group>"; };
 		5833F64E417C41E6F05A14D2 /* ChatAppearancePreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatAppearancePreferences.swift; sourceTree = "<group>"; };
@@ -90,11 +100,13 @@
 		5F4EA6D3D42CDCA5EB2557B4 /* AccountSwitcherView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountSwitcherView.swift; sourceTree = "<group>"; };
 		60A07362E7D58CCD1323E9D9 /* WorkspaceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceView.swift; sourceTree = "<group>"; };
 		60EC718AFEB186FBBAD2327B /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		6E366A693D49F4C8DDD26C02 /* SplitConversationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplitConversationView.swift; sourceTree = "<group>"; };
 		6F0DD7F78576F36AD65FAE6C /* AccountNotificationMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountNotificationMenu.swift; sourceTree = "<group>"; };
 		6FB35DB69AB7EF45CD225AFD /* WorkspaceRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceRepository.swift; sourceTree = "<group>"; };
 		71927B67C507CE8C5AA78962 /* AccountEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountEditor.swift; sourceTree = "<group>"; };
 		75120F37425BED0A5AB21DD8 /* AccountOrdering.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountOrdering.swift; sourceTree = "<group>"; };
 		75C8DEA79ECADB4AC53A77A5 /* WorkspaceToolbar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceToolbar.swift; sourceTree = "<group>"; };
+		8731AF80C87E693DAB4D7C16 /* SplitSelection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplitSelection.swift; sourceTree = "<group>"; };
 		906E8DBB1CDA039DB816AD05 /* icon-telegram.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "icon-telegram.png"; sourceTree = "<group>"; };
 		9ABC46808A44AC5DD7DCF0F9 /* NavigationPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationPolicy.swift; sourceTree = "<group>"; };
 		9C9E590D59CAAB599A4646ED /* ConversationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationView.swift; sourceTree = "<group>"; };
@@ -138,11 +150,13 @@
 				2F328BB0DC986FC8F983B730 /* BrowserAppearance.swift */,
 				15169739DF0C2C21D57C70D3 /* ChatAccount.swift */,
 				15FBFE37C64805E9143E2475 /* DownloadedFile.swift */,
+				3FC405E2DCB980BA3C6F97ED /* DownloadHistory.swift */,
 				ACE83E8D3B05C1C22027944F /* HibernationPolicy.swift */,
 				9ABC46808A44AC5DD7DCF0F9 /* NavigationPolicy.swift */,
 				422F2512262F6481F8F3E5B9 /* NotificationPolicy.swift */,
 				31F077B1BF8F8234F36AC24C /* QuietHours.swift */,
 				1F784394E90308BDB0A26A57 /* SignInDetector.swift */,
+				8731AF80C87E693DAB4D7C16 /* SplitSelection.swift */,
 				B89326CF898775FEDD83BD63 /* WebNavigationFailure.swift */,
 				6FB35DB69AB7EF45CD225AFD /* WorkspaceRepository.swift */,
 			);
@@ -166,12 +180,14 @@
 				5F4EA6D3D42CDCA5EB2557B4 /* AccountSwitcherView.swift */,
 				9C9E590D59CAAB599A4646ED /* ConversationView.swift */,
 				2CF831FCF5A5F165258861A8 /* Design.swift */,
+				40EE2C02C1550BA23B000FBE /* DownloadsPopover.swift */,
 				B03514F9D55F9BA91C96A883 /* LockScreenView.swift */,
 				2D1B23D22D22809EDFE6C042 /* MenuBarContent.swift */,
 				FE203BD69534DF61DC8D6D9E /* OverviewView.swift */,
 				242A520FB484BED4F38A344E /* SettingsSections.swift */,
 				C092968BE13F142C081C83A6 /* SettingsView.swift */,
 				A5625241992CE58C736AE5B1 /* SidebarPositionRestorer.swift */,
+				6E366A693D49F4C8DDD26C02 /* SplitConversationView.swift */,
 				75C8DEA79ECADB4AC53A77A5 /* WorkspaceToolbar.swift */,
 				60A07362E7D58CCD1323E9D9 /* WorkspaceView.swift */,
 			);
@@ -218,8 +234,10 @@
 				DB65ECBABE4AE20647C690AB /* BrowserPool.swift */,
 				0A0A0D1E90F5F584C48EE122 /* BrowserPopup.swift */,
 				A391E86918F2857937E05619 /* BrowserSession.swift */,
+				4881D57F4F7C93305679D0C9 /* DownloadCenter.swift */,
 				2EC590C4FF0299A0DDF806B7 /* DownloadHandler.swift */,
 				C3514E0B38695D8167E7F803 /* HubNotificationCenter.swift */,
+				464DAA55635E3E2DC779571D /* LinkOpener.swift */,
 				366D91B9B2E4D0E361316A75 /* ServiceTheme.swift */,
 				4140B9BD02BCD1A826FA1ED4 /* ServiceWebView.swift */,
 			);
@@ -345,11 +363,15 @@
 				B8D05B97932C5E2BFDA931D6 /* ChatHubApp.swift in Sources */,
 				C06D2C0DCF813870D776F050 /* ConversationView.swift in Sources */,
 				0921D305FEC399B0D78D15FF /* Design.swift in Sources */,
+				1BD6D72EA4F3DC91616F50C0 /* DownloadCenter.swift in Sources */,
 				ACDB888DE6D8D0D56B73CE38 /* DownloadHandler.swift in Sources */,
+				28280ABDBA3F56987294D181 /* DownloadHistory.swift in Sources */,
 				B4A1B8DF17FA28DBC20D1079 /* DownloadedFile.swift in Sources */,
+				5D5CED4FDC59AAC914462A19 /* DownloadsPopover.swift in Sources */,
 				AC71541CD39894F1E6591A8D /* HibernationPolicy.swift in Sources */,
 				5E6D0E0FB6883E44DAD9C4E5 /* HubNotificationCenter.swift in Sources */,
 				D84BA9E3D046B967295DB0F0 /* LaunchAtLogin.swift in Sources */,
+				7FE719820DB6C87BDC92912F /* LinkOpener.swift in Sources */,
 				C66BACB7AE7F2BA76AC35F0A /* Localization.swift in Sources */,
 				1269E7A7FE5142307557C28F /* LockScreenView.swift in Sources */,
 				1BBE1D1AC4EF2E07190016D0 /* MenuBarContent.swift in Sources */,
@@ -363,6 +385,8 @@
 				B38A41E81859E5DBB7AA2AC9 /* SettingsView.swift in Sources */,
 				DC27F22385552FBF18C9138E /* SidebarPositionRestorer.swift in Sources */,
 				252BFF6B55547428CD0E50D2 /* SignInDetector.swift in Sources */,
+				C477BB6AA9D573D905865627 /* SplitConversationView.swift in Sources */,
+				63FDA2AF3C21C8A114D96C41 /* SplitSelection.swift in Sources */,
 				FA1120536E882DF15D7B2BDA /* WebNavigationFailure.swift in Sources */,
 				AA272F37132FB9654D992D6E /* WorkspaceLayout.swift in Sources */,
 				B9CE5C566E9B3D4DC93E8F2F /* WorkspaceRepository.swift in Sources */,

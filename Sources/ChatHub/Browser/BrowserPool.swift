@@ -48,6 +48,16 @@ final class BrowserPool {
         if let previous = selectedID { lastActive[previous] = Date() }
         selectedID = account?.id
         guard let account else { return }
+        prepare(account)
+    }
+
+    /// Readies the session of an account shown beside the selected one.
+    func show(_ account: ChatAccount?) {
+        guard let account else { return }
+        prepare(account)
+    }
+
+    private func prepare(_ account: ChatAccount) {
         sleeping.remove(account.id)
         lastActive[account.id] = Date()
         if sessions[account.id] == nil {
@@ -73,11 +83,14 @@ final class BrowserPool {
 
     /// Releases muted accounts that have been idle for `idleAfter` seconds. Their data store is kept, so
     /// the user stays signed in; the page simply reloads the next time the account is opened.
-    func sleepIdle(accounts: [ChatAccount], after idleAfter: TimeInterval, now: Date = Date()) {
+    func sleepIdle(
+        accounts: [ChatAccount], after idleAfter: TimeInterval, keeping visible: Set<UUID> = [], now: Date = Date()
+    ) {
         for account in accounts {
             guard let session = sessions[account.id],
                 HibernationPolicy.shouldSleep(
-                    isMuted: account.notificationsMuted, isSelected: selectedID == account.id,
+                    isMuted: account.notificationsMuted,
+                    isSelected: selectedID == account.id || visible.contains(account.id),
                     hasActiveDownload: session.hasActiveDownloads,
                     lastActive: lastActive[account.id] ?? now, now: now, idleAfter: idleAfter)
             else { continue }

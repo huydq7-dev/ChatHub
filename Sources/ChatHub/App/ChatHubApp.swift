@@ -40,6 +40,10 @@ struct ChatHubApp: App {
                     if !store.selectNextUnread(unread: browsers.unreadCounts) { NSSound.beep() }
                 }
                 .keyboardShortcut("j", modifiers: .command)
+                Button(tr("Swap Split Panes")) { store.swapPanes() }
+                    .disabled(store.secondaryID == nil)
+                Button(tr("Close Split View")) { store.closeSecondary() }
+                    .disabled(store.secondaryID == nil)
                 Button(tr("Lock ChatHub")) {
                     if !lock.lock() { NSSound.beep() }
                 }

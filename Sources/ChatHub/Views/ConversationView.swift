@@ -31,7 +31,7 @@ struct ConversationView: View {
                         .fixedSize(horizontal: false, vertical: true)
                     Spacer()
                     if let url = session.externalURL {
-                        Button(tr("Continue in Browser")) { NSWorkspace.shared.open(url) }
+                        Button(tr("Continue in Browser")) { LinkOpener.open(url, for: account.id) }
                             .font(HubFont.captionMedium)
                             .buttonStyle(.link)
                             .help(url.host ?? "")

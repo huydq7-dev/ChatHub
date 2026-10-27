@@ -250,7 +250,7 @@ final class BrowserSession: NSObject {
 
     func openInBrowser() {
         guard let url = currentURL ?? account.url else { return }
-        NSWorkspace.shared.open(url)
+        LinkOpener.open(url, for: account.id)
     }
 
     func showFind() {
@@ -358,7 +358,7 @@ extension BrowserSession: WKNavigationDelegate {
             decisionHandler(.cancel)
             state = hasLoadedPage ? .loaded : .idle
             if navigationAction.navigationType == .linkActivated {
-                NSWorkspace.shared.open(url)
+                LinkOpener.open(url, for: account.id)
             } else if navigationAction.targetFrame != nil {
                 externalURL = url
                 notice = tr("This service needs to open another website to continue.")
@@ -387,7 +387,8 @@ extension BrowserSession: WKNavigationDelegate {
 
     private func retainDownload(_ download: WKDownload) {
         let id = ObjectIdentifier(download)
-        let handler = DownloadHandler(download: download, window: webView.window) { [weak self] error in
+        let handler = DownloadHandler(download: download, window: webView.window, accountName: account.name) {
+            [weak self] error in
             self?.downloads.removeValue(forKey: id)
             if let error { self?.notice = error.localizedDescription }
         }
@@ -403,7 +404,7 @@ extension BrowserSession: WKUIDelegate {
     ) -> WKWebView? {
         guard let url = navigationAction.request.url else { return nil }
         guard NavigationPolicy(account: account).disposition(for: url) == .inApp else {
-            if ["https", "http"].contains(url.scheme?.lowercased() ?? "") { NSWorkspace.shared.open(url) }
+            if ["https", "http"].contains(url.scheme?.lowercased() ?? "") { LinkOpener.open(url, for: account.id) }
             return nil
         }
         let popup = BrowserPopup(configuration: configuration, initialURL: url)
