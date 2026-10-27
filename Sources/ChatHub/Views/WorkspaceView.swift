@@ -16,8 +16,10 @@ struct WorkspaceView: View {
     @AppStorage(ChatAppearancePreferences.accentKey) private var accentRaw = HubAccent.iris.rawValue
     @AppStorage(ChatAppearancePreferences.densityKey) private var densityRaw = HubDensity.standard.rawValue
     @AppStorage(ChatAppearancePreferences.textScaleKey) private var textScaleRaw = HubTextScale.standard.rawValue
+    @AppStorage(ChatAppearancePreferences.keepConnectedKey) private var keepConnected = true
 
     private var currentAccent: HubAccent { HubAccent(rawValue: accentRaw) ?? .iris }
+    private var preloadIDs: [UUID] { keepConnected && store.loadError == nil ? store.accounts.map(\.id) : [] }
 
     var body: some View {
         @Bindable var store = store
@@ -46,9 +48,15 @@ struct WorkspaceView: View {
             HubNotificationCenter.shared.onSelectAccount = { id in
                 store.select(id)
             }
+            HubNotificationCenter.shared.isMuted = { id in store.isMuted(id) }
+            HubNotificationCenter.shared.isViewing = { id in store.selectedID == id }
         }
         .onChange(of: browserAppearance, initial: true) { _, appearance in browsers.updateAppearance(appearance) }
         .onChange(of: store.selectedID, initial: true) { _, _ in browsers.activate(store.selectedAccount) }
+        .task(id: preloadIDs) {
+            guard !preloadIDs.isEmpty else { return }
+            await browsers.preload(store.accounts)
+        }
         .sheet(isPresented: $store.isAddingAccount) { AccountEditor(service: store.suggestedService) }
         .sheet(
             isPresented: $store.isSwitchingAccount,
@@ -110,6 +118,9 @@ struct WorkspaceView: View {
             }
         } else if let account = store.selectedAccount, let session = browsers.sessions[account.id] {
             ConversationView(account: account, session: session)
+        } else if store.selectedAccount != nil {
+            // The selected account's session is being created; avoid flashing the overview.
+            HubStyle.canvas
         } else {
             OverviewView()
         }
@@ -392,6 +403,12 @@ private struct AccountSidebarRow: View {
                             .lineLimit(1)
                     }
                     Spacer(minLength: 0)
+                    if account.notificationsMuted {
+                        Image(systemName: "bell.slash.fill")
+                            .font(.system(size: 11))
+                            .foregroundStyle(HubStyle.textSecondary)
+                            .help(tr("Notifications muted"))
+                    }
                     if let session, session.unreadCount > 0 {
                         HubBadge(
                             text: session.unreadCount > 99 ? "99+" : "\(session.unreadCount)",
@@ -418,10 +435,17 @@ private struct AccountSidebarRow: View {
             account.name + (account.subtitle.isEmpty ? "" : " · " + account.subtitle)
                 + (shortcut.isEmpty ? "" : " · " + shortcut)
         )
-        .accessibilityLabel(account.name + ", " + account.service.name)
+        .accessibilityLabel(
+            [account.name, account.service.name, account.notificationsMuted ? tr("Notifications muted") : nil]
+                .compactMap { $0 }
+                .joined(separator: ", ")
+        )
         .accessibilityAddTraits(selected ? .isSelected : [])
         .contextMenu {
             Button(tr("Edit Account…")) { store.editingAccount = account }
+            Button(tr(account.notificationsMuted ? "Unmute Notifications" : "Mute Notifications")) {
+                store.setMuted(account, !account.notificationsMuted)
+            }
             if store.canMove(account, by: -1) {
                 Button(tr("Move Up")) { store.move(account, by: -1) }
             }

@@ -54,10 +54,12 @@ public struct ChatAccount: Identifiable, Codable, Equatable, Sendable {
     public var subtitle: String
     public var customURL: URL?
     public let createdAt: Date
+    public var notificationsMuted: Bool
 
     public init(
         id: UUID = UUID(), service: ChatService, name: String,
-        subtitle: String = "", customURL: URL? = nil, createdAt: Date = .now
+        subtitle: String = "", customURL: URL? = nil, createdAt: Date = .now,
+        notificationsMuted: Bool = false
     ) {
         self.id = id
         self.service = service
@@ -65,6 +67,19 @@ public struct ChatAccount: Identifiable, Codable, Equatable, Sendable {
         self.subtitle = subtitle
         self.customURL = customURL
         self.createdAt = createdAt
+        self.notificationsMuted = notificationsMuted
+    }
+
+    /// Workspaces saved before muting existed have no `notificationsMuted` key.
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(UUID.self, forKey: .id)
+        service = try container.decode(ChatService.self, forKey: .service)
+        name = try container.decode(String.self, forKey: .name)
+        subtitle = try container.decode(String.self, forKey: .subtitle)
+        customURL = try container.decodeIfPresent(URL.self, forKey: .customURL)
+        createdAt = try container.decode(Date.self, forKey: .createdAt)
+        notificationsMuted = try container.decodeIfPresent(Bool.self, forKey: .notificationsMuted) ?? false
     }
 
     public var url: URL? { service == .custom ? customURL : service.homeURL }

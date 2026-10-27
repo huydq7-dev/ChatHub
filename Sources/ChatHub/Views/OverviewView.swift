@@ -129,6 +129,9 @@ struct OverviewView: View {
                     }
                     .contextMenu {
                         Button(tr("Edit Account…")) { store.editingAccount = account }
+                        Button(tr(account.notificationsMuted ? "Unmute Notifications" : "Mute Notifications")) {
+                            store.setMuted(account, !account.notificationsMuted)
+                        }
                         if store.canMove(account, by: -1) {
                             Button(tr("Move Up")) { store.move(account, by: -1) }
                         }
@@ -219,6 +222,12 @@ private struct AccountOverviewCard: View {
                         .lineLimit(1)
                 }
                 Spacer(minLength: 0)
+                if account.notificationsMuted {
+                    Image(systemName: "bell.slash.fill")
+                        .font(.system(size: 11))
+                        .foregroundStyle(HubStyle.textSecondary)
+                        .help(tr("Notifications muted"))
+                }
                 if let session, session.unreadCount > 0 {
                     HubBadge(
                         text: session.unreadCount > 99 ? "99+" : "\(session.unreadCount)",

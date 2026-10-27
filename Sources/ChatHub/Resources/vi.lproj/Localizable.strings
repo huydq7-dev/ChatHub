@@ -152,3 +152,9 @@
 "You have 1 unread message." = "Bạn có 1 tin nhắn chưa đọc.";
 "You have %d unread messages." = "Bạn có %d tin nhắn chưa đọc.";
 "New message received" = "Có tin nhắn mới";
+"Mute Notifications" = "Tắt thông báo";
+"Unmute Notifications" = "Bật lại thông báo";
+"Notifications muted" = "Đã tắt thông báo";
+"Notifications" = "Thông báo";
+"Keep accounts connected in the background" = "Giữ các tài khoản kết nối nền";
+"Loads every account after launch so unread badges and notifications work before you open it. Uses more memory. Takes effect next launch when turned off. Mute individual accounts from their context menu." = "Tải mọi tài khoản sau khi mở app để huy hiệu chưa đọc và thông báo hoạt động trước khi bạn mở từng tài khoản. Tốn thêm bộ nhớ. Khi tắt, có hiệu lực ở lần mở sau. Tắt thông báo từng tài khoản bằng menu chuột phải.";

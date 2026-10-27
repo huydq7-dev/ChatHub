@@ -177,3 +177,59 @@ test('SPA navigation out of Messenger removes appearance and never observes the 
     assert.equal(p.attributes.size, 0);
     assert.equal(p.observers.length, 0);
 });
+
+const bridgeSource = readFileSync(new URL('../Sources/ChatHub/Resources/NotificationBridge.js', import.meta.url), 'utf8');
+
+// Runs the shipped notification bridge against a synthetic page. No provider content.
+function bridge({ host = 'web.whatsapp.com', title = 'WhatsApp', nodes = {} } = {}) {
+    const messages = [];
+    const timers = [];
+    const state = { title };
+    const observer = {};
+    const context = vm.createContext({
+        window: { webkit: { messageHandlers: { chatHubNotify: { postMessage: m => messages.push(JSON.parse(JSON.stringify(m))) } } } },
+        document: {
+            get title() { return state.title; },
+            documentElement: {},
+            querySelector: selector => nodes[selector]?.[0] ?? null,
+            querySelectorAll: selector => nodes[selector] ?? [],
+        },
+        location: { hostname: host },
+        MutationObserver: class { constructor(callback) { observer.callback = callback; } observe() {} },
+        EventTarget, Event,
+        setTimeout: callback => { timers.push(callback); return timers.length; },
+    });
+    vm.runInContext(bridgeSource, context);
+    const flush = () => { while (timers.length) timers.shift()(); };
+    const mutate = () => { observer.callback(); flush(); };
+    flush();
+    return { messages, state, mutate, context };
+}
+
+test('a title count is reported once and never flips to zero on services without DOM selectors', () => {
+    const b = bridge({ title: '(3) WhatsApp' });
+    for (let i = 0; i < 4; i++) b.mutate();
+    assert.deepEqual(b.messages, [{ kind: 'badge', count: 3 }]);
+});
+
+test('clearing the title count reports zero and a new count reports again', () => {
+    const b = bridge({ title: '(3) WhatsApp' });
+    b.state.title = 'WhatsApp';
+    b.mutate();
+    b.state.title = '[7] WhatsApp';
+    b.mutate();
+    assert.deepEqual(b.messages.map(m => m.count), [3, 0, 7]);
+});
+
+test('Zalo falls back to its navigation badge when the title has no count', () => {
+    const b = bridge({ host: 'chat.zalo.me', title: 'Zalo', nodes: { '#main-tab .z-noti-badge': [{ textContent: '4' }] } });
+    assert.deepEqual(b.messages, [{ kind: 'badge', count: 4 }]);
+});
+
+test('page notifications are forwarded with bounded fields', () => {
+    const b = bridge();
+    vm.runInContext(`new window.Notification('Hi', { body: '${'x'.repeat(400)}' })`, b.context);
+    const notice = b.messages.find(m => m.kind === 'notify');
+    assert.equal(notice.title, 'Hi');
+    assert.equal(notice.body.length, 300);
+});
