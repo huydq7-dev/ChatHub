@@ -695,17 +695,7 @@ private struct WindowAccessor: NSViewRepresentable {
 
         func configure() {
             guard let window else { return }
-            window.titleVisibility = .hidden
-            window.titlebarAppearsTransparent = true
-            window.titlebarSeparatorStyle = .none
-            window.isMovableByWindowBackground = true
-            window.toolbar = nil
-            window.backgroundColor = NSColor(Color(HubStyle.rail))
-            if !window.styleMask.contains(.fullSizeContentView) {
-                window.styleMask.insert(.fullSizeContentView)
-            }
-            window.contentView?.needsLayout = true
-            window.layoutIfNeeded()
+            WorkspaceWindowStyle.apply(to: window)
         }
     }
 }

@@ -103,8 +103,7 @@ final class BrowserPool {
         guard let session = sessions[account.id] else { return }
         session.updateAppearance(appearance)
         session.startIfNeeded()
-        containerView.show(session.webView)
-        session.didActivate()
+        if containerView.show(session.webView) { session.didActivate() }
         syncFocus()
     }
 

@@ -89,38 +89,26 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             forName: NSWindow.didBecomeKeyNotification,
             object: nil,
             queue: .main
-        ) { [weak self] _ in
+        ) { [weak self] notification in
+            guard let window = notification.object as? NSWindow else { return }
             MainActor.assumeIsolated {
-                for window in NSApplication.shared.windows {
-                    self?.configureWindow(window)
-                }
+                self?.configureWindow(window)
             }
         }
         NotificationCenter.default.addObserver(
             forName: NSWindow.didBecomeMainNotification,
             object: nil,
             queue: .main
-        ) { [weak self] _ in
+        ) { [weak self] notification in
+            guard let window = notification.object as? NSWindow else { return }
             MainActor.assumeIsolated {
-                for window in NSApplication.shared.windows {
-                    self?.configureWindow(window)
-                }
+                self?.configureWindow(window)
             }
         }
     }
 
     func configureWindow(_ window: NSWindow) {
-        window.titleVisibility = .hidden
-        window.titlebarAppearsTransparent = true
-        window.titlebarSeparatorStyle = .none
-        window.isMovableByWindowBackground = true
-        window.toolbar = nil
-        window.backgroundColor = NSColor(Color(HubStyle.rail))
-        if !window.styleMask.contains(.fullSizeContentView) {
-            window.styleMask.insert(.fullSizeContentView)
-        }
-        window.contentView?.needsLayout = true
-        window.layoutIfNeeded()
+        WorkspaceWindowStyle.apply(to: window)
     }
 
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { false }

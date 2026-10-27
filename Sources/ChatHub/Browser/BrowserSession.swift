@@ -608,10 +608,12 @@ final class BrowserSession: NSObject {
     @ObservationIgnored private var hasInstalledScripts = false
     @ObservationIgnored private var hubIsFocused = false
     @ObservationIgnored private var appearance: BrowserAppearance
+    @ObservationIgnored private var appearanceBootstrap: String?
 
     init(account: ChatAccount, appearance initialAppearance: BrowserAppearance = BrowserAppearance()) {
         self.account = account
         self.appearance = initialAppearance
+        self.appearanceBootstrap = ServiceTheme.bootstrap(service: account.service, appearance: initialAppearance)
         let configuration = WKWebViewConfiguration()
         configuration.applicationNameForUserAgent = "ChatHub/0.2.0"
         configuration.websiteDataStore = WKWebsiteDataStore(forIdentifier: account.id)
@@ -707,9 +709,10 @@ final class BrowserSession: NSObject {
             webView.appearance = NSAppearance(named: targetName)
         }
         if changed {
+            appearanceBootstrap = ServiceTheme.bootstrap(service: account.service, appearance: newAppearance)
             installUserScripts()
+            syncPageAppearance()
         }
-        syncPageAppearance()
     }
 
     private func syncPageAppearance() {
@@ -737,7 +740,7 @@ final class BrowserSession: NSObject {
                 forMainFrameOnly: true,
                 in: .page
             ))
-        if let source = ServiceTheme.bootstrap(service: account.service, appearance: appearance) {
+        if let source = appearanceBootstrap {
             controller.addUserScript(
                 WKUserScript(
                     source: source, injectionTime: .atDocumentEnd, forMainFrameOnly: true, in: .defaultClient
@@ -754,33 +757,13 @@ final class BrowserSession: NSObject {
     func didActivate() {
         webView.needsDisplay = true
         webView.needsLayout = true
-        guard hasLoadedPage, account.service == .messenger else { return }
-        webView.evaluateJavaScript(
-            """
-            (function() {
-                window.dispatchEvent(new Event("resize"));
-                const main = document.querySelector('[role="main"]');
-                if (!main) return;
-                for (const scroller of main.querySelectorAll('.x1odjw0f, .x10wlt62, [role="grid"]')) {
-                    if (scroller.scrollHeight > scroller.clientHeight) {
-                        const top = scroller.scrollTop;
-                        scroller.scrollTop = top > 0 ? top - 1 : top + 1;
-                        scroller.scrollTop = top;
-                        scroller.dispatchEvent(new Event("scroll", { bubbles: true }));
-                    }
-                }
-            })();
-            """,
-            completionHandler: nil
-        )
     }
 
     func setHubFocus(active: Bool) {
-        if hubIsFocused != active {
-            hubIsFocused = active
-            // Future documents need the latest native state before provider scripts run.
-            installUserScripts()
-        }
+        guard hubIsFocused != active else { return }
+        hubIsFocused = active
+        // Future documents need the latest native state before provider scripts run.
+        installUserScripts()
         syncHubFocus()
     }
 
@@ -892,6 +875,7 @@ extension BrowserSession: WKNavigationDelegate {
         canGoBack = webView.canGoBack
         canGoForward = webView.canGoForward
         updateAppearance(appearance)
+        syncPageAppearance()
         syncHubFocus()
         didActivate()
     }

@@ -8,7 +8,8 @@ final class WebHostContainerView: NSView {
         guard webView.superview !== self else { return }
         let initialBounds = bounds.isEmpty ? NSRect(x: 0, y: 0, width: 800, height: 600) : bounds
         webView.frame = initialBounds
-        webView.autoresizingMask = [.width, .height]
+        // Keep background sessions connected without relaying every live resize to them.
+        webView.autoresizingMask = []
         webView.alphaValue = 0.0
         addSubview(webView, positioned: .below, relativeTo: nil)
     }
@@ -20,29 +21,24 @@ final class WebHostContainerView: NSView {
         webView.removeFromSuperview()
     }
 
-    func show(_ webView: WKWebView) {
-        if webView.superview !== self {
-            let initialBounds = bounds.isEmpty ? NSRect(x: 0, y: 0, width: 800, height: 600) : bounds
-            webView.frame = initialBounds
-            webView.autoresizingMask = [.width, .height]
-            addSubview(webView, positioned: .above, relativeTo: nil)
-        } else if subviews.last !== webView {
+    @discardableResult
+    func show(_ webView: WKWebView) -> Bool {
+        // SwiftUI may update the representable while typing or changing a badge.
+        // Only an actual account switch should move focus or invalidate the web view.
+        guard activeWebView !== webView || webView.superview !== self else { return false }
+        activeWebView?.alphaValue = 0
+        attach(webView)
+        if subviews.last !== webView {
             addSubview(webView, positioned: .above, relativeTo: nil)
         }
         activeWebView = webView
-        for subview in subviews {
-            let isActive = (subview === webView)
-            subview.alphaValue = isActive ? 1.0 : 0.0
-            if isActive {
-                if !bounds.isEmpty {
-                    subview.frame = bounds
-                }
-                subview.needsDisplay = true
-                subview.needsLayout = true
-            }
-        }
+        syncSubviewFrames()
+        webView.alphaValue = 1
+        webView.needsDisplay = true
+        webView.needsLayout = true
         window?.invalidateCursorRects(for: self)
         window?.makeFirstResponder(webView)
+        return true
     }
 
     override func setFrameSize(_ newSize: NSSize) {
@@ -66,10 +62,10 @@ final class WebHostContainerView: NSView {
     }
 
     private func syncSubviewFrames() {
-        guard bounds.width > 0, bounds.height > 0 else { return }
-        for subview in subviews where subview.frame != bounds {
-            subview.frame = bounds
-        }
+        guard bounds.width > 0, bounds.height > 0,
+            let activeWebView, activeWebView.frame != bounds
+        else { return }
+        activeWebView.frame = bounds
     }
 
     override func hitTest(_ point: NSPoint) -> NSView? {
