@@ -392,12 +392,12 @@ html[data-chathub-service="telegram"] .Message :is(.message-title, .sender-title
     font-weight: var(--hub-weight-semibold) !important;
     line-height: var(--hub-leading-tight) !important;
 }
-html[data-chathub-service="telegram"] :is(.Message, .Composer) :is(.EmbeddedMessage, .ComposerEmbeddedMessage, .embedded-message, .reply) {
+html[data-chathub-service="telegram"] .Composer :is(.EmbeddedMessage, .ComposerEmbeddedMessage, .embedded-message, .reply) {
     height: auto !important;
     max-height: none !important;
     overflow: visible !important;
 }
-html[data-chathub-service="telegram"] :is(.Message, .Composer) :is(.EmbeddedMessage, .ComposerEmbeddedMessage, .embedded-message, .reply) :is(.EmbeddedMessage-content, .reply-content) {
+html[data-chathub-service="telegram"] .Composer :is(.EmbeddedMessage, .ComposerEmbeddedMessage, .embedded-message, .reply) :is(.EmbeddedMessage-content, .reply-content) {
     height: auto !important;
     overflow: visible !important;
 }
@@ -560,12 +560,8 @@ html[data-chathub-service="telegram"] #Main > div:first-child:not([id]):not(.Tra
     background-image: none !important;
 }
 
-/* Unified Telegram scrollbars */
+/* Unified Telegram scrollbars: keep navigation and picker scrollbars styled, but allow .MessageList and .Transition_slide to use macOS native overlay scrolling to prevent scroll jitter */
 html[data-chathub-service="telegram"] :is(
-    .custom-scroll,
-    .custom-scroll-x,
-    .Transition_slide,
-    .MessageList,
     .chat-list,
     .LeftSearch,
     .search-content,
@@ -580,10 +576,6 @@ html[data-chathub-service="telegram"] :is(
 }
 
 html[data-chathub-service="telegram"] :is(
-    .custom-scroll,
-    .custom-scroll-x,
-    .Transition_slide,
-    .MessageList,
     .chat-list,
     .LeftSearch,
     .search-content,
@@ -598,10 +590,6 @@ html[data-chathub-service="telegram"] :is(
 }
 
 html[data-chathub-service="telegram"] :is(
-    .custom-scroll,
-    .custom-scroll-x,
-    .Transition_slide,
-    .MessageList,
     .chat-list,
     .LeftSearch,
     .search-content,
@@ -618,10 +606,6 @@ html[data-chathub-service="telegram"] :is(
 }
 
 html[data-chathub-service="telegram"] :is(
-    .custom-scroll,
-    .custom-scroll-x,
-    .Transition_slide,
-    .MessageList,
     .chat-list,
     .LeftSearch,
     .search-content,
@@ -630,10 +614,6 @@ html[data-chathub-service="telegram"] :is(
     .media-list
 ):hover::-webkit-scrollbar-thumb,
 html[data-chathub-service="telegram"] :is(
-    .custom-scroll,
-    .custom-scroll-x,
-    .Transition_slide,
-    .MessageList,
     .chat-list,
     .LeftSearch,
     .search-content,
@@ -646,10 +626,6 @@ html[data-chathub-service="telegram"] :is(
 }
 
 html[data-chathub-service="telegram"] :is(
-    .custom-scroll,
-    .custom-scroll-x,
-    .Transition_slide,
-    .MessageList,
     .chat-list,
     .LeftSearch,
     .search-content,
@@ -659,4 +635,10 @@ html[data-chathub-service="telegram"] :is(
 )::-webkit-scrollbar-thumb:active {
     background: var(--hub-scrollbar-active) !important;
     background-color: var(--hub-scrollbar-active) !important;
+}
+
+/* Allow Telegram's message stream to use native hardware-accelerated overlay scrolling without synthetic webkit-scrollbar reflows */
+html[data-chathub-service="telegram"] :is(.MessageList, .messages-layout, .messages-container) {
+    -webkit-overflow-scrolling: touch !important;
+    overflow-anchor: auto !important;
 }

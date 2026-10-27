@@ -305,28 +305,28 @@ html[data-chathub-theme] :is(button, [role="button"], input):focus-visible {
     outline-offset: 2px;
 }
 
-/* Unified slim native-style scrollbars across all embedded services. */
+/* Unified slim native-style scrollbars across embedded services. Telegram manages its message list via native overlay scrolling. */
 html[data-chathub-theme],
 html[data-chathub-theme] * {
     scrollbar-width: thin !important;
     scrollbar-color: var(--hub-scrollbar) transparent !important;
 }
-html[data-chathub-theme] ::-webkit-scrollbar,
-html[data-chathub-theme] *::-webkit-scrollbar {
+html[data-chathub-theme]:not([data-chathub-service="telegram"]) ::-webkit-scrollbar,
+html[data-chathub-theme]:not([data-chathub-service="telegram"]) *::-webkit-scrollbar {
     width: 6px !important;
     height: 6px !important;
     background: transparent !important;
     background-color: transparent !important;
 }
-html[data-chathub-theme] ::-webkit-scrollbar-track,
-html[data-chathub-theme] *::-webkit-scrollbar-track {
+html[data-chathub-theme]:not([data-chathub-service="telegram"]) ::-webkit-scrollbar-track,
+html[data-chathub-theme]:not([data-chathub-service="telegram"]) *::-webkit-scrollbar-track {
     background: transparent !important;
     background-color: transparent !important;
     border: none !important;
     box-shadow: none !important;
 }
-html[data-chathub-theme] ::-webkit-scrollbar-thumb,
-html[data-chathub-theme] *::-webkit-scrollbar-thumb {
+html[data-chathub-theme]:not([data-chathub-service="telegram"]) ::-webkit-scrollbar-thumb,
+html[data-chathub-theme]:not([data-chathub-service="telegram"]) *::-webkit-scrollbar-thumb {
     background: var(--hub-scrollbar) !important;
     background-color: var(--hub-scrollbar) !important;
     border-radius: var(--hub-radius-pill) !important;
@@ -334,18 +334,18 @@ html[data-chathub-theme] *::-webkit-scrollbar-thumb {
     box-shadow: none !important;
     min-height: 20px;
 }
-html[data-chathub-theme] ::-webkit-scrollbar-thumb:hover,
-html[data-chathub-theme] *::-webkit-scrollbar-thumb:hover {
+html[data-chathub-theme]:not([data-chathub-service="telegram"]) ::-webkit-scrollbar-thumb:hover,
+html[data-chathub-theme]:not([data-chathub-service="telegram"]) *::-webkit-scrollbar-thumb:hover {
     background: var(--hub-scrollbar-hover) !important;
     background-color: var(--hub-scrollbar-hover) !important;
 }
-html[data-chathub-theme] ::-webkit-scrollbar-thumb:active,
-html[data-chathub-theme] *::-webkit-scrollbar-thumb:active {
+html[data-chathub-theme]:not([data-chathub-service="telegram"]) ::-webkit-scrollbar-thumb:active,
+html[data-chathub-theme]:not([data-chathub-service="telegram"]) *::-webkit-scrollbar-thumb:active {
     background: var(--hub-scrollbar-active) !important;
     background-color: var(--hub-scrollbar-active) !important;
 }
-html[data-chathub-theme] ::-webkit-scrollbar-corner,
-html[data-chathub-theme] *::-webkit-scrollbar-corner {
+html[data-chathub-theme]:not([data-chathub-service="telegram"]) ::-webkit-scrollbar-corner,
+html[data-chathub-theme]:not([data-chathub-service="telegram"]) *::-webkit-scrollbar-corner {
     background: transparent !important;
     background-color: transparent !important;
 }
