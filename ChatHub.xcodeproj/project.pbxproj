@@ -11,10 +11,12 @@
 		0921D305FEC399B0D78D15FF /* Design.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CF831FCF5A5F165258861A8 /* Design.swift */; };
 		1154283E44FB7DE6729E4311 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = B95DC1BEDD2E1858E6EDCCAB /* Localizable.strings */; };
 		19B7485C43289238992031B4 /* icon-telegram.png in Resources */ = {isa = PBXBuildFile; fileRef = 906E8DBB1CDA039DB816AD05 /* icon-telegram.png */; };
+		1BBE1D1AC4EF2E07190016D0 /* MenuBarContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D1B23D22D22809EDFE6C042 /* MenuBarContent.swift */; };
 		2296F68A9C704BE535A68D3F /* icon-discord.png in Resources */ = {isa = PBXBuildFile; fileRef = CFB665C5690AB9A3AF50AFF8 /* icon-discord.png */; };
 		247AF29D141208C8D47DC150 /* TelegramAppearance.css in Resources */ = {isa = PBXBuildFile; fileRef = 3D819505BBB842178CE2B809 /* TelegramAppearance.css */; };
 		249D5424B23F67A4A78F88D4 /* icon-zalo.png in Resources */ = {isa = PBXBuildFile; fileRef = BB02CFF4F87CC1EA9552E53F /* icon-zalo.png */; };
 		32F76B7F5355F9A6BA10F945 /* BrowserPool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB65ECBABE4AE20647C690AB /* BrowserPool.swift */; };
+		38237BF24595D3D9161B4DB2 /* AccountNavigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E618619BFDD11B9F796FED2B /* AccountNavigation.swift */; };
 		41F0FAAE2482EF4B2F9CCA78 /* WorkspaceStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D8604B5158582591AEF800A /* WorkspaceStore.swift */; };
 		4620D657B1FB199B7B5934F8 /* OverviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE203BD69534DF61DC8D6D9E /* OverviewView.swift */; };
 		4D2D429B7AB2FB658047F652 /* NavigationPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9ABC46808A44AC5DD7DCF0F9 /* NavigationPolicy.swift */; };
@@ -32,6 +34,7 @@
 		9C78655E5AD98B76F6299E8B /* ZaloAppearance.css in Resources */ = {isa = PBXBuildFile; fileRef = BEA4CBF97662091D4D2EBF60 /* ZaloAppearance.css */; };
 		A7EA45FF2FAEAF154AACBA15 /* ChatAppearance.css in Resources */ = {isa = PBXBuildFile; fileRef = 0734362CE88AA8C35EA71522 /* ChatAppearance.css */; };
 		AA272F37132FB9654D992D6E /* WorkspaceLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FB948D8B94B7532D510EF71 /* WorkspaceLayout.swift */; };
+		AC71541CD39894F1E6591A8D /* HibernationPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACE83E8D3B05C1C22027944F /* HibernationPolicy.swift */; };
 		ACDB888DE6D8D0D56B73CE38 /* DownloadHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EC590C4FF0299A0DDF806B7 /* DownloadHandler.swift */; };
 		AF1563706BCD3BE669E2172A /* icon-whatsapp.png in Resources */ = {isa = PBXBuildFile; fileRef = E352F17CEE3E559D4066FB48 /* icon-whatsapp.png */; };
 		B0C3FE636975DE9AAFF621E3 /* AccountEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71927B67C507CE8C5AA78962 /* AccountEditor.swift */; };
@@ -45,6 +48,7 @@
 		B9CE5C566E9B3D4DC93E8F2F /* WorkspaceRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FB35DB69AB7EF45CD225AFD /* WorkspaceRepository.swift */; };
 		C06D2C0DCF813870D776F050 /* ConversationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C9E590D59CAAB599A4646ED /* ConversationView.swift */; };
 		C66BACB7AE7F2BA76AC35F0A /* Localization.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABD75900051EC04AC08F52F4 /* Localization.swift */; };
+		D84BA9E3D046B967295DB0F0 /* LaunchAtLogin.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE8B1A0848657DD2C67928B8 /* LaunchAtLogin.swift */; };
 		DC27F22385552FBF18C9138E /* SidebarPositionRestorer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5625241992CE58C736AE5B1 /* SidebarPositionRestorer.swift */; };
 		FA1120536E882DF15D7B2BDA /* WebNavigationFailure.swift in Sources */ = {isa = PBXBuildFile; fileRef = B89326CF898775FEDD83BD63 /* WebNavigationFailure.swift */; };
 		FF2D3F88B6EEC4A48DC7B203 /* ServiceWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4140B9BD02BCD1A826FA1ED4 /* ServiceWebView.swift */; };
@@ -57,6 +61,7 @@
 		15FBFE37C64805E9143E2475 /* DownloadedFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadedFile.swift; sourceTree = "<group>"; };
 		1A976FE272AF1BE0CEDB9565 /* ChatHub.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ChatHub.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2CF831FCF5A5F165258861A8 /* Design.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Design.swift; sourceTree = "<group>"; };
+		2D1B23D22D22809EDFE6C042 /* MenuBarContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarContent.swift; sourceTree = "<group>"; };
 		2EC590C4FF0299A0DDF806B7 /* DownloadHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadHandler.swift; sourceTree = "<group>"; };
 		2F328BB0DC986FC8F983B730 /* BrowserAppearance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserAppearance.swift; sourceTree = "<group>"; };
 		35CA23D250648B876EDAAD9B /* ChatHubApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatHubApp.swift; sourceTree = "<group>"; };
@@ -82,6 +87,7 @@
 		A391E86918F2857937E05619 /* BrowserSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserSession.swift; sourceTree = "<group>"; };
 		A5625241992CE58C736AE5B1 /* SidebarPositionRestorer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SidebarPositionRestorer.swift; sourceTree = "<group>"; };
 		ABD75900051EC04AC08F52F4 /* Localization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Localization.swift; sourceTree = "<group>"; };
+		ACE83E8D3B05C1C22027944F /* HibernationPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HibernationPolicy.swift; sourceTree = "<group>"; };
 		B82159D34B485DE63615CFBD /* icon-messenger.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "icon-messenger.png"; sourceTree = "<group>"; };
 		B89326CF898775FEDD83BD63 /* WebNavigationFailure.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebNavigationFailure.swift; sourceTree = "<group>"; };
 		BB02CFF4F87CC1EA9552E53F /* icon-zalo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "icon-zalo.png"; sourceTree = "<group>"; };
@@ -92,8 +98,10 @@
 		CFB665C5690AB9A3AF50AFF8 /* icon-discord.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "icon-discord.png"; sourceTree = "<group>"; };
 		DB65ECBABE4AE20647C690AB /* BrowserPool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserPool.swift; sourceTree = "<group>"; };
 		E352F17CEE3E559D4066FB48 /* icon-whatsapp.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "icon-whatsapp.png"; sourceTree = "<group>"; };
+		E618619BFDD11B9F796FED2B /* AccountNavigation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountNavigation.swift; sourceTree = "<group>"; };
 		E989AF73A4455FE75013B5B8 /* WebAppearance.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = WebAppearance.js; sourceTree = "<group>"; };
 		FE203BD69534DF61DC8D6D9E /* OverviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverviewView.swift; sourceTree = "<group>"; };
+		FE8B1A0848657DD2C67928B8 /* LaunchAtLogin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchAtLogin.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -108,9 +116,11 @@
 		88B96A3153315257E97A0117 /* ChatHubCore */ = {
 			isa = PBXGroup;
 			children = (
+				E618619BFDD11B9F796FED2B /* AccountNavigation.swift */,
 				2F328BB0DC986FC8F983B730 /* BrowserAppearance.swift */,
 				15169739DF0C2C21D57C70D3 /* ChatAccount.swift */,
 				15FBFE37C64805E9143E2475 /* DownloadedFile.swift */,
+				ACE83E8D3B05C1C22027944F /* HibernationPolicy.swift */,
 				9ABC46808A44AC5DD7DCF0F9 /* NavigationPolicy.swift */,
 				422F2512262F6481F8F3E5B9 /* NotificationPolicy.swift */,
 				B89326CF898775FEDD83BD63 /* WebNavigationFailure.swift */,
@@ -135,6 +145,7 @@
 				5F4EA6D3D42CDCA5EB2557B4 /* AccountSwitcherView.swift */,
 				9C9E590D59CAAB599A4646ED /* ConversationView.swift */,
 				2CF831FCF5A5F165258861A8 /* Design.swift */,
+				2D1B23D22D22809EDFE6C042 /* MenuBarContent.swift */,
 				FE203BD69534DF61DC8D6D9E /* OverviewView.swift */,
 				C092968BE13F142C081C83A6 /* SettingsView.swift */,
 				A5625241992CE58C736AE5B1 /* SidebarPositionRestorer.swift */,
@@ -169,6 +180,7 @@
 			children = (
 				5833F64E417C41E6F05A14D2 /* ChatAppearancePreferences.swift */,
 				35CA23D250648B876EDAAD9B /* ChatHubApp.swift */,
+				FE8B1A0848657DD2C67928B8 /* LaunchAtLogin.swift */,
 				ABD75900051EC04AC08F52F4 /* Localization.swift */,
 				9FB948D8B94B7532D510EF71 /* WorkspaceLayout.swift */,
 				4D8604B5158582591AEF800A /* WorkspaceStore.swift */,
@@ -294,6 +306,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B0C3FE636975DE9AAFF621E3 /* AccountEditor.swift in Sources */,
+				38237BF24595D3D9161B4DB2 /* AccountNavigation.swift in Sources */,
 				93C54A72EF89145A2CEE1851 /* AccountSwitcherView.swift in Sources */,
 				8A31A424C8179B7F51732C43 /* BrowserAppearance.swift in Sources */,
 				32F76B7F5355F9A6BA10F945 /* BrowserPool.swift in Sources */,
@@ -306,8 +319,11 @@
 				0921D305FEC399B0D78D15FF /* Design.swift in Sources */,
 				ACDB888DE6D8D0D56B73CE38 /* DownloadHandler.swift in Sources */,
 				B4A1B8DF17FA28DBC20D1079 /* DownloadedFile.swift in Sources */,
+				AC71541CD39894F1E6591A8D /* HibernationPolicy.swift in Sources */,
 				5E6D0E0FB6883E44DAD9C4E5 /* HubNotificationCenter.swift in Sources */,
+				D84BA9E3D046B967295DB0F0 /* LaunchAtLogin.swift in Sources */,
 				C66BACB7AE7F2BA76AC35F0A /* Localization.swift in Sources */,
+				1BBE1D1AC4EF2E07190016D0 /* MenuBarContent.swift in Sources */,
 				4D2D429B7AB2FB658047F652 /* NavigationPolicy.swift in Sources */,
 				5B22040CCF7A541A53C8AC71 /* NotificationPolicy.swift in Sources */,
 				4620D657B1FB199B7B5934F8 /* OverviewView.swift in Sources */,

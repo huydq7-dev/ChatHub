@@ -118,12 +118,12 @@ struct OverviewView: View {
                     .foregroundStyle(HubStyle.textPrimary)
                 HubBadge(text: "\(store.accounts.count)")
                 Spacer()
-                Text(tr("Pick up where you left off"))
+                Text(tr("Unread first"))
                     .font(HubFont.caption)
                     .foregroundStyle(HubStyle.textSecondary)
             }
             LazyVGrid(columns: columns, spacing: HubSpace.md) {
-                ForEach(store.accounts) { account in
+                ForEach(AccountNavigation.unreadFirst(store.accounts, unread: browsers.unreadCounts)) { account in
                     AccountOverviewCard(account: account, session: browsers.sessions[account.id]) {
                         store.select(account.id)
                     }

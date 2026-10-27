@@ -105,6 +105,8 @@ final class BrowserSession: NSObject {
         ]
     }
 
+    var hasActiveDownloads: Bool { !downloads.isEmpty }
+
     var hasFailed: Bool {
         if case .failed = state { return true }
         return false

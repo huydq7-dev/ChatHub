@@ -17,9 +17,18 @@ struct WorkspaceView: View {
     @AppStorage(ChatAppearancePreferences.densityKey) private var densityRaw = HubDensity.standard.rawValue
     @AppStorage(ChatAppearancePreferences.textScaleKey) private var textScaleRaw = HubTextScale.standard.rawValue
     @AppStorage(ChatAppearancePreferences.keepConnectedKey) private var keepConnected = true
+    @AppStorage(ChatAppearancePreferences.sleepIdleHoursKey) private var sleepIdleHours = 1
 
     private var currentAccent: HubAccent { HubAccent(rawValue: accentRaw) ?? .iris }
     private var preloadIDs: [UUID] { keepConnected && store.loadError == nil ? store.accounts.map(\.id) : [] }
+    private var mutedIDs: Set<UUID> { Set(store.accounts.filter(\.notificationsMuted).map(\.id)) }
+
+    private static let sleepCheckInterval = 300.0
+
+    private struct PreloadKey: Hashable {
+        let ids: [UUID]
+        let sleeping: Set<UUID>
+    }
 
     var body: some View {
         @Bindable var store = store
@@ -50,12 +59,28 @@ struct WorkspaceView: View {
             }
             HubNotificationCenter.shared.isMuted = { id in store.isMuted(id) }
             HubNotificationCenter.shared.isViewing = { id in store.selectedID == id }
+            DockMenuSource.entries = {
+                let unread = browsers.unreadCounts
+                return AccountNavigation.unreadFirst(store.accounts, unread: unread).prefix(9).map {
+                    DockMenuEntry(id: $0.id, title: accountMenuTitle($0, unread: unread[$0.id] ?? 0))
+                }
+            }
+            DockMenuSource.select = { id in store.select(id) }
         }
         .onChange(of: browserAppearance, initial: true) { _, appearance in browsers.updateAppearance(appearance) }
         .onChange(of: store.selectedID, initial: true) { _, _ in browsers.activate(store.selectedAccount) }
-        .task(id: preloadIDs) {
+        .task(id: PreloadKey(ids: preloadIDs, sleeping: browsers.sleeping)) {
             guard !preloadIDs.isEmpty else { return }
             await browsers.preload(store.accounts)
+        }
+        .onChange(of: mutedIDs) { old, new in
+            for id in old.subtracting(new) { browsers.wake(id) }
+        }
+        .task(id: sleepIdleHours) {
+            while !Task.isCancelled {
+                try? await Task.sleep(for: .seconds(Self.sleepCheckInterval))
+                browsers.sleepIdle(accounts: store.accounts, after: TimeInterval(sleepIdleHours) * 3_600)
+            }
         }
         .sheet(isPresented: $store.isAddingAccount) { AccountEditor(service: store.suggestedService) }
         .sheet(
@@ -403,6 +428,12 @@ private struct AccountSidebarRow: View {
                             .lineLimit(1)
                     }
                     Spacer(minLength: 0)
+                    if browsers.sleeping.contains(account.id) {
+                        Image(systemName: "moon.zzz.fill")
+                            .font(.system(size: 11))
+                            .foregroundStyle(HubStyle.textSecondary)
+                            .help(tr("Sleeping to save memory. Opens when selected."))
+                    }
                     if account.notificationsMuted {
                         Image(systemName: "bell.slash.fill")
                             .font(.system(size: 11))

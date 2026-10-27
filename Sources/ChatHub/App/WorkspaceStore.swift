@@ -51,6 +51,15 @@ final class WorkspaceStore {
         if commit(accounts: accounts, selectedID: id) { selectedID = id }
     }
 
+    /// Jumps to the next account with unread messages. Returns false when there is none.
+    @discardableResult
+    func selectNextUnread(unread: [UUID: Int]) -> Bool {
+        guard let next = AccountNavigation.nextUnread(after: selectedID, accounts: accounts, unread: unread)
+        else { return false }
+        select(next)
+        return selectedID == next
+    }
+
     func add(service: ChatService? = nil) {
         suggestedService = service
         isAddingAccount = true
