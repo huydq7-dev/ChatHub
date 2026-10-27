@@ -100,3 +100,28 @@ test('bounded callback registry safely ignores evicted notifications', () => {
     p.window.__chatHubTriggerNotificationClick(p.posted[20].callbackID);
     assert.equal(clicks, 1);
 });
+
+test('callback IDs from an earlier document cannot target a new conversation', () => {
+    const old = page();
+    new old.window.Notification('Before navigation', { tag: 'same' });
+    const current = page();
+    const notification = new current.window.Notification('After navigation', { tag: 'same' });
+    let clicks = 0;
+    notification.onclick = () => clicks++;
+    assert.notEqual(old.posted[0].callbackID, current.posted[0].callbackID);
+    current.window.__chatHubTriggerNotificationClick(old.posted[0].callbackID);
+    assert.equal(clicks, 0);
+    current.window.__chatHubTriggerNotificationClick(current.posted[0].callbackID);
+    assert.equal(clicks, 1);
+});
+
+test('reused provider tags keep distinct callbacks and preserve replacement tags', () => {
+    const p = page();
+    const clicked = [];
+    new p.window.Notification('Earlier', { tag: 'thread' }).onclick = () => clicked.push('earlier');
+    new p.window.Notification('Latest', { tag: 'thread' }).onclick = () => clicked.push('latest');
+    assert.deepEqual(p.posted.map(payload => payload.tag), ['thread', 'thread']);
+    assert.notEqual(p.posted[0].callbackID, p.posted[1].callbackID);
+    p.window.__chatHubTriggerNotificationClick(p.posted[1].callbackID);
+    assert.deepEqual(clicked, ['latest']);
+});

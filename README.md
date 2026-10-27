@@ -98,7 +98,7 @@ supported solution and cannot be fixed by styling.
 
 ```sh
 bash scripts/test.sh
-node --test scripts/test-web.mjs
+node --test scripts/test-web.mjs scripts/test-notifications.mjs
 xcrun swift-format lint --strict --recursive Sources Tests scripts/render-icon.swift Package.swift
 ```
 

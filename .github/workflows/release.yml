@@ -24,7 +24,7 @@ jobs:
       - name: Run Web & Swift Tests
         run: |
           python3 scripts/test-release.py
-          node --test scripts/test-web.mjs
+          node --test scripts/test-web.mjs scripts/test-notifications.mjs
           bash scripts/test.sh
 
       - name: Build and Package DMG & ZIP
