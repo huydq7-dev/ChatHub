@@ -8,6 +8,7 @@ struct ChatHubApp: App {
     @State private var browsers = BrowserPool()
     @State private var layout = WorkspaceLayout()
     @AppStorage("appearance") private var appearance = "system"
+    @AppStorage(ChatAppearancePreferences.showMenuBarKey) private var showMenuBar = true
 
     init() { ChatAppearancePreferences.migrate() }
 
@@ -33,6 +34,10 @@ struct ChatHubApp: App {
                     .keyboardShortcut("k", modifiers: .command)
                 Button(tr("Toggle Sidebar")) { layout.toggle() }
                     .keyboardShortcut("s", modifiers: [.command, .control])
+                Button(tr("Next Unread Account")) {
+                    if !store.selectNextUnread(unread: browsers.unreadCounts) { NSSound.beep() }
+                }
+                .keyboardShortcut("j", modifiers: .command)
                 Divider()
                 Button(tr("Overview")) { store.select(nil) }
                     .keyboardShortcut("0", modifiers: .command)
@@ -58,6 +63,16 @@ struct ChatHubApp: App {
             }
         }
 
+        MenuBarExtra(isInserted: $showMenuBar) {
+            MenuBarContent()
+                .environment(store)
+                .environment(browsers)
+        } label: {
+            MenuBarLabel()
+                .environment(store)
+                .environment(browsers)
+        }
+
         Settings {
             SettingsView()
                 .environment(store)
@@ -68,8 +83,40 @@ struct ChatHubApp: App {
     }
 }
 
+struct DockMenuEntry {
+    let id: UUID
+    let title: String
+}
+
+/// Feeds the Dock menu; the workspace view installs the closures once it appears.
+@MainActor
+enum DockMenuSource {
+    static var entries: () -> [DockMenuEntry] = { [] }
+    static var select: (UUID) -> Void = { _ in }
+}
+
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
+    func applicationDockMenu(_ sender: NSApplication) -> NSMenu? {
+        let entries = DockMenuSource.entries()
+        guard !entries.isEmpty else { return nil }
+        let menu = NSMenu()
+        for entry in entries {
+            let item = NSMenuItem(title: entry.title, action: #selector(openAccountFromDock(_:)), keyEquivalent: "")
+            item.target = self
+            item.representedObject = entry.id
+            menu.addItem(item)
+        }
+        return menu
+    }
+
+    @objc private func openAccountFromDock(_ sender: NSMenuItem) {
+        guard let id = sender.representedObject as? UUID else { return }
+        DockMenuSource.select(id)
+        _ = applicationShouldHandleReopen(NSApplication.shared, hasVisibleWindows: false)
+        NSApplication.shared.activate(ignoringOtherApps: true)
+    }
+
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApplication.shared.setActivationPolicy(.regular)
         NSApplication.shared.activate(ignoringOtherApps: true)

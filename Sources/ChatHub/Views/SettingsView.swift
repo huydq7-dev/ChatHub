@@ -15,8 +15,35 @@ struct SettingsView: View {
     @AppStorage(ChatAppearancePreferences.densityKey) private var densityRaw = HubDensity.standard.rawValue
     @AppStorage(ChatAppearancePreferences.textScaleKey) private var textScaleRaw = HubTextScale.standard.rawValue
     @AppStorage(ChatAppearancePreferences.keepConnectedKey) private var keepConnected = true
+    @AppStorage(ChatAppearancePreferences.showMenuBarKey) private var showMenuBar = true
+    @AppStorage(ChatAppearancePreferences.sleepIdleHoursKey) private var sleepIdleHours = 1
+    @State private var launchAtLogin = LaunchAtLogin.isRegistered
+    @State private var launchError: String?
 
     private var selectedAccent: HubAccent { HubAccent(rawValue: accentRaw) ?? .iris }
+
+    private var launchAtLoginBinding: Binding<Bool> {
+        Binding(
+            get: { launchAtLogin },
+            set: { enabled in
+                do {
+                    try LaunchAtLogin.set(enabled)
+                    launchError = nil
+                } catch {
+                    launchError = error.localizedDescription
+                }
+                launchAtLogin = LaunchAtLogin.isRegistered
+            }
+        )
+    }
+
+    private func idleLabel(_ hours: Int) -> String {
+        switch hours {
+        case 0: tr("Never")
+        case 1: tr("1 hour")
+        default: String(format: tr("%d hours"), hours)
+        }
+    }
 
     var body: some View {
         @Bindable var layout = layout
@@ -109,13 +136,33 @@ struct SettingsView: View {
             }
             Section {
                 Toggle(tr("Keep accounts connected in the background"), isOn: $keepConnected)
+                Picker(tr("Sleep muted accounts after"), selection: $sleepIdleHours) {
+                    ForEach(HibernationPolicy.allowedIdleHours, id: \.self) { hours in
+                        Text(idleLabel(hours)).tag(hours)
+                    }
+                }
             } header: {
                 Text(tr("Notifications"))
             } footer: {
                 Text(
                     tr(
                         "Loads every account after launch so unread badges and notifications work before you open it. Uses more memory. Takes effect next launch when turned off. Mute individual accounts from their context menu."
-                    ))
+                    ) + " "
+                        + tr(
+                            "Muted accounts that sit idle release their memory and reopen when selected. Accounts with notifications stay awake."
+                        ))
+            }
+            Section {
+                Toggle(tr("Show in menu bar"), isOn: $showMenuBar)
+                Toggle(tr("Open ChatHub at login"), isOn: launchAtLoginBinding)
+            } header: {
+                Text(tr("Menu bar and startup"))
+            } footer: {
+                if let launchError {
+                    Text(launchError).foregroundStyle(.red)
+                } else if LaunchAtLogin.status == .requiresApproval {
+                    Text(tr("Approve ChatHub in System Settings → General → Login Items."))
+                }
             }
             Section {
                 LabeledContent(tr("Accounts"), value: "\(store.accounts.count)")

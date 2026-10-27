@@ -8,6 +8,8 @@ enum ChatAppearancePreferences {
     static let densityKey = "chatDensity"
     static let textScaleKey = "chatTextScale"
     static let keepConnectedKey = "chatKeepAccountsConnected"
+    static let showMenuBarKey = "chatShowMenuBar"
+    static let sleepIdleHoursKey = "chatSleepIdleHours"
 
     static func migrate(defaults: UserDefaults = .standard) {
         for (old, new) in [("zaloNativeThemeEnabled", themeKey), ("zaloShowServiceTools", toolsKey)] {
