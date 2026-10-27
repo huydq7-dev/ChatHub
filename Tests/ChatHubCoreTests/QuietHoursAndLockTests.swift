@@ -64,6 +64,13 @@ struct QuietHoursAndLockTests {
         #expect(try JSONDecoder().decode(ChatAccount.self, from: legacy).snoozedUntil == nil)
     }
 
+    @Test func theUnlockPromptWaitsUntilTheUserIsBackInTheApp() {
+        #expect(AppLockPolicy.shouldPromptForUnlock(isLocked: true, isAppActive: true, isAuthenticating: false))
+        #expect(!AppLockPolicy.shouldPromptForUnlock(isLocked: true, isAppActive: false, isAuthenticating: false))
+        #expect(!AppLockPolicy.shouldPromptForUnlock(isLocked: true, isAppActive: true, isAuthenticating: true))
+        #expect(!AppLockPolicy.shouldPromptForUnlock(isLocked: false, isAppActive: true, isAuthenticating: false))
+    }
+
     @Test func lockWaitsForTheTimeoutAndNeverLocksWithoutALeaveTime() {
         let left = date(10)
         #expect(AppLockPolicy.shouldLockOnReturn(leftAt: left, now: date(10), timeoutMinutes: 0))
