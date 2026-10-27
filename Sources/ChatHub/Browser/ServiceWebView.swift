@@ -16,6 +16,13 @@ final class WebHostContainerView: NSView {
         layerContentsRedrawPolicy = .onSetNeedsDisplay
     }
 
+    /// A locked workspace hides the page and drops keyboard focus so nothing can be typed into it.
+    func setLocked(_ locked: Bool) {
+        guard isHidden != locked else { return }
+        isHidden = locked
+        if locked { window?.makeFirstResponder(nil) }
+    }
+
     func attach(_ webView: WKWebView) {
         guard webView.superview !== self else { return }
         let initialBounds = bounds.isEmpty ? NSRect(x: 0, y: 0, width: 800, height: 600) : bounds
@@ -96,11 +103,13 @@ final class WebHostContainerView: NSView {
 struct ServiceWebView: NSViewRepresentable {
     let containerView: WebHostContainerView
     let session: BrowserSession?
+    var isLocked = false
 
     func makeNSView(context: Context) -> WebHostContainerView {
         if let session {
             containerView.show(session.webView)
         }
+        containerView.setLocked(isLocked)
         return containerView
     }
 
@@ -108,5 +117,6 @@ struct ServiceWebView: NSViewRepresentable {
         if let session {
             containerView.show(session.webView)
         }
+        containerView.setLocked(isLocked)
     }
 }

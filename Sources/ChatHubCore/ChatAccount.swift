@@ -54,10 +54,20 @@ public struct ChatAccount: Identifiable, Codable, Equatable, Sendable {
     public var subtitle: String
     public var customURL: URL?
     public let createdAt: Date
+    public var notificationsMuted: Bool
+    /// Notifications resume by themselves once this moment has passed.
+    public var snoozedUntil: Date?
+    public var isPinned: Bool
+    /// Set once the service has been seen signed in, so a later sign-in page means the session expired.
+    public var hasSignedIn: Bool
+    /// Bundle identifier of the browser that opens this account's links; nil means the default browser.
+    public var linkBrowserID: String?
 
     public init(
         id: UUID = UUID(), service: ChatService, name: String,
-        subtitle: String = "", customURL: URL? = nil, createdAt: Date = .now
+        subtitle: String = "", customURL: URL? = nil, createdAt: Date = .now,
+        notificationsMuted: Bool = false, snoozedUntil: Date? = nil,
+        isPinned: Bool = false, hasSignedIn: Bool = false, linkBrowserID: String? = nil
     ) {
         self.id = id
         self.service = service
@@ -65,6 +75,32 @@ public struct ChatAccount: Identifiable, Codable, Equatable, Sendable {
         self.subtitle = subtitle
         self.customURL = customURL
         self.createdAt = createdAt
+        self.notificationsMuted = notificationsMuted
+        self.snoozedUntil = snoozedUntil
+        self.isPinned = isPinned
+        self.hasSignedIn = hasSignedIn
+        self.linkBrowserID = linkBrowserID
+    }
+
+    public func isSnoozed(at date: Date = .now) -> Bool {
+        guard let snoozedUntil else { return false }
+        return snoozedUntil > date
+    }
+
+    /// Workspaces saved before muting existed have no `notificationsMuted` key.
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(UUID.self, forKey: .id)
+        service = try container.decode(ChatService.self, forKey: .service)
+        name = try container.decode(String.self, forKey: .name)
+        subtitle = try container.decode(String.self, forKey: .subtitle)
+        customURL = try container.decodeIfPresent(URL.self, forKey: .customURL)
+        createdAt = try container.decode(Date.self, forKey: .createdAt)
+        notificationsMuted = try container.decodeIfPresent(Bool.self, forKey: .notificationsMuted) ?? false
+        snoozedUntil = try container.decodeIfPresent(Date.self, forKey: .snoozedUntil)
+        isPinned = try container.decodeIfPresent(Bool.self, forKey: .isPinned) ?? false
+        hasSignedIn = try container.decodeIfPresent(Bool.self, forKey: .hasSignedIn) ?? false
+        linkBrowserID = try container.decodeIfPresent(String.self, forKey: .linkBrowserID)
     }
 
     public var url: URL? { service == .custom ? customURL : service.homeURL }
@@ -77,6 +113,9 @@ public struct ChatAccount: Identifiable, Codable, Equatable, Sendable {
             throw AccountValidationError.invalidName
         }
         guard account.subtitle.count <= 120 else { throw AccountValidationError.invalidSubtitle }
+        if let browser = account.linkBrowserID, browser.isEmpty || browser.count > 200 {
+            account.linkBrowserID = nil
+        }
         if service == .custom {
             guard let customURL else { throw AccountValidationError.invalidURL }
             account.customURL = try SafeWebsiteURL.parse(customURL.absoluteString)

@@ -223,3 +223,84 @@ test('typography and text scaling are synchronized across all supported services
         assert.equal(p.attributes.get('data-chathub-text-scale'), 'small');
     }
 });
+
+// The bridge ships inside BrowserSession.swift; decode Swift's escaped backslashes in regex literals.
+const swiftSource = readFileSync(new URL('../Sources/ChatHub/Browser/BrowserSession.swift', import.meta.url), 'utf8');
+const bridgeSource = swiftSource.split('private static let notificationBridgeScript = """')[1].split('"""')[0].replaceAll('\\\\', '\\');
+
+// Runs the shipped notification bridge against a synthetic page. No provider content.
+function bridge({ host = 'web.whatsapp.com', title = 'WhatsApp', nodes = {} } = {}) {
+    const messages = [];
+    const timers = [];
+    const state = { title };
+    const observer = {};
+    const context = vm.createContext({
+        window: { webkit: { messageHandlers: { chatHubNotify: { postMessage: m => messages.push(JSON.parse(JSON.stringify(m))) } } } },
+        document: {
+            get title() { return state.title; },
+            documentElement: {},
+            querySelector: selector => nodes[selector]?.[0] ?? null,
+            getElementById: id => nodes['#' + id]?.[0] ?? null,
+            querySelectorAll: selector => nodes[selector] ?? [],
+        },
+        location: { hostname: host },
+        MutationObserver: class { constructor(callback) { observer.callback = callback; } observe() {} },
+        EventTarget, Event,
+        setTimeout: callback => { timers.push(callback); return timers.length; },
+    });
+    vm.runInContext(bridgeSource, context);
+    const flush = () => { while (timers.length) timers.shift()(); };
+    const mutate = () => { observer.callback([{ target: { nodeType: 1, closest: () => null } }]); flush(); };
+    flush();
+    return { messages, state, mutate, context };
+}
+
+test('a title count is reported once and never flips to zero on services without DOM selectors', () => {
+    const b = bridge({ title: '(3) WhatsApp' });
+    for (let i = 0; i < 4; i++) b.mutate();
+    assert.deepEqual(b.messages, [{ kind: 'badge', count: 3 }]);
+});
+
+test('clearing the title count reports zero and a new count reports again', () => {
+    const b = bridge({ title: '(3) WhatsApp' });
+    b.state.title = 'WhatsApp';
+    b.mutate();
+    b.state.title = '[7] WhatsApp';
+    b.mutate();
+    assert.deepEqual(b.messages.map(m => m.count), [3, 0, 7]);
+});
+
+test('Zalo falls back to its navigation badge when the title has no count', () => {
+    const b = bridge({ host: 'chat.zalo.me', title: 'Zalo', nodes: { '#main-tab .z-noti-badge, #sidebarNav .z-noti-badge': [{ textContent: '4' }] } });
+    assert.deepEqual(b.messages, [{ kind: 'badge', count: 4 }]);
+});
+
+test('page notifications are forwarded with bounded fields', () => {
+    const b = bridge();
+    vm.runInContext(`new window.Notification('Hi', { body: '${'x'.repeat(400)}' })`, b.context);
+    const notice = b.messages.find(m => m.kind === 'notify');
+    assert.equal(notice.title, 'Hi');
+    assert.equal(notice.body.length, 300);
+});
+
+const TELEGRAM_AUTH = '#auth-qr-form, #auth-phone-number-form, #auth-code-form, #auth-password-form, #auth-registration-form';
+const authMessages = b => b.messages.filter(m => m.kind === 'auth');
+
+test('Telegram reports its sign-in screen and then the signed-in shell, once each', () => {
+    const nodes = { [TELEGRAM_AUTH]: [{}] };
+    const b = bridge({ host: 'web.telegram.org', title: 'Telegram', nodes });
+    b.mutate();
+    assert.deepEqual(authMessages(b), [{ kind: 'auth', required: true }]);
+    delete nodes[TELEGRAM_AUTH];
+    nodes['#Main'] = [{}];
+    nodes['#LeftColumn'] = [{}];
+    b.mutate();
+    b.mutate();
+    assert.deepEqual(authMessages(b), [{ kind: 'auth', required: true }, { kind: 'auth', required: false }]);
+});
+
+test('auth state stays silent while Telegram loads and on other services', () => {
+    assert.deepEqual(authMessages(bridge({ host: 'web.telegram.org', title: 'Telegram' })), []);
+    const zalo = bridge({ host: 'chat.zalo.me', title: 'Zalo', nodes: { [TELEGRAM_AUTH]: [{}] } });
+    assert.deepEqual(authMessages(zalo), []);
+});
