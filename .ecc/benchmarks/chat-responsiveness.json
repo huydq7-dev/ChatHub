@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "baselineCommit": "5581fa2",
+  "platform": "macOS 27.0.1, Apple Silicon, Xcode 26.3",
+  "method": "Real AppKit/WebKit fixtures with synthetic HTML; work counters, not FPS or user latency",
+  "command": "swift test --enable-code-coverage --filter ResponsivenessTests",
+  "baseline": {
+    "repeatedHostFocusRequests": 100,
+    "backgroundViewportResizes": 100,
+    "forcedWindowLayouts": 100,
+    "messengerSyntheticEvents": 101,
+    "duplicateFocusCalls": 100,
+    "duplicateAppearanceCalls": 100
+  },
+  "workload": {
+    "hostUpdates": 100,
+    "hostResizes": 100,
+    "windowConfigurations": 100,
+    "messengerActivations": 1,
+    "messengerScrollableFixtureNodes": 100,
+    "duplicateFocusAndAppearanceUpdates": 100
+  }
+}
