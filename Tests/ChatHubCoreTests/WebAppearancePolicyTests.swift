@@ -27,6 +27,9 @@ struct WebAppearancePolicyTests {
     }
     @Test(arguments: [
         (ChatService.telegram, "https://web.telegram.org/a/#123"),
+        (ChatService.telegram, "https://web.telegram.org/a/"),
+        (ChatService.telegram, "https://web.telegram.org/"),
+        (ChatService.telegram, "https://web.telegram.org/k/"),
         (.messenger, "https://www.facebook.com/messages/"),
         (.messenger, "https://www.facebook.com/messages/e2ee/t/123"),
         (.messenger, "https://web.facebook.com/messages/"),
@@ -40,7 +43,7 @@ struct WebAppearancePolicyTests {
     }
 
     @Test(arguments: [
-        (ChatService.telegram, "https://web.telegram.org/k/"),
+        (ChatService.telegram, "https://web.telegram.org/unsupported/"),
         (.telegram, "https://web.telegram.org.evil.example/a/"),
         (.messenger, "https://www.facebook.com/login/"),
         (.messenger, "https://www.facebook.com/checkpoint/"),

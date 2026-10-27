@@ -6,7 +6,11 @@ function allowedLocation() {
     if (location.protocol !== "https:" || location.username || location.password) return false;
     const host = location.hostname, path = location.pathname;
     if (service === "zalo") return host === "chat.zalo.me" && (path === "/" || path === "");
-    if (service === "telegram") return host === "web.telegram.org" && ["/a", "/a/"].includes(path);
+    if (service === "telegram") {
+        const isTelegramHost = ["web.telegram.org", "weba.telegram.org", "webk.telegram.org", "webz.telegram.org"].includes(host);
+        if (!isTelegramHost) return false;
+        return path === "/" || path === "" || path.startsWith("/a") || path.startsWith("/k") || path.startsWith("/z");
+    }
     if (service === "messenger") {
         const isMessengerHost = ["messenger.com", "www.messenger.com"].includes(host);
         const isFacebookHost = ["facebook.com", "www.facebook.com", "web.facebook.com"].includes(host);
@@ -20,7 +24,24 @@ if (!allowedLocation()) return;
 
 function hasApplicationShell() {
     if (service === "zalo") return !!(document.getElementById("sidebarNav") || document.getElementById("main-tab") || document.querySelector(".conv-item") || document.querySelector(".chat-content"));
-    if (service === "telegram") return !!(document.getElementById("Main") || document.getElementById("LeftColumn") || document.querySelector(".messages-layout") || document.querySelector(".MessageList") || document.querySelector(".Chat"));
+    if (service === "telegram") {
+        return !!(
+            document.getElementById("Main") ||
+            document.getElementById("LeftColumn") ||
+            document.getElementById("MiddleColumn") ||
+            document.querySelector(".messages-layout") ||
+            document.querySelector(".MessageList") ||
+            document.querySelector(".Chat") ||
+            document.querySelector("#auth-qr-form, #auth-phone-number-form, #auth-code-form, #auth-password-form, .auth-pages") ||
+            document.getElementById("column-left") ||
+            document.getElementById("column-middle") ||
+            document.querySelector(".chatlist") ||
+            document.querySelector(".chat") ||
+            document.querySelector(".bubbles") ||
+            document.querySelector(".bubble") ||
+            (document.body && document.body.children.length > 0)
+        );
+    }
     if (service === "messenger") {
         return !!(
             document.querySelector('[role="main"]') ||
@@ -92,7 +113,7 @@ function update(next) {
     if (!apply() && settings.enabled && allowedLocation() && !observer && document.documentElement) {
         observer = new MutationObserver(() => { apply(); });
         observer.observe(document.documentElement, { childList: true, subtree: true });
-        timeout = setTimeout(stopObserving, 20000);
+        timeout = setTimeout(stopObserving, 300000);
     }
     return document.documentElement?.hasAttribute("data-chathub-theme") || false;
 }

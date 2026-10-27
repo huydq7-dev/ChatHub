@@ -382,7 +382,13 @@ html[data-chathub-privacy="true"] :is(
 }
 
 /* Telegram avatars: clip children to circle so blur never bleeds into a square box */
-html[data-chathub-privacy="true"] .Avatar :is(img, canvas, span, svg) {
+html[data-chathub-privacy="true"] :is(
+    .Avatar :is(img, canvas, span, svg),
+    .avatar :is(img, canvas, span, svg),
+    .avatar-photo,
+    .user-avatar :is(img, canvas, span, svg),
+    .peer-avatar :is(img, canvas, span, svg)
+) {
     border-radius: 50% !important;
     filter: blur(5px) !important;
     opacity: 0.8 !important;
@@ -408,8 +414,9 @@ html[data-chathub-privacy="true"] :is(
 
 /* Blur content across all services: targeted leaf nodes, never nested containers */
 html[data-chathub-privacy="true"] :is(
-    /* Telegram */
+    /* Telegram Web A */
     .Message .message-content,
+    .Message .text-content,
     .Message .media-inner,
     .Message .Album,
     .Message img:not([class*="emoji"]),
@@ -418,7 +425,25 @@ html[data-chathub-privacy="true"] :is(
     .Chat .last-message,
     .Chat .last-message-summary,
     .Chat .title,
+    .ListItem .title,
+    .ListItem .subtitle,
+    .ListItem .last-message,
     .MiddleHeader .title,
+    .Topic .topic-title,
+
+    /* Telegram Web K */
+    .bubble .bubble-content,
+    .bubble .message,
+    .bubble-call,
+    .bubble-media,
+    .bubble img:not([class*="emoji"]),
+    .bubble video,
+    .chatlist-chat .dialog-title,
+    .chatlist-chat .dialog-subtitle,
+    .chatlist-chat .chatlist-parts,
+    .chat-info .person,
+    .chat-info .chat-info-name,
+    .chat-info .chat-subtitle,
 
     /* Zalo */
     .chat-content .card,
@@ -520,14 +545,23 @@ html[data-chathub-privacy="true"] :is(
     ),
     .chat-bubble,
     .Avatar,
-    .Avatar :is(img, canvas, span, svg)
+    .Avatar :is(img, canvas, span, svg),
+    .avatar,
+    .avatar-photo,
+    .user-avatar,
+    .peer-avatar
 ):hover,
-html[data-chathub-privacy="true"] .Avatar:hover :is(img, canvas, span, svg),
-html[data-chathub-privacy="true"] :is(.Chat, .ListItem, .Message, .MiddleHeader):hover .Avatar :is(img, canvas, span, svg),
-html[data-chathub-privacy="true"] .Message:hover :is(.message-content, .media-inner, .Album, img, video, .Avatar),
-html[data-chathub-privacy="true"] .Chat:hover :is(.subtitle, .last-message, .last-message-summary, .title, .Avatar),
-html[data-chathub-privacy="true"] .ListItem:hover :is(.title, .subtitle, .last-message, .Avatar),
-html[data-chathub-privacy="true"] .MiddleHeader:hover :is(.title, .Avatar),
+html[data-chathub-privacy="true"] :is(.Avatar, .avatar, .avatar-photo, .user-avatar, .peer-avatar):hover :is(img, canvas, span, svg, .avatar-photo),
+html[data-chathub-privacy="true"] :is(.Chat, .ListItem, .Message, .MiddleHeader, .Topic):hover :is(.Avatar, .Avatar *),
+html[data-chathub-privacy="true"] :is(.chatlist-chat, .chat-info, .bubble):hover :is(.avatar, .avatar-photo, .user-avatar, .peer-avatar, img, canvas, span, svg),
+html[data-chathub-privacy="true"] .Message:hover :is(.message-content, .text-content, .media-inner, .Album, img, video, .Avatar, .Avatar *),
+html[data-chathub-privacy="true"] .Chat:hover :is(.subtitle, .last-message, .last-message-summary, .title, .Avatar, .Avatar *),
+html[data-chathub-privacy="true"] .ListItem:hover :is(.title, .subtitle, .last-message, .Avatar, .Avatar *),
+html[data-chathub-privacy="true"] .MiddleHeader:hover :is(.title, .Avatar, .Avatar *),
+html[data-chathub-privacy="true"] .Topic:hover :is(.topic-title, .Avatar, .Avatar *),
+html[data-chathub-privacy="true"] .bubble:hover :is(.bubble-content, .message, .bubble-call, .bubble-media, img, video, .avatar, .avatar-photo, .user-avatar, .peer-avatar),
+html[data-chathub-privacy="true"] .chatlist-chat:hover :is(.dialog-title, .dialog-subtitle, .chatlist-parts, .avatar, .avatar-photo, .user-avatar, .peer-avatar),
+html[data-chathub-privacy="true"] .chat-info:hover :is(.person, .chat-info-name, .chat-subtitle, .avatar, .avatar-photo),
 /* Zalo sidebar row hover */
 html[data-chathub-privacy="true"] :is(
     .conv-item,

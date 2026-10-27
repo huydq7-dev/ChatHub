@@ -171,7 +171,7 @@ test('cross-service registrations cannot theme other origins, authentication or 
     for (const options of [
         {service:'telegram',host:'web.telegram.org.evil.example'},
         {service:'telegram',host:'chat.zalo.me'},
-        {service:'telegram',path:'/k/'},
+        {service:'telegram',path:'/unsupported/'},
         {service:'messenger',host:'www.facebook.com.evil.example'},
         {service:'messenger',path:'/login/'},
         {service:'messenger',path:'/checkpoint/'},

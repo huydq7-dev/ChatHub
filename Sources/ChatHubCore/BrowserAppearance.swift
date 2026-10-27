@@ -62,7 +62,12 @@ public enum WebAppearancePolicy {
         case .zalo:
             return host == "chat.zalo.me" && (url.path == "/" || url.path.isEmpty)
         case .telegram:
-            return host == "web.telegram.org" && ["/a", "/a/"].contains(url.path)
+            let isTelegramHost =
+                host == "web.telegram.org" || host == "weba.telegram.org" || host == "webk.telegram.org"
+                || host == "webz.telegram.org"
+            guard isTelegramHost else { return false }
+            return url.path == "/" || url.path.isEmpty || url.path.hasPrefix("/a") || url.path.hasPrefix("/k")
+                || url.path.hasPrefix("/z")
         case .messenger:
             let isMessengerHost = ["messenger.com", "www.messenger.com"].contains(host)
             let isFacebookHost = ["facebook.com", "www.facebook.com", "web.facebook.com"].contains(host)
