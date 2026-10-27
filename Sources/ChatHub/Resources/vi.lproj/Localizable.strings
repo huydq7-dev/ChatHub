@@ -208,7 +208,7 @@
 "Privacy Shield (Blur messages)" = "Màn chắn Riêng tư (Làm mờ tin nhắn)";
 "Keep window always on top" = "Luôn ghim cửa sổ trên cùng";
 "Workspace & Privacy" = "Không gian & Riêng tư";
-"Privacy Shield blurs messages and media in open chats; hover with your mouse to peek. Always on Top keeps ChatHub visible above other windows." = "Màn chắn Riêng tư làm mờ tin nhắn và hình ảnh trong khung chat; rê chuột qua để xem nhanh. Ghim trên cùng giữ ChatHub luôn hiển thị trên các ứng dụng khác.";
+"Privacy Shield blurs chat content in Telegram, Messenger and Zalo, including when appearance matching is off. Hover to peek while ChatHub is active. Always on Top keeps ChatHub above other windows." = "Màn chắn Riêng tư làm mờ nội dung chat trong Telegram, Messenger và Zalo, kể cả khi tắt đồng bộ giao diện. Rê chuột để xem nhanh khi ChatHub đang hoạt động. Ghim trên cùng giữ ChatHub phía trên các cửa sổ khác.";
 "%d unread messages" = "%d tin nhắn chưa đọc";
 "All caught up" = "Không có tin mới";
 "Open ChatHub" = "Mở ChatHub";

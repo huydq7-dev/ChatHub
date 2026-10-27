@@ -759,7 +759,8 @@ final class BrowserSession: NSObject {
         if let source = appearanceBootstrap {
             controller.addUserScript(
                 WKUserScript(
-                    source: source, injectionTime: .atDocumentEnd, forMainFrameOnly: true, in: .defaultClient
+                    source: "globalThis.__chatHubPrivacyFocused = \(hubIsFocused ? "true" : "false");\n" + source,
+                    injectionTime: .atDocumentEnd, forMainFrameOnly: true, in: .defaultClient
                 ))
         }
     }
@@ -786,6 +787,11 @@ final class BrowserSession: NSObject {
     private func syncHubFocus() {
         webView.evaluateJavaScript(
             "window.__chatHubSetFocused?.(\(hubIsFocused ? "true" : "false"));",
+            completionHandler: nil
+        )
+        webView.callAsyncJavaScript(
+            "globalThis.__chatHubNativeAppearance?.setFocused(active); return true;",
+            arguments: ["active": hubIsFocused], in: nil, in: .defaultClient,
             completionHandler: nil
         )
     }

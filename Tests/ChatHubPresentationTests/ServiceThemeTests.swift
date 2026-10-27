@@ -87,7 +87,7 @@ struct ServiceThemeTests {
             body: source + """
                 return {
                     privacy: document.documentElement.getAttribute('data-chathub-privacy') || '',
-                    filter: getComputedStyle(document.getElementById('outgoing')).filter || ''
+                    filter: privacyFilter(document.getElementById('outgoing'))
                 };
                 """
         )
@@ -100,7 +100,7 @@ struct ServiceThemeTests {
                 globalThis.__chatHubNativeAppearance.update({privacyShield: false});
                 return {
                     privacy: document.documentElement.getAttribute('data-chathub-privacy') || '',
-                    filter: getComputedStyle(document.getElementById('outgoing')).filter || ''
+                    filter: privacyFilter(document.getElementById('outgoing'))
                 };
                 """
         )
@@ -115,6 +115,7 @@ struct ServiceThemeTests {
         let navigation = ThemeNavigation()
         view.navigationDelegate = navigation
         let html = """
+            <style>.zl-avatar, .avatar {border-radius:50%;overflow:hidden}</style>
             <div id="sidebarNav">
                 <div id="main-tab"></div>
                 <div class="conv-item"><div class="avatar"><img id="sidebarAvatarImg" src="data:image/png;base64,iVBORw0KGgo="></div></div>
@@ -146,19 +147,19 @@ struct ServiceThemeTests {
             body: source + """
                 return {
                     privacy: document.documentElement.getAttribute('data-chathub-privacy') || '',
-                    msgAvatarFilter: getComputedStyle(document.getElementById('msgAvatarImg')).filter || '',
-                    msgAvatarClip: getComputedStyle(document.getElementById('msgAvatarImg')).clipPath || '',
-                    senderNameFilter: getComputedStyle(document.getElementById('senderName')).filter || '',
-                    headerAvatarFilter: getComputedStyle(document.getElementById('headerAvatarImg')).filter || '',
-                    headerTitleFilter: getComputedStyle(document.getElementById('headerTitle')).filter || '',
-                    sidebarAvatarFilter: getComputedStyle(document.getElementById('sidebarAvatarImg')).filter || '',
-                    outgoingFilter: getComputedStyle(document.getElementById('outgoing')).filter || ''
+                    msgAvatarFilter: privacyFilter(document.getElementById('msgAvatarImg')),
+                    msgAvatarRadius: getComputedStyle(document.getElementById('msgAvatar')).borderRadius || '',
+                    senderNameFilter: privacyFilter(document.getElementById('senderName')),
+                    headerAvatarFilter: privacyFilter(document.getElementById('headerAvatarImg')),
+                    headerTitleFilter: privacyFilter(document.getElementById('headerTitle')),
+                    sidebarAvatarFilter: privacyFilter(document.getElementById('sidebarAvatarImg')),
+                    outgoingFilter: privacyFilter(document.getElementById('outgoing'))
                 };
                 """
         )
         #expect(privacy["privacy"] == "true")
         #expect(privacy["msgAvatarFilter"]?.contains("blur") == true)
-        #expect(privacy["msgAvatarClip"]?.contains("circle") == true)
+        #expect(privacy["msgAvatarRadius"] == "50%")
         #expect(privacy["senderNameFilter"]?.contains("blur") == true)
         #expect(privacy["headerAvatarFilter"]?.contains("blur") == true)
         #expect(privacy["headerTitleFilter"]?.contains("blur") == true)
@@ -171,10 +172,10 @@ struct ServiceThemeTests {
                 globalThis.__chatHubNativeAppearance.update({privacyShield: false});
                 return {
                     privacy: document.documentElement.getAttribute('data-chathub-privacy') || '',
-                    msgAvatarFilter: getComputedStyle(document.getElementById('msgAvatarImg')).filter || '',
-                    senderNameFilter: getComputedStyle(document.getElementById('senderName')).filter || '',
-                    headerAvatarFilter: getComputedStyle(document.getElementById('headerAvatarImg')).filter || '',
-                    outgoingFilter: getComputedStyle(document.getElementById('outgoing')).filter || ''
+                    msgAvatarFilter: privacyFilter(document.getElementById('msgAvatarImg')),
+                    senderNameFilter: privacyFilter(document.getElementById('senderName')),
+                    headerAvatarFilter: privacyFilter(document.getElementById('headerAvatarImg')),
+                    outgoingFilter: privacyFilter(document.getElementById('outgoing'))
                 };
                 """
         )
@@ -221,11 +222,11 @@ struct ServiceThemeTests {
             body: source + """
                 return {
                     privacy: document.documentElement.getAttribute('data-chathub-privacy') || '',
-                    nameFilter: getComputedStyle(document.getElementById('chatName')).filter || '',
-                    msgFilter: getComputedStyle(document.getElementById('chatMsg')).filter || '',
-                    titleFilter: getComputedStyle(document.getElementById('chatTitle')).filter || '',
-                    subFilter: getComputedStyle(document.getElementById('chatSub')).filter || '',
-                    avatarFilter: getComputedStyle(document.getElementById('avatarImg')).filter || ''
+                    nameFilter: privacyFilter(document.getElementById('chatName')),
+                    msgFilter: privacyFilter(document.getElementById('chatMsg')),
+                    titleFilter: privacyFilter(document.getElementById('chatTitle')),
+                    subFilter: privacyFilter(document.getElementById('chatSub')),
+                    avatarFilter: privacyFilter(document.getElementById('avatarImg'))
                 };
                 """
         )
@@ -241,11 +242,11 @@ struct ServiceThemeTests {
             body: """
                 document.getElementById('chatRow').setAttribute('data-chathub-peek', 'true');
                 return {
-                    nameFilter: getComputedStyle(document.getElementById('chatName')).filter || '',
-                    msgFilter: getComputedStyle(document.getElementById('chatMsg')).filter || '',
-                    titleFilter: getComputedStyle(document.getElementById('chatTitle')).filter || '',
-                    subFilter: getComputedStyle(document.getElementById('chatSub')).filter || '',
-                    avatarFilter: getComputedStyle(document.getElementById('avatarImg')).filter || ''
+                    nameFilter: privacyFilter(document.getElementById('chatName')),
+                    msgFilter: privacyFilter(document.getElementById('chatMsg')),
+                    titleFilter: privacyFilter(document.getElementById('chatTitle')),
+                    subFilter: privacyFilter(document.getElementById('chatSub')),
+                    avatarFilter: privacyFilter(document.getElementById('avatarImg'))
                 };
                 """
         )
@@ -307,7 +308,7 @@ struct ServiceThemeTests {
         default:
             content = """
                 <div role="navigation"></div><div role="grid"></div><div role="main">
-                <div id="outgoing" style="background:var(--chat-outgoing-message-bubble-background-color)">Sample</div>
+                <div id="outgoing" dir="auto" style="background:var(--chat-outgoing-message-bubble-background-color)">Sample</div>
                 <div id="editor" contenteditable="true" role="textbox">Draft</div></div>
                 """
         }
@@ -316,7 +317,18 @@ struct ServiceThemeTests {
 
     private func evaluate(_ view: WKWebView, body: String) async throws -> [String: String] {
         try await withCheckedThrowingContinuation { continuation in
-            view.callAsyncJavaScript(body, arguments: [:], in: nil, in: .defaultClient) { result in
+            let filterProbe = """
+                // Blur applies to the rendered subtree, even when a leaf has filter:none.
+                function privacyFilter(node) {
+                    while (node) {
+                        const filter = getComputedStyle(node).filter;
+                        if (filter.includes('blur')) return filter;
+                        node = node.parentElement;
+                    }
+                    return 'none';
+                }
+                """
+            view.callAsyncJavaScript(filterProbe + body, arguments: [:], in: nil, in: .defaultClient) { result in
                 switch result {
                 case .success(let value): continuation.resume(returning: value as? [String: String] ?? [:])
                 case .failure(let error): continuation.resume(throwing: error)

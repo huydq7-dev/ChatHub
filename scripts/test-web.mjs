@@ -66,6 +66,21 @@ test('disabling restores provider appearance; enabling can reapply', () => {
     assert.equal(p.attributes.get('data-chathub-reduce-motion'), 'true');
 });
 
+for (const service of ['telegram', 'zalo', 'messenger']) {
+    test(`${service}: privacy survives theme disable and restores independently`, () => {
+        const p = page({ service });
+        p.update({ enabled: false, privacyShield: true });
+        assert.equal(p.attributes.get('data-chathub-privacy'), 'true');
+        assert.equal(p.attributes.get('data-chathub-privacy-service'), service);
+        assert.equal(p.attributes.has('data-chathub-theme'), false);
+        assert.equal(p.attributes.has('data-chathub-service'), false);
+        assert.ok(p.elements.has('chathub-native-appearance-v1'));
+        p.update({ enabled: false, privacyShield: false });
+        assert.equal(p.attributes.size, 0);
+        assert.equal(p.elements.has('chathub-native-appearance-v1'), false);
+    });
+}
+
 test('waits for app hydration then disconnects the observer', () => {
     const p = page({ hydrated: false });
     assert.equal(p.attributes.size, 0);

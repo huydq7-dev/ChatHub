@@ -147,7 +147,7 @@ struct SettingsView: View {
             } footer: {
                 Text(
                     tr(
-                        "Privacy Shield blurs messages and media in open chats; hover with your mouse to peek. Always on Top keeps ChatHub visible above other windows."
+                        "Privacy Shield blurs chat content in Telegram, Messenger and Zalo, including when appearance matching is off. Hover to peek while ChatHub is active. Always on Top keeps ChatHub above other windows."
                     ))
             }
             Section {

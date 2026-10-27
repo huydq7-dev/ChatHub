@@ -132,6 +132,19 @@ service tools**) restores contacts, provider settings and the full chat toolbar
 without a reload. The same preference is in Settings. Turning off appearance
 matching restores the original provider interface.
 
+### Privacy Shield
+
+Use **⌘⇧P** or the eye icon to blur chat content in Telegram (Web A/K),
+Messenger and Zalo. Names, previews, message surfaces and media use one blur layer;
+controls and the composer stay usable. Hover reveals one row or message, and
+leaving it, scrolling, switching accounts or deactivating the workspace covers it
+again. It also works with **Match macOS Appearance** turned off.
+
+This is a visual shoulder-surfing aid. It does not remove content from the
+provider page or its accessibility tree. WhatsApp, Discord and custom services do
+not currently have privacy adapters. Provider markup changes may need adapter
+updates. See [privacy verification](docs/PRIVACY_SHIELD.md).
+
 ### Update notifications (0.3.0+)
 
 ChatHub automatically checks GitHub Releases every six hours while running and
