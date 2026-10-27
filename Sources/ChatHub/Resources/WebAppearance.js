@@ -118,11 +118,11 @@ function update(next) {
     return document.documentElement?.hasAttribute("data-chathub-theme") || false;
 }
 
-// Privacy hover-peek: Messenger renders sidebar rows with obfuscated, frequently
-// changing markup, so pure CSS :hover selectors miss them. Mark the hovered row with
-// an owned attribute (layout geometry only, no content reads) and let CSS unblur it.
+// Privacy hover-peek: Messenger and Telegram render sidebar rows with dynamic or
+// complex markup, so pure CSS :hover selectors can miss child nodes. Mark the hovered
+// row with an owned attribute (layout geometry only, no content reads) and let CSS unblur it.
 const peekAttribute = "data-chathub-peek";
-const rowSelector = '[role="row"], [role="listitem"], [role="gridcell"], [role="link"], a[href]';
+const rowSelector = '[role="row"], [role="listitem"], [role="gridcell"], [role="link"], a[href], .Chat, .ListItem, .chatlist-chat, [data-peer-id]';
 let peeked;
 function clearPeek() {
     peeked?.removeAttribute(peekAttribute);
@@ -133,7 +133,7 @@ function findPeekRow(target) {
     if (!node) return undefined;
     // Inside the conversation pane only the header strip (avatar + name) is peeked;
     // message bubbles keep their own CSS hover rules.
-    const main = node.closest('[role="main"]');
+    const main = node.closest('[role="main"], #MiddleColumn, #column-center, .middle-column, .messages-layout');
     if (main) {
         const mainTop = main.getBoundingClientRect().top;
         if (node.getBoundingClientRect().top - mainTop > 80) return undefined;
@@ -168,7 +168,7 @@ function onPointerOver(event) {
         peeked = row;
     }
 }
-if (service === "messenger" && !globalThis.__chatHubPeekInstalled && typeof document.addEventListener === "function") {
+if ((service === "messenger" || service === "telegram") && !globalThis.__chatHubPeekInstalled && typeof document.addEventListener === "function") {
     globalThis.__chatHubPeekInstalled = true;
     document.addEventListener("pointerover", onPointerOver, { passive: true, capture: true });
     document.addEventListener("pointerleave", clearPeek, { passive: true });

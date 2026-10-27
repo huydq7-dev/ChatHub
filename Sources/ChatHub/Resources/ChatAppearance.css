@@ -477,7 +477,6 @@ html[data-chathub-privacy="true"] :is(
     .chat-content img:not([class*="emoji"]):not([class*="reaction"]):not([class*="sticker"]),
     .chat-content video,
     .chat-content .file-item,
-    :is(#header, .thread-chat-header, .chat-header, .header-info, [class*="header"]) :is(.header-title, .header-subtitle, .chat-header-title),
     :is(.conv-item, .msg-item, [class*="conv-item"], [class*="msg-item"]) :is(.conv-item-title__name, .conv-message, .conv-item-body__main, .truncate, .conv-dbname, .conv-time),
 
     /* Messenger */
@@ -528,7 +527,7 @@ html[data-chathub-privacy="true"] :is(
 }
 
 /* Zalo header blur (separated from generic :is to prevent inflating blur specificity to ID level) */
-html[data-chathub-privacy="true"] :is(#header, .thread-chat-header, .chat-header) :is(.header-title, .header-subtitle, .chat-header-title) {
+html[data-chathub-privacy="true"] :is(#header, .thread-chat-header, .chat-header, .header-info, [class*="header"]) :is(.header-title, .header-subtitle, .chat-header-title) {
     filter: blur(6px) !important;
     opacity: 0.75 !important;
     user-select: none !important;
@@ -582,10 +581,8 @@ html[data-chathub-privacy="true"] :is(
     [class*="avatar"],
     .card-avatar,
     .chat-item-avatar,
-    :is(#header, .thread-chat-header, .chat-header, .header-info, [class*="header"]) :is(img, svg, canvas, .header-title, .header-subtitle, .chat-header-title, .avatar, .zl-avatar, [class*="avatar"]),
     :is(.conv-item, .msg-item, [class*="conv-item"], [class*="msg-item"]) :is(.conv-item-title__name, .conv-message, .conv-item-body__main, .truncate, .conv-dbname, .conv-time),
     :is(.conv-item, .msg-item, [class*="conv-item"], [class*="msg-item"]) :is(img, svg, canvas, [class*="avatar"], .avatar, .zl-avatar),
-    #sidebarNav :is(img, svg, canvas, [class*="avatar"]),
     [role="main"] div[dir="auto"],
     [role="main"] div[style*="--chat-"],
     [role="main"] img,
@@ -800,3 +797,14 @@ html[data-chathub-privacy="true"] [role="main"] [role="row"]:hover :is(div[dir="
     -webkit-user-select: text !important;
     transition: none !important;
 }
+
+/* JS-marked hovered sidebar row across all services (WebAppearance.js sets data-chathub-peek) */
+html[data-chathub-privacy="true"] [data-chathub-peek="true"]:not(#chathub-peek-boost),
+html[data-chathub-privacy="true"] [data-chathub-peek="true"]:not(#chathub-peek-boost) * {
+    filter: none !important;
+    opacity: 1 !important;
+    user-select: text !important;
+    -webkit-user-select: text !important;
+    transition: none !important;
+}
+

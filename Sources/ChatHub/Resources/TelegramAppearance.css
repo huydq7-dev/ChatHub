@@ -753,7 +753,47 @@ html[data-chathub-service="telegram"][data-chathub-privacy="true"] .MiddleHeader
 html[data-chathub-service="telegram"][data-chathub-privacy="true"] .Topic:hover:not(#chathub-peek-boost) :is(.topic-title, .Avatar, .Avatar *),
 html[data-chathub-service="telegram"][data-chathub-privacy="true"] .bubble:hover:not(#chathub-peek-boost) :is(.bubble-content, .bubble-call, .bubble-media, img, video, .avatar, .avatar-photo, .user-avatar, .peer-avatar, .avatar *),
 html[data-chathub-service="telegram"][data-chathub-privacy="true"] .chatlist-chat:hover:not(#chathub-peek-boost) :is(.dialog-title, .dialog-subtitle, .chatlist-parts, .avatar, .avatar-photo, .user-avatar, .peer-avatar, .avatar *),
-html[data-chathub-service="telegram"][data-chathub-privacy="true"] .chat-info:hover:not(#chathub-peek-boost) :is(.person, .chat-info-name, .chat-subtitle, .avatar, .avatar-photo, .avatar *) {
+html[data-chathub-service="telegram"][data-chathub-privacy="true"] .chat-info:hover:not(#chathub-peek-boost) :is(.person, .chat-info-name, .chat-subtitle, .avatar, .avatar-photo, .avatar *),
+/* Telegram sidebar row hover & child hover via :has: reveal whole row (name, preview, avatar) */
+html[data-chathub-service="telegram"][data-chathub-privacy="true"] :is(
+    .Chat,
+    .ListItem,
+    .chatlist-chat,
+    .chat-item-clickable,
+    .chat-item,
+    .ListItem-button,
+    [data-peer-id],
+    [data-chat-id],
+    :is(#LeftColumn, #column-left, .chat-list, .chatlist, .ChatFolders) :is([role="listitem"], [role="button"], a, [class*="chat"], [class*="item"])
+):is(:hover, :has(*:hover)):not(#chathub-peek-boost) :is(
+    .title,
+    .subtitle,
+    .last-message,
+    .last-message-summary,
+    .dialog-title,
+    .dialog-subtitle,
+    .chatlist-parts,
+    .peer-title,
+    .user-status,
+    .FullNameTitle,
+    .LastMessageMeta,
+    .time,
+    .Avatar,
+    .avatar,
+    .avatar-photo,
+    .user-avatar,
+    .peer-avatar,
+    h3,
+    h4,
+    p,
+    span,
+    img,
+    svg,
+    canvas,
+    *
+),
+html[data-chathub-service="telegram"][data-chathub-privacy="true"] [data-chathub-peek="true"]:not(#chathub-peek-boost),
+html[data-chathub-service="telegram"][data-chathub-privacy="true"] [data-chathub-peek="true"]:not(#chathub-peek-boost) * {
     filter: none !important;
     opacity: 1 !important;
     user-select: text !important;

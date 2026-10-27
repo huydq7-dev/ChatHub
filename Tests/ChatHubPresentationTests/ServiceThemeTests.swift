@@ -185,6 +185,77 @@ struct ServiceThemeTests {
         #expect(disabled["outgoingFilter"] == "none")
     }
 
+    @Test func telegramPrivacyShieldBlursAndRevealsSidebarRow() async throws {
+        let configuration = WKWebViewConfiguration()
+        configuration.websiteDataStore = .nonPersistent()
+        let view = WKWebView(frame: CGRect(x: 0, y: 0, width: 1100, height: 800), configuration: configuration)
+        let navigation = ThemeNavigation()
+        view.navigationDelegate = navigation
+        let html = """
+            <div id="Main">
+                <div id="LeftColumn">
+                    <div class="chat-list">
+                        <div id="chatRow" class="ListItem Chat chat-item-clickable">
+                            <a id="chatBtn" class="ListItem-button" role="button">
+                                <div class="Avatar" id="avatarWrap"><img id="avatarImg" src="data:image/png;base64,iVBORw0KGgo="></div>
+                                <div class="info">
+                                    <div class="title" id="chatTitle"><h3 id="chatH3"><span id="chatName">Friend Name</span></h3></div>
+                                    <div class="subtitle" id="chatSub"><p class="last-message"><span id="chatMsg">Recent message snippet</span></p></div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="Message own"><div id="outgoing" class="message-content">Sample</div></div>
+            </div>
+            """
+        try await navigation.load(view, html: html, baseURL: ChatService.telegram.homeURL)
+        let source = try #require(
+            ServiceTheme.bootstrap(
+                service: .telegram,
+                appearance: BrowserAppearance(privacyShield: true)
+            )
+        )
+        let privacy = try await evaluate(
+            view,
+            body: source + """
+                return {
+                    privacy: document.documentElement.getAttribute('data-chathub-privacy') || '',
+                    nameFilter: getComputedStyle(document.getElementById('chatName')).filter || '',
+                    msgFilter: getComputedStyle(document.getElementById('chatMsg')).filter || '',
+                    titleFilter: getComputedStyle(document.getElementById('chatTitle')).filter || '',
+                    subFilter: getComputedStyle(document.getElementById('chatSub')).filter || '',
+                    avatarFilter: getComputedStyle(document.getElementById('avatarImg')).filter || ''
+                };
+                """
+        )
+        #expect(privacy["privacy"] == "true")
+        #expect(privacy["nameFilter"]?.contains("blur") == true)
+        #expect(privacy["msgFilter"]?.contains("blur") == true)
+        #expect(privacy["titleFilter"]?.contains("blur") == true)
+        #expect(privacy["subFilter"]?.contains("blur") == true)
+        #expect(privacy["avatarFilter"]?.contains("blur") == true)
+
+        let peeked = try await evaluate(
+            view,
+            body: """
+                document.getElementById('chatRow').setAttribute('data-chathub-peek', 'true');
+                return {
+                    nameFilter: getComputedStyle(document.getElementById('chatName')).filter || '',
+                    msgFilter: getComputedStyle(document.getElementById('chatMsg')).filter || '',
+                    titleFilter: getComputedStyle(document.getElementById('chatTitle')).filter || '',
+                    subFilter: getComputedStyle(document.getElementById('chatSub')).filter || '',
+                    avatarFilter: getComputedStyle(document.getElementById('avatarImg')).filter || ''
+                };
+                """
+        )
+        #expect(peeked["nameFilter"] == "none")
+        #expect(peeked["msgFilter"] == "none")
+        #expect(peeked["titleFilter"] == "none")
+        #expect(peeked["subFilter"] == "none")
+        #expect(peeked["avatarFilter"] == "none")
+    }
+
     @Test func workspaceWindowStyleTogglesFloatingLevel() {
         let window = NSWindow(
             contentRect: NSRect(x: 0, y: 0, width: 800, height: 600),
