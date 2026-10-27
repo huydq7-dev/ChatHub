@@ -55,11 +55,13 @@ public struct ChatAccount: Identifiable, Codable, Equatable, Sendable {
     public var customURL: URL?
     public let createdAt: Date
     public var notificationsMuted: Bool
+    /// Notifications resume by themselves once this moment has passed.
+    public var snoozedUntil: Date?
 
     public init(
         id: UUID = UUID(), service: ChatService, name: String,
         subtitle: String = "", customURL: URL? = nil, createdAt: Date = .now,
-        notificationsMuted: Bool = false
+        notificationsMuted: Bool = false, snoozedUntil: Date? = nil
     ) {
         self.id = id
         self.service = service
@@ -68,6 +70,12 @@ public struct ChatAccount: Identifiable, Codable, Equatable, Sendable {
         self.customURL = customURL
         self.createdAt = createdAt
         self.notificationsMuted = notificationsMuted
+        self.snoozedUntil = snoozedUntil
+    }
+
+    public func isSnoozed(at date: Date = .now) -> Bool {
+        guard let snoozedUntil else { return false }
+        return snoozedUntil > date
     }
 
     /// Workspaces saved before muting existed have no `notificationsMuted` key.
@@ -80,6 +88,7 @@ public struct ChatAccount: Identifiable, Codable, Equatable, Sendable {
         customURL = try container.decodeIfPresent(URL.self, forKey: .customURL)
         createdAt = try container.decode(Date.self, forKey: .createdAt)
         notificationsMuted = try container.decodeIfPresent(Bool.self, forKey: .notificationsMuted) ?? false
+        snoozedUntil = try container.decodeIfPresent(Date.self, forKey: .snoozedUntil)
     }
 
     public var url: URL? { service == .custom ? customURL : service.homeURL }

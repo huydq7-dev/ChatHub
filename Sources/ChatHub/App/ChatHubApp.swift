@@ -7,6 +7,7 @@ struct ChatHubApp: App {
     @State private var store = WorkspaceStore()
     @State private var browsers = BrowserPool()
     @State private var layout = WorkspaceLayout()
+    @State private var lock = AppLock()
     @AppStorage("appearance") private var appearance = "system"
     @AppStorage(ChatAppearancePreferences.showMenuBarKey) private var showMenuBar = true
 
@@ -18,6 +19,7 @@ struct ChatHubApp: App {
                 .environment(store)
                 .environment(browsers)
                 .environment(layout)
+                .environment(lock)
                 .preferredColorScheme(appearance == "system" ? nil : appearance == "dark" ? .dark : .light)
                 .frame(minWidth: 860, minHeight: 600)
         }
@@ -38,6 +40,10 @@ struct ChatHubApp: App {
                     if !store.selectNextUnread(unread: browsers.unreadCounts) { NSSound.beep() }
                 }
                 .keyboardShortcut("j", modifiers: .command)
+                Button(tr("Lock ChatHub")) {
+                    if !lock.lock() { NSSound.beep() }
+                }
+                .keyboardShortcut("l", modifiers: [.command, .control])
                 Divider()
                 Button(tr("Overview")) { store.select(nil) }
                     .keyboardShortcut("0", modifiers: .command)
@@ -67,6 +73,7 @@ struct ChatHubApp: App {
             MenuBarContent()
                 .environment(store)
                 .environment(browsers)
+                .environment(lock)
         } label: {
             MenuBarLabel()
                 .environment(store)

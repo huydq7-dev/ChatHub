@@ -4,6 +4,12 @@ import WebKit
 final class WebHostContainerView: NSView {
     private weak var activeWebView: WKWebView?
 
+    /// A locked workspace hides the page and drops keyboard focus so nothing can be typed into it.
+    func setLocked(_ locked: Bool) {
+        isHidden = locked
+        if locked { window?.makeFirstResponder(nil) }
+    }
+
     func show(_ webView: WKWebView) {
         if webView.superview !== self {
             webView.frame = bounds
@@ -62,14 +68,17 @@ final class WebHostContainerView: NSView {
 
 struct ServiceWebView: NSViewRepresentable {
     let session: BrowserSession
+    var isLocked = false
 
     func makeNSView(context: Context) -> WebHostContainerView {
         let container = WebHostContainerView()
         container.show(session.webView)
+        container.setLocked(isLocked)
         return container
     }
 
     func updateNSView(_ nsView: WebHostContainerView, context: Context) {
         nsView.show(session.webView)
+        nsView.setLocked(isLocked)
     }
 }

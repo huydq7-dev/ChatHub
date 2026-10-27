@@ -5,9 +5,11 @@ public enum NotificationPolicy {
     /// Wait this long after an unread increase for the service's own notification before synthesizing one.
     public static let fallbackDelay: TimeInterval = 2
 
-    /// Muted accounts and the conversation the user is looking at never interrupt.
-    public static func shouldAlert(isMuted: Bool, isViewing: Bool) -> Bool {
-        !isMuted && !isViewing
+    /// Muted or snoozed accounts, quiet hours and the conversation the user is looking at never interrupt.
+    public static func shouldAlert(
+        isMuted: Bool, isViewing: Bool, isSnoozed: Bool = false, isQuietHours: Bool = false
+    ) -> Bool {
+        !isMuted && !isViewing && !isSnoozed && !isQuietHours
     }
 
     /// The service usually sends its own notification; only fill in when none arrived after the increase.
