@@ -19,8 +19,8 @@ function allowedLocation() {
 if (!allowedLocation()) return;
 
 function hasApplicationShell() {
-    if (service === "zalo") return !!(document.getElementById("sidebarNav") || document.getElementById("main-tab"));
-    if (service === "telegram") return !!(document.getElementById("Main") || document.getElementById("LeftColumn"));
+    if (service === "zalo") return !!(document.getElementById("sidebarNav") || document.getElementById("main-tab") || document.querySelector(".conv-item") || document.querySelector(".chat-content"));
+    if (service === "telegram") return !!(document.getElementById("Main") || document.getElementById("LeftColumn") || document.querySelector(".messages-layout") || document.querySelector(".MessageList") || document.querySelector(".Chat"));
     if (service === "messenger") {
         return !!(
             document.querySelector('[role="main"]') ||
@@ -44,7 +44,8 @@ const ownedAttributes = [
     "data-chathub-focus",
     "data-chathub-accent",
     "data-chathub-density",
-    "data-chathub-text-scale"
+    "data-chathub-text-scale",
+    "data-chathub-privacy"
 ];
 let settings = initialSettings;
 let observer;
@@ -58,6 +59,7 @@ function stopObserving() {
 function restore(stop = true) {
     for (const name of ownedAttributes) document.documentElement?.removeAttribute(name);
     document.getElementById(styleID)?.remove();
+    clearPeek();
     if (stop) stopObserving();
 }
 function apply() {
@@ -71,6 +73,8 @@ function apply() {
         style.id = styleID;
         style.textContent = css;
         (document.head || root).appendChild(style);
+    } else if (style.textContent !== css) {
+        style.textContent = css;
     }
     root.setAttribute("data-chathub-service", service);
     root.setAttribute("data-chathub-theme", settings.dark ? "dark" : "light");
@@ -79,17 +83,75 @@ function apply() {
     root.setAttribute("data-chathub-accent", settings.accent || "iris");
     root.setAttribute("data-chathub-density", settings.density || "standard");
     root.setAttribute("data-chathub-text-scale", settings.textScale || "standard");
+    root.setAttribute("data-chathub-privacy", String(Boolean(settings.privacyShield)));
     stopObserving();
     return true;
 }
 function update(next) {
-    settings = next;
+    settings = Object.assign({}, settings, next);
     if (!apply() && settings.enabled && allowedLocation() && !observer && document.documentElement) {
         observer = new MutationObserver(() => { apply(); });
         observer.observe(document.documentElement, { childList: true, subtree: true });
         timeout = setTimeout(stopObserving, 20000);
     }
     return document.documentElement?.hasAttribute("data-chathub-theme") || false;
+}
+
+// Privacy hover-peek: Messenger renders sidebar rows with obfuscated, frequently
+// changing markup, so pure CSS :hover selectors miss them. Mark the hovered row with
+// an owned attribute (layout geometry only, no content reads) and let CSS unblur it.
+const peekAttribute = "data-chathub-peek";
+const rowSelector = '[role="row"], [role="listitem"], [role="gridcell"], [role="link"], a[href]';
+let peeked;
+function clearPeek() {
+    peeked?.removeAttribute(peekAttribute);
+    peeked = undefined;
+}
+function findPeekRow(target) {
+    let node = target instanceof Element ? target : target?.parentElement;
+    if (!node) return undefined;
+    // Inside the conversation pane only the header strip (avatar + name) is peeked;
+    // message bubbles keep their own CSS hover rules.
+    const main = node.closest('[role="main"]');
+    if (main) {
+        const mainTop = main.getBoundingClientRect().top;
+        if (node.getBoundingClientRect().top - mainTop > 80) return undefined;
+        let header;
+        for (let depth = 0; node && node !== main && depth < 16; depth += 1, node = node.parentElement) {
+            const rect = node.getBoundingClientRect();
+            if (rect.height > 120) break;
+            if (rect.width >= 120 && rect.height >= 32) header = node;
+        }
+        return header;
+    }
+    let fallback;
+    for (let depth = 0; node && node !== document.body && depth < 14; depth += 1, node = node.parentElement) {
+        const rect = node.getBoundingClientRect();
+        const rowSized = rect.height >= 36 && rect.height <= 120 && rect.width >= 120;
+        if (rowSized && node.matches(rowSelector)) return node;
+        if (rowSized && !fallback && node.querySelector('img, svg, [role="img"]')) fallback = node;
+        if (rect.height > 120) break;
+    }
+    return fallback;
+}
+function onPointerOver(event) {
+    if (document.documentElement?.getAttribute?.("data-chathub-privacy") !== "true") {
+        clearPeek();
+        return;
+    }
+    const row = findPeekRow(event.target);
+    if (row === peeked) return;
+    clearPeek();
+    if (row) {
+        row.setAttribute(peekAttribute, "true");
+        peeked = row;
+    }
+}
+if (service === "messenger" && !globalThis.__chatHubPeekInstalled && typeof document.addEventListener === "function") {
+    globalThis.__chatHubPeekInstalled = true;
+    document.addEventListener("pointerover", onPointerOver, { passive: true, capture: true });
+    document.addEventListener("pointerleave", clearPeek, { passive: true });
+    globalThis.addEventListener?.("blur", clearPeek, { passive: true });
 }
 
 globalThis.__chatHubNativeAppearance = Object.freeze({ update });

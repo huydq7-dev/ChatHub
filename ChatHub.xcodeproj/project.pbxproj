@@ -26,6 +26,7 @@
 		8A31A424C8179B7F51732C43 /* BrowserAppearance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F328BB0DC986FC8F983B730 /* BrowserAppearance.swift */; };
 		8AAEAF6492079798DA770668 /* ChatAccount.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15169739DF0C2C21D57C70D3 /* ChatAccount.swift */; };
 		93C54A72EF89145A2CEE1851 /* AccountSwitcherView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F4EA6D3D42CDCA5EB2557B4 /* AccountSwitcherView.swift */; };
+		A1B2C3D4E5F6A7B8C9D0E1F2 /* ChatHubMenuBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1C2D3E4F5A6B7C8D9E0F1A2 /* ChatHubMenuBar.swift */; };
 		96AFDF5F0BA34BC90D066FF5 /* ServiceTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 366D91B9B2E4D0E361316A75 /* ServiceTheme.swift */; };
 		9C3A4B79F9335AD3A563C3F5 /* ChatAppearancePreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5833F64E417C41E6F05A14D2 /* ChatAppearancePreferences.swift */; };
 		9C78655E5AD98B76F6299E8B /* ZaloAppearance.css in Resources */ = {isa = PBXBuildFile; fileRef = BEA4CBF97662091D4D2EBF60 /* ZaloAppearance.css */; };
@@ -71,6 +72,7 @@
 		5833F64E417C41E6F05A14D2 /* ChatAppearancePreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatAppearancePreferences.swift; sourceTree = "<group>"; };
 		589B05AD08C3EC85A10E0980 /* MessengerAppearance.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = MessengerAppearance.css; sourceTree = "<group>"; };
 		5F4EA6D3D42CDCA5EB2557B4 /* AccountSwitcherView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountSwitcherView.swift; sourceTree = "<group>"; };
+		B1C2D3E4F5A6B7C8D9E0F1A2 /* ChatHubMenuBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatHubMenuBar.swift; sourceTree = "<group>"; };
 		60A07362E7D58CCD1323E9D9 /* WorkspaceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceView.swift; sourceTree = "<group>"; };
 		60EC718AFEB186FBBAD2327B /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		6FB35DB69AB7EF45CD225AFD /* WorkspaceRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceRepository.swift; sourceTree = "<group>"; };
@@ -135,6 +137,7 @@
 			children = (
 				71927B67C507CE8C5AA78962 /* AccountEditor.swift */,
 				5F4EA6D3D42CDCA5EB2557B4 /* AccountSwitcherView.swift */,
+				B1C2D3E4F5A6B7C8D9E0F1A2 /* ChatHubMenuBar.swift */,
 				9C9E590D59CAAB599A4646ED /* ConversationView.swift */,
 				2CF831FCF5A5F165258861A8 /* Design.swift */,
 				FE203BD69534DF61DC8D6D9E /* OverviewView.swift */,
@@ -297,6 +300,7 @@
 			files = (
 				B0C3FE636975DE9AAFF621E3 /* AccountEditor.swift in Sources */,
 				93C54A72EF89145A2CEE1851 /* AccountSwitcherView.swift in Sources */,
+				A1B2C3D4E5F6A7B8C9D0E1F2 /* ChatHubMenuBar.swift in Sources */,
 				F8AE76C2D5D1A8969DBED676 /* AppUpdater.swift in Sources */,
 				8A31A424C8179B7F51732C43 /* BrowserAppearance.swift in Sources */,
 				32F76B7F5355F9A6BA10F945 /* BrowserPool.swift in Sources */,
@@ -380,7 +384,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Manual;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 5;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -401,7 +405,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 0.3.1;
+				MARKETING_VERSION = 0.3.2;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -451,7 +455,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Manual;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 5;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -466,7 +470,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 0.3.1;
+				MARKETING_VERSION = 0.3.2;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";

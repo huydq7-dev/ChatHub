@@ -265,6 +265,12 @@ html[data-chathub-theme][data-chathub-density="comfortable"] {
     --hub-radius-composer: 18px;
 }
 
+html[data-chathub-theme] {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+}
+
 html[data-chathub-theme] body {
     font-family: var(--hub-font) !important;
     font-size: var(--hub-size-body) !important;
@@ -273,6 +279,7 @@ html[data-chathub-theme] body {
     background-color: var(--hub-canvas) !important;
     color: var(--hub-text);
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 html[data-chathub-theme] :is(button, select) {
@@ -291,7 +298,7 @@ html[data-chathub-theme] :is(input, textarea, [contenteditable="true"]) {
     caret-color: var(--hub-link);
 }
 
-html[data-chathub-theme] :is(time, abbr) {
+html[data-chathub-theme] :is(time, abbr, .badge, .ChatBadge, [aria-label*="unread"]) {
     font-variant-numeric: tabular-nums;
 }
 
@@ -352,4 +359,296 @@ html[data-chathub-theme]:not([data-chathub-service="telegram"]) *::-webkit-scrol
 
 html[data-chathub-reduce-motion="true"] :is(.conv-item, .Chat, [role="row"]) {
     transition-duration: 0s !important;
+}
+
+/* Privacy Shield Mode (Boss Mode): blur sensitive messages, media and avatars with hover-peek */
+html[data-chathub-privacy="true"] :is(
+    .Avatar,
+    .conv-item img,
+    .conv-item svg,
+    .conv-item [class*="avatar"],
+    .msg-item img,
+    .msg-item svg,
+    .msg-item [class*="avatar"],
+    [role="navigation"] img,
+    [role="navigation"] svg,
+    [role="navigation"] [role="img"],
+    [role="grid"] img,
+    [role="grid"] svg,
+    [role="grid"] [role="img"],
+    :is(#header, .thread-chat-header, .chat-header) img
+) {
+    border-radius: 50% !important;
+}
+
+/* Telegram avatars: clip children to circle so blur never bleeds into a square box */
+html[data-chathub-privacy="true"] .Avatar :is(img, canvas, span, svg) {
+    border-radius: 50% !important;
+    filter: blur(5px) !important;
+    opacity: 0.8 !important;
+    transition: filter 0.15s ease-out, opacity 0.15s ease-out !important;
+}
+
+/* Zalo profile avatars: circular clip-path so blur is strictly circular */
+html[data-chathub-privacy="true"] :is(
+    .conv-item :is(img, svg, canvas, [class*="avatar"]),
+    .msg-item :is(img, svg, canvas, [class*="avatar"]),
+    [class*="conv-item"] :is(img, svg, canvas, [class*="avatar"]),
+    [class*="msg-item"] :is(img, svg, canvas, [class*="avatar"]),
+    #sidebarNav :is(.avatar, .zl-avatar, [class*="avatar"]) :is(img, svg, canvas),
+    :is(#header, .thread-chat-header, .chat-header, .header-info) :is(img, svg)
+) {
+    border-radius: 50% !important;
+    overflow: hidden !important;
+    clip-path: circle(50% at 50% 50%) !important;
+    filter: blur(5px) !important;
+    opacity: 0.8 !important;
+    transition: filter 0.15s ease-out, opacity 0.15s ease-out !important;
+}
+
+/* Blur content across all services: targeted leaf nodes, never nested containers */
+html[data-chathub-privacy="true"] :is(
+    /* Telegram */
+    .Message .message-content,
+    .Message .media-inner,
+    .Message .Album,
+    .Message img:not([class*="emoji"]),
+    .Message video,
+    .Chat .subtitle,
+    .Chat .last-message,
+    .Chat .last-message-summary,
+    .Chat .title,
+    .MiddleHeader .title,
+
+    /* Zalo */
+    .chat-content .card,
+    .chat-message-list .card,
+    .card--text,
+    .bubble-content,
+    .msg-text,
+    .message-view__body,
+    .chat-content img:not([class*="emoji"]):not([class*="reaction"]):not([class*="sticker"]),
+    .chat-content video,
+    .chat-content .file-item,
+    :is(#header, .thread-chat-header, .chat-header) :is(.header-title, .header-subtitle, .chat-header-title),
+    :is(.conv-item, .msg-item, [class*="conv-item"], [class*="msg-item"]) :is(.conv-item-title__name, .conv-message, .conv-item-body__main, .truncate, .conv-dbname, .conv-time),
+
+    /* Messenger */
+    [role="main"] div[dir="auto"],
+    [role="main"] div[style*="--chat-"],
+    [role="main"] :is(img, video):not([class*="emoji"]),
+    [role="banner"] :is(span, [dir="auto"], img, svg, [role="img"]),
+    :is(
+        [role="row"],
+        [role="link"],
+        [role="listitem"],
+        [role="button"],
+        [role="gridcell"],
+        a,
+        div[data-testid*="row"],
+        div[data-testid*="thread"],
+        div[data-testid*="mwthreadlist-item"],
+        div:has(> a[href*="/t/"]),
+        div:has(> a[href*="/messages/"])
+    ) :is(span, [dir="auto"]),
+    :is(
+        [role="row"],
+        [role="link"],
+        [role="listitem"],
+        [role="button"],
+        [role="gridcell"],
+        a,
+        div[data-testid*="row"],
+        div[data-testid*="thread"],
+        div[data-testid*="mwthreadlist-item"],
+        :is([role="navigation"], [role="grid"], [role="region"], [aria-label*="Thread" i], [aria-label*="Chat" i], [aria-label*="Đoạn chat" i], [aria-label*="Tin nhắn" i], [aria-label*="Conversation" i], [aria-label*="Messenger" i])
+    ) :is(
+        img,
+        [role="img"],
+        svg,
+        image
+    ),
+
+    /* Fallback generic */
+    .chat-bubble,
+    .user-avatar img
+) {
+    filter: blur(6px) !important;
+    opacity: 0.75 !important;
+    user-select: none !important;
+    -webkit-user-select: none !important;
+    transition: filter 0.15s ease-out, opacity 0.15s ease-out !important;
+}
+
+/* Hover-peek: Reveal directly hovered items or when hovering over their parent card/row */
+html[data-chathub-privacy="true"] :is(
+    /* Direct hover on any blurred node */
+    .Message .message-content,
+    .Message .media-inner,
+    .Message .Album,
+    .Message img,
+    .Message video,
+    .Chat .subtitle,
+    .Chat .last-message,
+    .Chat .last-message-summary,
+    .Chat .title,
+    .MiddleHeader .title,
+    .chat-content .card,
+    .card--text,
+    .bubble-content,
+    .msg-text,
+    .message-view__body,
+    .chat-content img,
+    .chat-content video,
+    .chat-content .file-item,
+    :is(#header, .thread-chat-header, .chat-header) :is(img, svg, .header-title, .header-subtitle, .chat-header-title),
+    :is(.conv-item, .msg-item, [class*="conv-item"], [class*="msg-item"]) :is(.conv-item-title__name, .conv-message, .conv-item-body__main, .truncate, .conv-dbname, .conv-time),
+    :is(.conv-item, .msg-item, [class*="conv-item"], [class*="msg-item"]) :is(img, svg, canvas, [class*="avatar"], .avatar, .zl-avatar),
+    #sidebarNav :is(img, svg, canvas, [class*="avatar"]),
+    [role="main"] div[dir="auto"],
+    [role="main"] div[style*="--chat-"],
+    [role="main"] img,
+    [role="main"] video,
+    [role="banner"] :is(span, [dir="auto"], img, svg, [role="img"]),
+    :is([role="navigation"], [role="grid"], [aria-label*="Thread" i], [aria-label*="Chat" i], [aria-label*="Đoạn chat" i], [aria-label*="Tin nhắn" i]) :is(
+        span,
+        [dir="auto"],
+        img,
+        svg,
+        image,
+        [role="img"]
+    ),
+    .chat-bubble,
+    .Avatar,
+    .Avatar :is(img, canvas, span, svg)
+):hover,
+html[data-chathub-privacy="true"] .Avatar:hover :is(img, canvas, span, svg),
+html[data-chathub-privacy="true"] :is(.Chat, .ListItem, .Message, .MiddleHeader):hover .Avatar :is(img, canvas, span, svg),
+html[data-chathub-privacy="true"] .Message:hover :is(.message-content, .media-inner, .Album, img, video, .Avatar),
+html[data-chathub-privacy="true"] .Chat:hover :is(.subtitle, .last-message, .last-message-summary, .title, .Avatar),
+html[data-chathub-privacy="true"] .ListItem:hover :is(.title, .subtitle, .last-message, .Avatar),
+html[data-chathub-privacy="true"] .MiddleHeader:hover :is(.title, .Avatar),
+/* Zalo sidebar row hover */
+html[data-chathub-privacy="true"] :is(
+    .conv-item,
+    .msg-item,
+    [class*="conv-item"],
+    [class*="msg-item"],
+    #sidebarNav [role="listitem"],
+    #sidebarNav [class*="item"]
+):hover :is(
+    img, svg, canvas,
+    .avatar, .zl-avatar, [class*="avatar"], [class*="avatar"] img,
+    .conv-message, .conv-item-body__main, .conv-item-title__name, .truncate, .conv-dbname, .conv-time
+),
+/* Zalo direct avatar hover */
+html[data-chathub-privacy="true"] :is(
+    .conv-item,
+    .msg-item,
+    [class*="conv-item"],
+    [class*="msg-item"],
+    #sidebarNav
+) :is(img, svg, canvas, .avatar, .zl-avatar, [class*="avatar"]):hover,
+html[data-chathub-privacy="true"] :is(
+    .conv-item,
+    .msg-item,
+    [class*="conv-item"],
+    [class*="msg-item"],
+    #sidebarNav
+) :is(.avatar, .zl-avatar, [class*="avatar"]):hover :is(img, svg, canvas),
+html[data-chathub-privacy="true"] .chat-content .card:hover :is(.text, .card--text, .bubble-content, .msg-text, img, video, .file-item),
+html[data-chathub-privacy="true"] :is(.message-view, .chat-message, .chat-content .card, div:has(> .bubble-content)):hover :is(.card, .text, .card--text, .bubble-content, .msg-text, img, svg, video, .file-item),
+html[data-chathub-privacy="true"] :is(#header, .thread-chat-header, .chat-header, .header-info, [class*="header"]):hover :is(.header-title, .header-subtitle, .chat-header-title, img, svg),
+/* Messenger direct avatar hover */
+html[data-chathub-privacy="true"] :is(
+    [role="img"],
+    svg
+):hover :is(
+    img,
+    svg,
+    image,
+    [role="img"],
+    [role="img"] *
+),
+/* Messenger generic row hover */
+html[data-chathub-privacy="true"] :is(
+    [role="row"],
+    [role="link"],
+    [role="listitem"],
+    [role="button"],
+    [role="gridcell"],
+    a,
+    a[href*="/t/"],
+    a[href*="/messages/"],
+    a[href*="/e2ee/"],
+    [data-testid*="row"],
+    [data-testid*="thread"],
+    [data-testid*="mwthreadlist-item"],
+    div:has(> a[href*="/t/"]),
+    div:has(> a[href*="/messages/"]),
+    div:has(> [role="link"]),
+    div:has(> [role="img"]),
+    div:has(> div > [role="img"]),
+    div[tabindex="0"],
+    div[tabindex="-1"]
+):hover :is(
+    span,
+    [dir="auto"],
+    div[dir="auto"],
+    h3,
+    h4,
+    time,
+    abbr,
+    img,
+    svg,
+    image,
+    [role="img"],
+    [role="img"] *
+),
+/* Messenger sidebar container + row hover */
+html[data-chathub-privacy="true"] :is(
+    [role="navigation"],
+    [role="grid"],
+    [role="region"],
+    [aria-label*="Thread" i],
+    [aria-label*="Chat" i],
+    [aria-label*="Đoạn chat" i],
+    [aria-label*="Tin nhắn" i],
+    [aria-label*="Conversation" i],
+    [aria-label*="Messenger" i]
+) :is(
+    [role="row"],
+    [role="link"],
+    [role="listitem"],
+    [role="button"],
+    [role="gridcell"],
+    a,
+    [data-testid*="row"],
+    [data-testid*="thread"],
+    [data-testid*="mwthreadlist-item"],
+    div:has(> a),
+    div:has(> [role="link"]),
+    div:has([role="img"]),
+    div[tabindex]
+):hover :is(
+    span,
+    [dir="auto"],
+    div[dir="auto"],
+    h3,
+    h4,
+    time,
+    abbr,
+    img,
+    svg,
+    image,
+    [role="img"],
+    [role="img"] *
+),
+html[data-chathub-privacy="true"] [role="banner"]:hover :is(span, [dir="auto"], img, svg, [role="img"]),
+html[data-chathub-privacy="true"] [role="main"] div:hover > :is(div[dir="auto"], div[style*="--chat-"], img, video),
+html[data-chathub-privacy="true"] [role="main"] [role="row"]:hover :is(div[dir="auto"], div[style*="--chat-"], img, video) {
+    filter: none !important;
+    opacity: 1 !important;
+    user-select: text !important;
+    -webkit-user-select: text !important;
 }

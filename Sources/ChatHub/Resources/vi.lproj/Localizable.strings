@@ -196,3 +196,34 @@
 "Update options" = "Tùy chọn cập nhật";
 
 "ChatHub checks GitHub Releases every six hours. New versions appear in the workspace. Installation is manual; your chats and account profiles stay in place." = "ChatHub kiểm tra GitHub Releases mỗi 6 giờ và báo bản mới trong workspace. Bạn cài đặt thủ công; dữ liệu chat và profile tài khoản vẫn được giữ lại.";
+
+"Command Palette…" = "Bảng lệnh…";
+"Enable Privacy Shield" = "Bật Màn chắn Riêng tư";
+"Disable Privacy Shield" = "Tắt Màn chắn Riêng tư";
+"Keep Window on Top" = "Ghim cửa sổ trên cùng";
+"Disable Always on Top" = "Bỏ ghim cửa sổ";
+"Privacy Shield Active (Hover to peek)" = "Đang che tin nhắn (Rê chuột để xem nhanh)";
+"Turn Off" = "Tắt";
+"Show Menu Bar Icon" = "Hiện biểu tượng Menu Bar";
+"Privacy Shield (Blur messages)" = "Màn chắn Riêng tư (Làm mờ tin nhắn)";
+"Keep window always on top" = "Luôn ghim cửa sổ trên cùng";
+"Workspace & Privacy" = "Không gian & Riêng tư";
+"Privacy Shield blurs messages and media in open chats; hover with your mouse to peek. Always on Top keeps ChatHub visible above other windows." = "Màn chắn Riêng tư làm mờ tin nhắn và hình ảnh trong khung chat; rê chuột qua để xem nhanh. Ghim trên cùng giữ ChatHub luôn hiển thị trên các ứng dụng khác.";
+"%d unread messages" = "%d tin nhắn chưa đọc";
+"All caught up" = "Không có tin mới";
+"Open ChatHub" = "Mở ChatHub";
+"Quit ChatHub" = "Thoát ChatHub";
+"Search accounts or type a command…" = "Tìm tài khoản hoặc gõ lệnh…";
+"Actions" = "Tác vụ";
+"Accounts" = "Tài khoản";
+"Blur messages with hover peek" = "Làm mờ tin nhắn, rê chuột để xem nhanh";
+"Float window above other apps" = "Giữ cửa sổ nổi trên các ứng dụng khác";
+"Connect Telegram, Messenger, Zalo…" = "Kết nối Telegram, Messenger, Zalo…";
+"Refresh current conversation" = "Tải lại cuộc trò chuyện hiện tại";
+"Search text in current chat" = "Tìm kiếm văn bản trong đoạn chat";
+"Open in Safari or default browser" = "Mở bằng Safari hoặc trình duyệt mặc định";
+"Toggle Dark / Light Mode" = "Đổi giao diện Sáng / Tối";
+"Switch between dark and light appearance" = "Chuyển đổi giữa chế độ sáng và tối";
+"Preferences, theme and data" = "Tùy chọn, giao diện và dữ liệu";
+"↑↓ to navigate · ↩ to select · esc to close" = "↑↓ Di chuyển · ↩ Chọn · esc Đóng";
+

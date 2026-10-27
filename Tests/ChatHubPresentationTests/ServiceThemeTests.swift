@@ -68,6 +68,61 @@ struct ServiceThemeTests {
         #expect(BrowserSession.parseUnreadCount(from: "Zalo Web") == nil)
     }
 
+    @Test(arguments: [ChatService.telegram, .zalo, .messenger])
+    func privacyShieldAppliesBlurAcrossAllServices(service: ChatService) async throws {
+        let configuration = WKWebViewConfiguration()
+        configuration.websiteDataStore = .nonPersistent()
+        let view = WKWebView(frame: CGRect(x: 0, y: 0, width: 1100, height: 800), configuration: configuration)
+        let navigation = ThemeNavigation()
+        view.navigationDelegate = navigation
+        try await navigation.load(view, html: fixture(service), baseURL: service.homeURL)
+        let source = try #require(
+            ServiceTheme.bootstrap(
+                service: service,
+                appearance: BrowserAppearance(privacyShield: true)
+            )
+        )
+        let privacy = try await evaluate(
+            view,
+            body: source + """
+                return {
+                    privacy: document.documentElement.getAttribute('data-chathub-privacy') || '',
+                    filter: getComputedStyle(document.getElementById('outgoing')).filter || ''
+                };
+                """
+        )
+        #expect(privacy["privacy"] == "true")
+        #expect(privacy["filter"]?.contains("blur") == true)
+
+        let disabled = try await evaluate(
+            view,
+            body: """
+                globalThis.__chatHubNativeAppearance.update({privacyShield: false});
+                return {
+                    privacy: document.documentElement.getAttribute('data-chathub-privacy') || '',
+                    filter: getComputedStyle(document.getElementById('outgoing')).filter || ''
+                };
+                """
+        )
+        #expect(disabled["privacy"] == "false")
+        #expect(disabled["filter"] == "none")
+    }
+
+    @Test func workspaceWindowStyleTogglesFloatingLevel() {
+        let window = NSWindow(
+            contentRect: NSRect(x: 0, y: 0, width: 800, height: 600),
+            styleMask: [.titled, .closable],
+            backing: .buffered,
+            defer: false
+        )
+        WorkspaceWindowStyle.apply(to: window, alwaysOnTop: false)
+        #expect(window.level == .normal)
+        WorkspaceWindowStyle.apply(to: window, alwaysOnTop: true)
+        #expect(window.level == .floating)
+        WorkspaceWindowStyle.apply(to: window, alwaysOnTop: false)
+        #expect(window.level == .normal)
+    }
+
     private var probe: String {
         """
         const editor = document.getElementById('editor'); editor.focus();

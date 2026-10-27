@@ -26,6 +26,7 @@ public struct BrowserAppearance: Equatable, Sendable {
     public var accent: HubAccent
     public var density: HubDensity
     public var textScale: HubTextScale
+    public var privacyShield: Bool
 
     public init(
         isDark: Bool = false,
@@ -34,7 +35,8 @@ public struct BrowserAppearance: Equatable, Sendable {
         showServiceTools: Bool = false,
         accent: HubAccent = .iris,
         density: HubDensity = .standard,
-        textScale: HubTextScale = .standard
+        textScale: HubTextScale = .standard,
+        privacyShield: Bool = false
     ) {
         self.isDark = isDark
         self.themeEnabled = themeEnabled
@@ -43,6 +45,7 @@ public struct BrowserAppearance: Equatable, Sendable {
         self.accent = accent
         self.density = density
         self.textScale = textScale
+        self.privacyShield = privacyShield
     }
 }
 

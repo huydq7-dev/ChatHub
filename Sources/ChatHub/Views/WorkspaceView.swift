@@ -17,6 +17,11 @@ struct WorkspaceView: View {
     @AppStorage(ChatAppearancePreferences.accentKey) private var accentRaw = HubAccent.iris.rawValue
     @AppStorage(ChatAppearancePreferences.densityKey) private var densityRaw = HubDensity.standard.rawValue
     @AppStorage(ChatAppearancePreferences.textScaleKey) private var textScaleRaw = HubTextScale.standard.rawValue
+    @AppStorage("privacyShieldEnabled") private var privacyShieldEnabled = false
+    @AppStorage("alwaysOnTopEnabled") private var alwaysOnTopEnabled = false
+    /// The privacy banner floats over the conversation header, so it only shows briefly
+    /// after enabling; the toolbar eye icon keeps indicating the active state.
+    @State private var showPrivacyBanner = false
 
     private var currentAccent: HubAccent { HubAccent(rawValue: accentRaw) ?? .iris }
 
@@ -46,10 +51,19 @@ struct WorkspaceView: View {
             .background(HubStyle.canvas)
             .layoutPriority(1)
         }
-        .background(WindowAccessor())
+        .background(WindowAccessor(alwaysOnTop: alwaysOnTopEnabled))
         .ignoresSafeArea()
         .animation(reduceMotion ? nil : .easeInOut(duration: 0.18), value: layout.isExpanded)
         .tint(HubStyle.accentColor(for: currentAccent))
+        .onKeyPress(.escape) {
+            if privacyShieldEnabled {
+                withAnimation(.easeInOut(duration: 0.15)) {
+                    privacyShieldEnabled = false
+                }
+                return .handled
+            }
+            return .ignored
+        }
         .onAppear {
             updater.start()
             HubNotificationCenter.shared.onSelectAccount = { id in
@@ -102,7 +116,8 @@ struct WorkspaceView: View {
             showServiceTools: showServiceTools,
             accent: HubAccent(rawValue: accentRaw) ?? .iris,
             density: HubDensity(rawValue: densityRaw) ?? .standard,
-            textScale: HubTextScale(rawValue: textScaleRaw) ?? .standard
+            textScale: HubTextScale(rawValue: textScaleRaw) ?? .standard,
+            privacyShield: privacyShieldEnabled
         )
     }
 
@@ -122,7 +137,7 @@ struct WorkspaceView: View {
                     .buttonStyle(HubButtonStyle(prominent: true))
             }
         } else {
-            ZStack {
+            ZStack(alignment: .top) {
                 if let account = store.selectedAccount, let session = browsers.sessions[account.id] {
                     ConversationView(account: account, session: session)
                 } else {
@@ -132,8 +147,53 @@ struct WorkspaceView: View {
                         .allowsHitTesting(false)
                     OverviewView()
                 }
+
+                if privacyShieldEnabled && showPrivacyBanner {
+                    privacyShieldBanner
+                        .transition(.move(edge: .top).combined(with: .opacity))
+                }
+            }
+            .task(id: privacyShieldEnabled) {
+                guard privacyShieldEnabled else {
+                    showPrivacyBanner = false
+                    return
+                }
+                withAnimation(.easeInOut(duration: 0.15)) { showPrivacyBanner = true }
+                try? await Task.sleep(for: .seconds(2.5))
+                guard !Task.isCancelled else { return }
+                withAnimation(.easeInOut(duration: 0.25)) { showPrivacyBanner = false }
             }
         }
+    }
+
+    private var privacyShieldBanner: some View {
+        HStack(spacing: HubSpace.xs) {
+            Image(systemName: "eye.slash.fill")
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundStyle(HubStyle.accentText)
+            Text(tr("Privacy Shield Active (Hover to peek)"))
+                .font(HubFont.captionMedium)
+                .foregroundStyle(HubStyle.textPrimary)
+            Text("·")
+                .foregroundStyle(HubStyle.textSecondary)
+            Button(tr("Turn Off")) {
+                withAnimation(.easeInOut(duration: 0.15)) {
+                    privacyShieldEnabled = false
+                }
+            }
+            .buttonStyle(.plain)
+            .font(HubFont.captionMedium)
+            .foregroundStyle(HubStyle.accentText)
+        }
+        .padding(.horizontal, HubSpace.md)
+        .padding(.vertical, 6)
+        .background {
+            Capsule()
+                .fill(.ultraThinMaterial)
+                .overlay(Capsule().strokeBorder(HubStyle.border, lineWidth: 1))
+        }
+        .shadow(color: .black.opacity(0.12), radius: 8, y: 3)
+        .padding(.top, HubSpace.sm)
     }
 }
 
@@ -143,6 +203,8 @@ private struct WorkspaceSidebar: View {
     @Environment(WorkspaceLayout.self) private var layout
     @AppStorage(ChatAppearancePreferences.themeKey) private var nativeThemeEnabled = true
     @AppStorage(ChatAppearancePreferences.toolsKey) private var showServiceTools = false
+    @AppStorage("privacyShieldEnabled") private var privacyShieldEnabled = false
+    @AppStorage("alwaysOnTopEnabled") private var alwaysOnTopEnabled = false
     @State private var showingAppearanceStudio = false
 
     private var supportsAppearance: Bool {
@@ -253,7 +315,12 @@ private struct WorkspaceSidebar: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .onChange(of: geometry.size.width) { _, width in layout.rememberWidth(width) }
         }
-        .background(HubStyle.rail)
+        .background {
+            ZStack {
+                HubStyle.rail.opacity(0.85)
+                Rectangle().fill(.ultraThinMaterial)
+            }
+        }
         .overlay(alignment: .trailing) {
             Rectangle()
                 .fill(HubStyle.border)
@@ -335,6 +402,32 @@ private struct WorkspaceSidebar: View {
                     Spacer()
 
                     Button {
+                        privacyShieldEnabled.toggle()
+                    } label: {
+                        Image(systemName: privacyShieldEnabled ? "eye.slash.fill" : "eye.slash")
+                            .font(.system(size: 13, weight: .medium))
+                            .frame(width: 28, height: 28)
+                            .contentShape(Rectangle())
+                    }
+                    .buttonStyle(SidebarSmallButtonStyle())
+                    .foregroundStyle(privacyShieldEnabled ? HubStyle.accentText : HubStyle.textSecondary)
+                    .help(tr(privacyShieldEnabled ? "Disable Privacy Shield" : "Enable Privacy Shield") + " · ⌘⇧P")
+                    .accessibilityLabel(tr(privacyShieldEnabled ? "Disable Privacy Shield" : "Enable Privacy Shield"))
+
+                    Button {
+                        alwaysOnTopEnabled.toggle()
+                    } label: {
+                        Image(systemName: alwaysOnTopEnabled ? "pin.fill" : "pin")
+                            .font(.system(size: 13, weight: .medium))
+                            .frame(width: 28, height: 28)
+                            .contentShape(Rectangle())
+                    }
+                    .buttonStyle(SidebarSmallButtonStyle())
+                    .foregroundStyle(alwaysOnTopEnabled ? HubStyle.accentText : HubStyle.textSecondary)
+                    .help(tr(alwaysOnTopEnabled ? "Disable Always on Top" : "Keep Window on Top") + " · ⌘⇧T")
+                    .accessibilityLabel(tr(alwaysOnTopEnabled ? "Disable Always on Top" : "Keep Window on Top"))
+
+                    Button {
                         showingAppearanceStudio.toggle()
                     } label: {
                         Image(systemName: "paintbrush.pointed")
@@ -414,6 +507,30 @@ private struct WorkspaceSidebar: View {
                     .help(tr("Add account") + " · ⌘N")
                     .accessibilityLabel(tr("Add account"))
                     .disabled(store.loadError != nil)
+
+                    Button {
+                        privacyShieldEnabled.toggle()
+                    } label: {
+                        Image(systemName: privacyShieldEnabled ? "eye.slash.fill" : "eye.slash")
+                            .font(.system(size: 14, weight: .medium))
+                            .frame(width: 34, height: 34)
+                    }
+                    .buttonStyle(SidebarButtonStyle())
+                    .foregroundStyle(privacyShieldEnabled ? HubStyle.accentText : HubStyle.textSecondary)
+                    .help(tr(privacyShieldEnabled ? "Disable Privacy Shield" : "Enable Privacy Shield") + " · ⌘⇧P")
+                    .accessibilityLabel(tr(privacyShieldEnabled ? "Disable Privacy Shield" : "Enable Privacy Shield"))
+
+                    Button {
+                        alwaysOnTopEnabled.toggle()
+                    } label: {
+                        Image(systemName: alwaysOnTopEnabled ? "pin.fill" : "pin")
+                            .font(.system(size: 14, weight: .medium))
+                            .frame(width: 34, height: 34)
+                    }
+                    .buttonStyle(SidebarButtonStyle())
+                    .foregroundStyle(alwaysOnTopEnabled ? HubStyle.accentText : HubStyle.textSecondary)
+                    .help(tr(alwaysOnTopEnabled ? "Disable Always on Top" : "Keep Window on Top") + " · ⌘⇧T")
+                    .accessibilityLabel(tr(alwaysOnTopEnabled ? "Disable Always on Top" : "Keep Window on Top"))
 
                     SettingsLink {
                         Image(systemName: "gearshape")
@@ -515,6 +632,7 @@ private struct SidebarAction: View {
                 selected ? HubStyle.selectedSurface(for: accent) : .clear,
                 in: RoundedRectangle(cornerRadius: HubRadius.row, style: .continuous)
             )
+            .animation(.spring(response: 0.28, dampingFraction: 0.78), value: selected)
             .foregroundStyle(selected ? HubStyle.accentTextColor(for: accent) : HubStyle.textSecondary)
             .contentShape(Rectangle())
         }
@@ -535,6 +653,9 @@ private struct AccountSidebarRow: View {
     private var accent: HubAccent { HubAccent(rawValue: accentRaw) ?? .iris }
     private var selected: Bool { store.selectedID == account.id }
     private var session: BrowserSession? { browsers.sessions[account.id] }
+    private var statusBorderColor: Color {
+        selected ? HubStyle.selectedSurface(for: accent) : HubStyle.rail
+    }
     private var shortcut: String {
         guard let index = store.accounts.firstIndex(where: { $0.id == account.id }), index < 9 else { return "" }
         return "⌘\(index + 1)"
@@ -555,7 +676,7 @@ private struct AccountSidebarRow: View {
                                 .padding(.horizontal, 4)
                                 .padding(.vertical, 1.5)
                                 .background(HubStyle.accentColor(for: accent), in: Capsule())
-                                .overlay(Capsule().strokeBorder(HubStyle.rail, lineWidth: 1.5))
+                                .overlay(Capsule().strokeBorder(statusBorderColor, lineWidth: 1.5))
                                 .offset(x: 5, y: -4)
                         }
                     }
@@ -571,13 +692,13 @@ private struct AccountSidebarRow: View {
                                 Circle()
                                     .fill(Color.green)
                                     .frame(width: 8, height: 8)
-                                    .overlay(Circle().strokeBorder(HubStyle.rail, lineWidth: 1.5))
+                                    .overlay(Circle().strokeBorder(statusBorderColor, lineWidth: 1.5))
                                     .offset(x: 2, y: 2)
                             } else if case .loading = session.state {
                                 Circle()
                                     .fill(HubStyle.accentColor(for: accent))
                                     .frame(width: 8, height: 8)
-                                    .overlay(Circle().strokeBorder(HubStyle.rail, lineWidth: 1.5))
+                                    .overlay(Circle().strokeBorder(statusBorderColor, lineWidth: 1.5))
                                     .offset(x: 2, y: 2)
                             }
                         }
@@ -613,6 +734,7 @@ private struct AccountSidebarRow: View {
                 selected ? HubStyle.selectedSurface(for: accent) : .clear,
                 in: RoundedRectangle(cornerRadius: HubRadius.row, style: .continuous)
             )
+            .animation(.spring(response: 0.28, dampingFraction: 0.78), value: selected)
             .contentShape(Rectangle())
         }
         .buttonStyle(SidebarButtonStyle())
@@ -657,6 +779,9 @@ private struct SidebarSmallButtonSurface<Content: View>: View {
                 isPressed ? HubStyle.pressed : (hovered ? HubStyle.hover : .clear),
                 in: RoundedRectangle(cornerRadius: 6, style: .continuous)
             )
+            .scaleEffect(isPressed ? 0.94 : 1.0)
+            .animation(.spring(response: 0.22, dampingFraction: 0.72), value: isPressed)
+            .animation(.easeOut(duration: 0.12), value: hovered)
             .onHover { hovered = $0 }
     }
 }
@@ -678,24 +803,34 @@ private struct SidebarButtonSurface<Content: View>: View {
                 isPressed ? HubStyle.pressed : (hovered ? HubStyle.hover : .clear),
                 in: RoundedRectangle(cornerRadius: HubRadius.row, style: .continuous)
             )
+            .scaleEffect(isPressed ? 0.96 : 1.0)
+            .animation(.spring(response: 0.22, dampingFraction: 0.72), value: isPressed)
+            .animation(.easeOut(duration: 0.12), value: hovered)
             .onHover { hovered = $0 }
     }
 }
 
 private struct WindowAccessor: NSViewRepresentable {
+    var alwaysOnTop: Bool = false
+
     func makeNSView(context: Context) -> WindowAccessingView { WindowAccessingView() }
-    func updateNSView(_ nsView: WindowAccessingView, context: Context) { nsView.configure() }
+    func updateNSView(_ nsView: WindowAccessingView, context: Context) { nsView.configure(alwaysOnTop: alwaysOnTop) }
 
     @MainActor
     final class WindowAccessingView: NSView {
+        private var currentAlwaysOnTop: Bool?
+
         override func viewDidMoveToWindow() {
             super.viewDidMoveToWindow()
-            configure()
+            if let window, let alwaysOnTop = currentAlwaysOnTop {
+                WorkspaceWindowStyle.apply(to: window, alwaysOnTop: alwaysOnTop)
+            }
         }
 
-        func configure() {
+        func configure(alwaysOnTop: Bool) {
+            currentAlwaysOnTop = alwaysOnTop
             guard let window else { return }
-            WorkspaceWindowStyle.apply(to: window)
+            WorkspaceWindowStyle.apply(to: window, alwaysOnTop: alwaysOnTop)
         }
     }
 }

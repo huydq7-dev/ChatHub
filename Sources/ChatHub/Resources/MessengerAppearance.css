@@ -5,12 +5,8 @@ html[data-chathub-service="messenger"] :is(
     body,
     .__fb-light-mode,
     .__fb-dark-mode,
-    [role="main"],
     [role="navigation"],
-    .xz23t90,
-    [style*="--chat-"],
-    [style*="--mwp-"],
-    [style*="--messenger-"]
+    .xz23t90
 ) {
     --font-family-apple: var(--hub-font) !important;
     --font-family-default: var(--hub-font) !important;
@@ -131,6 +127,18 @@ html[data-chathub-service="messenger"] :is(
     --chat-thread-header-title-font-size: var(--hub-size-header) !important;
 }
 
+/* Keep specific bubble colors and thread backgrounds clean when Messenger injects inline styles */
+html[data-chathub-service="messenger"] [style*="--chat-"] {
+    --chat-incoming-message-bubble-background-color: var(--hub-raised) !important;
+    --chat-incoming-message-text-color: var(--hub-text) !important;
+    --chat-outgoing-message-bubble-background-color: var(--hub-outgoing) !important;
+    --chat-outgoing-message-text-color: var(--hub-text) !important;
+    --chat-replied-message-background-color: var(--hub-surface) !important;
+    --chat-quoted-incoming-message-bubble-color: var(--hub-surface) !important;
+    --chat-thread-background-image: none !important;
+    --chat-thread-background-gradient: none !important;
+}
+
 /* Flatten M5 floating card layout ("bubble" cards) into full-bleed split panes */
 html[data-chathub-service="messenger"] :is(.x13dmulc, .x1105k1t, .xkbglvu, .x166lnxr) {
     margin-top: 0 !important;
@@ -222,7 +230,7 @@ html[data-chathub-service="messenger"] :is([aria-current="page"], [aria-selected
 /* Unified conversation row typography */
 html[data-chathub-service="messenger"] [role="navigation"] :is([role="row"], [role="listitem"], a[role="link"]) :is(
     span.x1lliihq:first-of-type,
-    div:has(> span):first-child > span,
+    div:first-child > span,
     [role="gridcell"] > div > div:first-child span,
     h3, h4
 ) {
@@ -315,11 +323,7 @@ html[data-chathub-service="messenger"] [role="main"] [contenteditable="true"] {
     outline: none !important;
     box-shadow: none !important;
     color: var(--hub-text) !important;
-    font-family: var(--hub-font) !important;
-    font-size: var(--hub-size-message) !important;
-    font-weight: var(--hub-weight-regular) !important;
-    line-height: var(--hub-leading-message) !important;
-    letter-spacing: var(--hub-tracking-normal) !important;
+    caret-color: var(--hub-link) !important;
 }
 html[data-chathub-service="messenger"] [role="main"] [role="textbox"]:focus-visible { outline: none !important; }
 
@@ -342,8 +346,7 @@ html[data-chathub-service="messenger"] :is(
     [role="banner"],
     [data-pagelet="Bluebar"],
     [data-pagelet="NavBar"],
-    [role="navigation"]:has(+ [role="navigation"]),
-    [role="navigation"]:has(a[href*="/marketplace/"])
+    [role="navigation"]:has(+ [role="navigation"])
 ) {
     display: none !important;
     visibility: hidden !important;
@@ -368,31 +371,32 @@ html[data-chathub-service="messenger"][data-chathub-focus="true"] [role="complem
     height: 0 !important;
 }
 
-@media (min-width: 900px) {
-    html[data-chathub-service="messenger"] [role="navigation"]:not(:has(+ [role="navigation"])) {
-        flex: 0 0 var(--hub-list-width) !important;
-        width: var(--hub-list-width) !important;
-        min-width: var(--hub-list-width) !important;
-        max-width: var(--hub-list-width) !important;
-    }
+html[data-chathub-service="messenger"] [role="navigation"]:not(:has(+ [role="navigation"])) {
+    flex: 0 0 var(--hub-list-width) !important;
+    width: var(--hub-list-width) !important;
+    min-width: var(--hub-list-width) !important;
+    max-width: var(--hub-list-width) !important;
 }
 
 html[data-chathub-service="messenger"] [role="main"] [style*="--chat-composer-button-color"] {
     background-image: none !important;
 }
 
-/* Unified Messenger scrollbars */
+/* Hardware-accelerated smooth scrolling for message virtualizer */
+html[data-chathub-service="messenger"] [role="main"] :is([aria-label="Messages"], [data-virtualized="true"]) {
+    -webkit-overflow-scrolling: touch !important;
+    overflow-anchor: auto !important;
+}
+
+/* Unified Messenger navigation scrollbars */
 html[data-chathub-service="messenger"] :is(
     [role="navigation"],
     [role="grid"],
-    [role="main"],
     .x1odjw0f,
     .x10wlt62,
     .x78zum5,
     .x1n2onr6,
-    [data-virtualized="true"],
-    [aria-label="Thread list"],
-    [aria-label="Messages"]
+    [aria-label="Thread list"]
 )::-webkit-scrollbar {
     width: 6px !important;
     height: 6px !important;
@@ -403,14 +407,11 @@ html[data-chathub-service="messenger"] :is(
 html[data-chathub-service="messenger"] :is(
     [role="navigation"],
     [role="grid"],
-    [role="main"],
     .x1odjw0f,
     .x10wlt62,
     .x78zum5,
     .x1n2onr6,
-    [data-virtualized="true"],
-    [aria-label="Thread list"],
-    [aria-label="Messages"]
+    [aria-label="Thread list"]
 )::-webkit-scrollbar-track {
     background: transparent !important;
     background-color: transparent !important;
@@ -421,14 +422,11 @@ html[data-chathub-service="messenger"] :is(
 html[data-chathub-service="messenger"] :is(
     [role="navigation"],
     [role="grid"],
-    [role="main"],
     .x1odjw0f,
     .x10wlt62,
     .x78zum5,
     .x1n2onr6,
-    [data-virtualized="true"],
-    [aria-label="Thread list"],
-    [aria-label="Messages"]
+    [aria-label="Thread list"]
 )::-webkit-scrollbar-thumb {
     background: var(--hub-scrollbar) !important;
     background-color: var(--hub-scrollbar) !important;
@@ -441,26 +439,20 @@ html[data-chathub-service="messenger"] :is(
 html[data-chathub-service="messenger"] :is(
     [role="navigation"],
     [role="grid"],
-    [role="main"],
     .x1odjw0f,
     .x10wlt62,
     .x78zum5,
     .x1n2onr6,
-    [data-virtualized="true"],
-    [aria-label="Thread list"],
-    [aria-label="Messages"]
+    [aria-label="Thread list"]
 ):hover::-webkit-scrollbar-thumb,
 html[data-chathub-service="messenger"] :is(
     [role="navigation"],
     [role="grid"],
-    [role="main"],
     .x1odjw0f,
     .x10wlt62,
     .x78zum5,
     .x1n2onr6,
-    [data-virtualized="true"],
-    [aria-label="Thread list"],
-    [aria-label="Messages"]
+    [aria-label="Thread list"]
 )::-webkit-scrollbar-thumb:hover {
     background: var(--hub-scrollbar-hover) !important;
     background-color: var(--hub-scrollbar-hover) !important;
@@ -469,15 +461,200 @@ html[data-chathub-service="messenger"] :is(
 html[data-chathub-service="messenger"] :is(
     [role="navigation"],
     [role="grid"],
-    [role="main"],
     .x1odjw0f,
     .x10wlt62,
     .x78zum5,
     .x1n2onr6,
-    [data-virtualized="true"],
-    [aria-label="Thread list"],
-    [aria-label="Messages"]
+    [aria-label="Thread list"]
 )::-webkit-scrollbar-thumb:active {
     background: var(--hub-scrollbar-active) !important;
     background-color: var(--hub-scrollbar-active) !important;
+}
+
+/* Privacy Shield Mode for Messenger */
+/* Avatars in sidebar and banner: circular clip */
+html[data-chathub-service="messenger"][data-chathub-privacy="true"] :is(
+    [role="banner"] :is(img, svg, [role="img"]),
+    :is([role="navigation"], [role="grid"], [role="region"], [aria-label*="Thread" i], [aria-label*="Chat" i], [aria-label*="Đoạn chat" i], [aria-label*="Tin nhắn" i], [aria-label*="Conversation" i], [aria-label*="Messenger" i]) :is(
+        img,
+        svg,
+        [role="img"],
+        image
+    ),
+    :is([role="row"], [role="link"], [role="listitem"], [role="button"], [role="gridcell"], a[href*="/t/"], a[href*="/messages/"]) :is(
+        img,
+        svg,
+        [role="img"],
+        image
+    )
+) {
+    border-radius: 50% !important;
+}
+
+html[data-chathub-service="messenger"][data-chathub-privacy="true"] :is(
+    /* Chat pane */
+    [role="main"] div[dir="auto"],
+    [role="main"] div[style*="--chat-"],
+    [role="main"] :is(img, video):not([class*="emoji"]),
+    [role="banner"] :is(span, [dir="auto"], img, svg, [role="img"]),
+
+    /* Sidebar text */
+    :is(
+        [role="row"],
+        [role="link"],
+        [role="listitem"],
+        [role="button"],
+        [role="gridcell"],
+        a,
+        div[data-testid*="row"],
+        div[data-testid*="thread"],
+        div[data-testid*="mwthreadlist-item"],
+        div:has(> a[href*="/t/"]),
+        div:has(> a[href*="/messages/"])
+    ) :is(span, [dir="auto"]),
+
+    /* Sidebar avatars and media */
+    :is(
+        [role="row"],
+        [role="link"],
+        [role="listitem"],
+        [role="button"],
+        [role="gridcell"],
+        a,
+        div[data-testid*="row"],
+        div[data-testid*="thread"],
+        div[data-testid*="mwthreadlist-item"],
+        :is([role="navigation"], [role="grid"], [role="region"], [aria-label*="Thread" i], [aria-label*="Chat" i], [aria-label*="Đoạn chat" i], [aria-label*="Tin nhắn" i], [aria-label*="Conversation" i], [aria-label*="Messenger" i])
+    ) :is(
+        img,
+        [role="img"],
+        svg,
+        image
+    )
+) {
+    filter: blur(6px) !important;
+    opacity: 0.75 !important;
+    user-select: none !important;
+    -webkit-user-select: none !important;
+    transition: filter 0.15s ease-out, opacity 0.15s ease-out !important;
+}
+
+/* Hover-peek: Reveal directly hovered items or when hovering over their parent card/row */
+/* 1. Direct hover on any blurred node */
+html[data-chathub-service="messenger"][data-chathub-privacy="true"] :is(
+    [role="main"] div[dir="auto"],
+    [role="main"] div[style*="--chat-"],
+    [role="main"] img,
+    [role="main"] video,
+    [role="banner"] :is(span, [dir="auto"], img, svg, [role="img"]),
+    span,
+    [dir="auto"],
+    img,
+    svg,
+    image,
+    [role="img"]
+):hover,
+/* 2. Direct hover on avatar container unblurs inner SVG and image */
+html[data-chathub-service="messenger"][data-chathub-privacy="true"] :is(
+    [role="img"],
+    svg
+):hover :is(
+    img,
+    svg,
+    image,
+    [role="img"],
+    [role="img"] *
+),
+/* 3. Sidebar row hover (standalone) unblurs ALL avatars, text, and icons */
+html[data-chathub-service="messenger"][data-chathub-privacy="true"] :is(
+    [role="row"],
+    [role="link"],
+    [role="listitem"],
+    [role="button"],
+    [role="gridcell"],
+    a,
+    a[href*="/t/"],
+    a[href*="/messages/"],
+    a[href*="/e2ee/"],
+    [data-testid*="row"],
+    [data-testid*="thread"],
+    [data-testid*="mwthreadlist-item"],
+    div:has(> a[href*="/t/"]),
+    div:has(> a[href*="/messages/"]),
+    div:has(> [role="link"]),
+    div:has(> [role="img"]),
+    div:has(> div > [role="img"]),
+    div[tabindex="0"],
+    div[tabindex="-1"]
+):hover :is(
+    span,
+    [dir="auto"],
+    div[dir="auto"],
+    h3,
+    h4,
+    time,
+    abbr,
+    img,
+    svg,
+    image,
+    [role="img"],
+    [role="img"] *
+),
+/* 4. High-specificity sidebar container + row hover */
+html[data-chathub-service="messenger"][data-chathub-privacy="true"] :is(
+    [role="navigation"],
+    [role="grid"],
+    [role="region"],
+    [aria-label*="Thread" i],
+    [aria-label*="Chat" i],
+    [aria-label*="Đoạn chat" i],
+    [aria-label*="Tin nhắn" i],
+    [aria-label*="Conversation" i],
+    [aria-label*="Messenger" i]
+) :is(
+    [role="row"],
+    [role="link"],
+    [role="listitem"],
+    [role="button"],
+    [role="gridcell"],
+    a,
+    [data-testid*="row"],
+    [data-testid*="thread"],
+    [data-testid*="mwthreadlist-item"],
+    div:has(> a),
+    div:has(> [role="link"]),
+    div:has([role="img"]),
+    div[tabindex]
+):hover :is(
+    span,
+    [dir="auto"],
+    div[dir="auto"],
+    h3,
+    h4,
+    time,
+    abbr,
+    img,
+    svg,
+    image,
+    [role="img"],
+    [role="img"] *
+),
+/* 5. Header banner hover */
+html[data-chathub-service="messenger"][data-chathub-privacy="true"] [role="banner"]:hover :is(span, [dir="auto"], img, svg, [role="img"]),
+/* 6. Main chat message hover */
+html[data-chathub-service="messenger"][data-chathub-privacy="true"] [role="main"] div:hover > :is(div[dir="auto"], div[style*="--chat-"], img, video),
+html[data-chathub-service="messenger"][data-chathub-privacy="true"] [role="main"] [role="row"]:hover :is(div[dir="auto"], div[style*="--chat-"], img, video) {
+    filter: none !important;
+    opacity: 1 !important;
+    user-select: text !important;
+    -webkit-user-select: text !important;
+}
+
+
+/* 7. JS-marked hovered sidebar row (WebAppearance.js sets data-chathub-peek).
+   :not(#chathub-peek-boost) adds ID-level specificity so it beats every blur rule. */
+html[data-chathub-service="messenger"][data-chathub-privacy="true"] [data-chathub-peek="true"]:not(#chathub-peek-boost),
+html[data-chathub-service="messenger"][data-chathub-privacy="true"] [data-chathub-peek="true"] :not(#chathub-peek-boost) {
+    filter: none !important;
+    opacity: 1 !important;
 }

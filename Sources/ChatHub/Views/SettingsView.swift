@@ -15,6 +15,9 @@ struct SettingsView: View {
     @AppStorage(ChatAppearancePreferences.accentKey) private var accentRaw = HubAccent.iris.rawValue
     @AppStorage(ChatAppearancePreferences.densityKey) private var densityRaw = HubDensity.standard.rawValue
     @AppStorage(ChatAppearancePreferences.textScaleKey) private var textScaleRaw = HubTextScale.standard.rawValue
+    @AppStorage("showMenuBarExtra") private var showMenuBarExtra = true
+    @AppStorage("privacyShieldEnabled") private var privacyShieldEnabled = false
+    @AppStorage("alwaysOnTopEnabled") private var alwaysOnTopEnabled = false
 
     private var selectedAccent: HubAccent { HubAccent(rawValue: accentRaw) ?? .iris }
 
@@ -106,6 +109,18 @@ struct SettingsView: View {
                 Text(
                     tr(
                         "One ChatHub appearance for Telegram, Messenger and Zalo. Colors, typography and chat surfaces follow the appearance above. Show extra tools to access service-specific controls. Turn off to restore the original interfaces."
+                    ))
+            }
+            Section {
+                Toggle(tr("Show Menu Bar Icon"), isOn: $showMenuBarExtra)
+                Toggle(tr("Privacy Shield (Blur messages)"), isOn: $privacyShieldEnabled)
+                Toggle(tr("Keep window always on top"), isOn: $alwaysOnTopEnabled)
+            } header: {
+                Text(tr("Workspace & Privacy"))
+            } footer: {
+                Text(
+                    tr(
+                        "Privacy Shield blurs messages and media in open chats; hover with your mouse to peek. Always on Top keeps ChatHub visible above other windows."
                     ))
             }
             Section {

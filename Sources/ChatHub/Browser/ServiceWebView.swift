@@ -4,6 +4,18 @@ import WebKit
 final class WebHostContainerView: NSView {
     private weak var activeWebView: WKWebView?
 
+    override init(frame frameRect: NSRect) {
+        super.init(frame: frameRect)
+        wantsLayer = true
+        layerContentsRedrawPolicy = .onSetNeedsDisplay
+    }
+
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        wantsLayer = true
+        layerContentsRedrawPolicy = .onSetNeedsDisplay
+    }
+
     func attach(_ webView: WKWebView) {
         guard webView.superview !== self else { return }
         let initialBounds = bounds.isEmpty ? NSRect(x: 0, y: 0, width: 800, height: 600) : bounds

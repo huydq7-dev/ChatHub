@@ -10,6 +10,8 @@ struct WorkspaceToolbar: ToolbarContent {
     @Environment(WorkspaceLayout.self) private var layout
     @AppStorage(ChatAppearancePreferences.themeKey) private var nativeThemeEnabled = true
     @AppStorage(ChatAppearancePreferences.toolsKey) private var showServiceTools = false
+    @AppStorage("privacyShieldEnabled") private var privacyShieldEnabled = false
+    @AppStorage("alwaysOnTopEnabled") private var alwaysOnTopEnabled = false
     @State private var showingAppearanceStudio = false
 
     private var supportsAppearance: Bool {
@@ -77,8 +79,26 @@ struct WorkspaceToolbar: ToolbarContent {
             } label: {
                 Image(systemName: "command")
             }
-            .help(tr("Switch Account…") + " · ⌘K")
-            .accessibilityLabel(tr("Switch Account…"))
+            .help(tr("Command Palette…") + " · ⌘K")
+            .accessibilityLabel(tr("Command Palette…"))
+
+            Button {
+                privacyShieldEnabled.toggle()
+            } label: {
+                Image(systemName: privacyShieldEnabled ? "eye.slash.fill" : "eye.slash")
+                    .foregroundStyle(privacyShieldEnabled ? HubStyle.accentText : HubStyle.textSecondary)
+            }
+            .help(tr(privacyShieldEnabled ? "Disable Privacy Shield" : "Enable Privacy Shield") + " · ⌘⇧P")
+            .accessibilityLabel(tr(privacyShieldEnabled ? "Disable Privacy Shield" : "Enable Privacy Shield"))
+
+            Button {
+                alwaysOnTopEnabled.toggle()
+            } label: {
+                Image(systemName: alwaysOnTopEnabled ? "pin.fill" : "pin")
+                    .foregroundStyle(alwaysOnTopEnabled ? HubStyle.accentText : HubStyle.textSecondary)
+            }
+            .help(tr(alwaysOnTopEnabled ? "Disable Always on Top" : "Keep Window on Top") + " · ⌘⇧T")
+            .accessibilityLabel(tr(alwaysOnTopEnabled ? "Disable Always on Top" : "Keep Window on Top"))
 
             Button {
                 showingAppearanceStudio.toggle()

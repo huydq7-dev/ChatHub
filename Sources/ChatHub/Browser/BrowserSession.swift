@@ -399,72 +399,6 @@ final class BrowserSession: NSObject {
                 } catch (_) {}
             }
 
-            if (location.hostname.includes("facebook.com") || location.hostname.includes("messenger.com")) {
-                try {
-                    const origMatchMedia = window.matchMedia;
-                    if (typeof origMatchMedia === "function") {
-                        window.matchMedia = function(query) {
-                            const res = origMatchMedia.apply(this, arguments);
-                            if (typeof query === "string" && query.includes("display-mode: standalone")) {
-                                return {
-                                    matches: true,
-                                    media: query,
-                                    onchange: null,
-                                    addListener: function() {},
-                                    removeListener: function() {},
-                                    addEventListener: function() {},
-                                    removeEventListener: function() {},
-                                    dispatchEvent: function() { return false; }
-                                };
-                            }
-                            return res;
-                        };
-                    }
-                } catch (_) {}
-
-                try {
-                    let currentD = window.__d;
-                    Object.defineProperty(window, "__d", {
-                        configurable: true,
-                        enumerable: true,
-                        get: function() { return currentD; },
-                        set: function(fn) {
-                            currentD = function(name, deps, factory) {
-                                if (typeof name === "string" && name.includes("MWNotificationRenderer")) {
-                                    const origFactory = factory;
-                                    factory = function(a, b, c, d, e, f) {
-                                        const res = origFactory.apply(this, arguments);
-                                        try {
-                                            const exportsObj = (f && f.exports) || (e && e.exports);
-                                            if (exportsObj && typeof exportsObj.renderDocumentTitle === "function") {
-                                                const origRender = exportsObj.renderDocumentTitle;
-                                                exportsObj.renderDocumentTitle = function(message, actorId, thread, contact, participant) {
-                                                    try {
-                                                        if (!window.__chatHubIsFocused) {
-                                                            const sender = contact?.name || participant?.name || thread?.name || "Messenger";
-                                                            const text = message?.text || message?.snippet || "Tin nhắn mới";
-                                                            post({
-                                                                kind: "notify",
-                                                                title: String(sender).slice(0, 160),
-                                                                body: String(text).slice(0, 300),
-                                                                tag: String(thread?.thread_key || thread?.id || "")
-                                                            });
-                                                        }
-                                                    } catch (_) {}
-                                                    return origRender.apply(this, arguments);
-                                                };
-                                            }
-                                        } catch (_) {}
-                                        return res;
-                                    };
-                                }
-                                return fn.apply(this, arguments);
-                            };
-                        }
-                    });
-                } catch (_) {}
-            }
-
             if (location.hostname === "chat.zalo.me") {
                 try {
                     if (typeof Storage !== "undefined") {
@@ -576,10 +510,21 @@ final class BrowserSession: NSObject {
                 badgeTimer = setTimeout(computeBadgeCount, 1200);
             }
             if (document.documentElement) {
-                new MutationObserver(scheduleBadgeCheck).observe(document.documentElement, {
+                const badgeObserver = new MutationObserver(function(mutations) {
+                    for (let i = 0; i < mutations.length; i++) {
+                        const target = mutations[i].target;
+                        if (target && target.nodeType === 1) {
+                            if (target.closest && target.closest('[contenteditable="true"], [role="textbox"], [role="main"]')) {
+                                continue;
+                            }
+                        }
+                        scheduleBadgeCheck();
+                        break;
+                    }
+                });
+                badgeObserver.observe(document.documentElement, {
                     childList: true,
-                    subtree: true,
-                    characterData: true
+                    subtree: true
                 });
                 setTimeout(computeBadgeCount, 1500);
             }
@@ -615,7 +560,7 @@ final class BrowserSession: NSObject {
         self.appearance = initialAppearance
         self.appearanceBootstrap = ServiceTheme.bootstrap(service: account.service, appearance: initialAppearance)
         let configuration = WKWebViewConfiguration()
-        configuration.applicationNameForUserAgent = "ChatHub/0.2.0"
+        configuration.applicationNameForUserAgent = "Version/18.0 Safari/605.1.15 ChatHub/0.2.0"
         configuration.websiteDataStore = WKWebsiteDataStore(forIdentifier: account.id)
         configuration.preferences.javaScriptCanOpenWindowsAutomatically = false
         configuration.mediaTypesRequiringUserActionForPlayback = .all
@@ -631,7 +576,9 @@ final class BrowserSession: NSObject {
         webView.uiDelegate = self
         webView.allowsBackForwardNavigationGestures = true
         webView.allowsMagnification = true
-        webView.isInspectable = false
+        if #available(macOS 13.3, *) {
+            webView.isInspectable = true
+        }
         webView.underPageBackgroundColor = .windowBackgroundColor
         observations = [
             webView.observe(\.estimatedProgress) { [weak self] _, _ in

@@ -9,6 +9,9 @@ struct ChatHubApp: App {
     @State private var layout = WorkspaceLayout()
     @State private var updater = AppUpdater()
     @AppStorage("appearance") private var appearance = "system"
+    @AppStorage("showMenuBarExtra") private var showMenuBarExtra = true
+    @AppStorage("privacyShieldEnabled") private var privacyShieldEnabled = false
+    @AppStorage("alwaysOnTopEnabled") private var alwaysOnTopEnabled = false
 
     init() { ChatAppearancePreferences.migrate() }
 
@@ -35,10 +38,19 @@ struct ChatHubApp: App {
                     .keyboardShortcut("n", modifiers: .command)
             }
             CommandMenu(tr("Workspace")) {
-                Button(tr("Switch Account…")) { store.isSwitchingAccount = true }
+                Button(tr("Command Palette…")) { store.isSwitchingAccount = true }
                     .keyboardShortcut("k", modifiers: .command)
                 Button(tr("Toggle Sidebar")) { layout.toggle() }
                     .keyboardShortcut("s", modifiers: [.command, .control])
+                Divider()
+                Button(privacyShieldEnabled ? tr("Disable Privacy Shield") : tr("Enable Privacy Shield")) {
+                    privacyShieldEnabled.toggle()
+                }
+                .keyboardShortcut("p", modifiers: [.command, .shift])
+                Button(alwaysOnTopEnabled ? tr("Disable Always on Top") : tr("Keep Window on Top")) {
+                    alwaysOnTopEnabled.toggle()
+                }
+                .keyboardShortcut("t", modifiers: [.command, .shift])
                 Divider()
                 Button(tr("Overview")) { store.select(nil) }
                     .keyboardShortcut("0", modifiers: .command)
@@ -62,6 +74,18 @@ struct ChatHubApp: App {
             CommandGroup(replacing: .help) {
                 Button(tr("ChatHub Help")) { delegate.showHelp() }
             }
+        }
+
+        MenuBarExtra(isInserted: $showMenuBarExtra) {
+            ChatHubMenuBarMenu(
+                privacyShieldEnabled: $privacyShieldEnabled,
+                alwaysOnTopEnabled: $alwaysOnTopEnabled
+            )
+            .environment(store)
+            .environment(browsers)
+        } label: {
+            ChatHubMenuBarLabel()
+                .environment(browsers)
         }
 
         Settings {
@@ -108,7 +132,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func configureWindow(_ window: NSWindow) {
-        WorkspaceWindowStyle.apply(to: window)
+        let alwaysOnTop = UserDefaults.standard.bool(forKey: "alwaysOnTopEnabled")
+        WorkspaceWindowStyle.apply(to: window, alwaysOnTop: alwaysOnTop)
     }
 
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { false }

@@ -77,3 +77,34 @@
 "Update options" = "Update options";
 
 "ChatHub checks GitHub Releases every six hours. New versions appear in the workspace. Installation is manual; your chats and account profiles stay in place." = "ChatHub checks GitHub Releases every six hours. New versions appear in the workspace. Installation is manual; your chats and account profiles stay in place.";
+
+"Command Palette…" = "Command Palette…";
+"Enable Privacy Shield" = "Enable Privacy Shield";
+"Disable Privacy Shield" = "Disable Privacy Shield";
+"Keep Window on Top" = "Keep Window on Top";
+"Disable Always on Top" = "Disable Always on Top";
+"Privacy Shield Active (Hover to peek)" = "Privacy Shield Active (Hover to peek)";
+"Turn Off" = "Turn Off";
+"Show Menu Bar Icon" = "Show Menu Bar Icon";
+"Privacy Shield (Blur messages)" = "Privacy Shield (Blur messages)";
+"Keep window always on top" = "Keep window always on top";
+"Workspace & Privacy" = "Workspace & Privacy";
+"Privacy Shield blurs messages and media in open chats; hover with your mouse to peek. Always on Top keeps ChatHub visible above other windows." = "Privacy Shield blurs messages and media in open chats; hover with your mouse to peek. Always on Top keeps ChatHub visible above other windows.";
+"%d unread messages" = "%d unread messages";
+"All caught up" = "All caught up";
+"Open ChatHub" = "Open ChatHub";
+"Quit ChatHub" = "Quit ChatHub";
+"Search accounts or type a command…" = "Search accounts or type a command…";
+"Actions" = "Actions";
+"Accounts" = "Accounts";
+"Blur messages with hover peek" = "Blur messages with hover peek";
+"Float window above other apps" = "Float window above other apps";
+"Connect Telegram, Messenger, Zalo…" = "Connect Telegram, Messenger, Zalo…";
+"Refresh current conversation" = "Refresh current conversation";
+"Search text in current chat" = "Search text in current chat";
+"Open in Safari or default browser" = "Open in Safari or default browser";
+"Toggle Dark / Light Mode" = "Toggle Dark / Light Mode";
+"Switch between dark and light appearance" = "Switch between dark and light appearance";
+"Preferences, theme and data" = "Preferences, theme and data";
+"↑↓ to navigate · ↩ to select · esc to close" = "↑↓ to navigate · ↩ to select · esc to close";
+

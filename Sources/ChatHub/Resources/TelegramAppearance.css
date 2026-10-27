@@ -642,3 +642,62 @@ html[data-chathub-service="telegram"] :is(.MessageList, .messages-layout, .messa
     -webkit-overflow-scrolling: touch !important;
     overflow-anchor: auto !important;
 }
+
+/* Privacy Shield Mode for Telegram */
+html[data-chathub-service="telegram"][data-chathub-privacy="true"] .Avatar {
+    border-radius: 50% !important;
+    overflow: hidden !important;
+}
+
+html[data-chathub-service="telegram"][data-chathub-privacy="true"] .Avatar :is(img, canvas, span, svg) {
+    border-radius: 50% !important;
+    filter: blur(5px) !important;
+    opacity: 0.8 !important;
+    transition: filter 0.15s ease-out, opacity 0.15s ease-out !important;
+}
+
+html[data-chathub-service="telegram"][data-chathub-privacy="true"] :is(
+    .Message .message-content,
+    .Message .media-inner,
+    .Message .Album,
+    .Message img:not([class*="emoji"]),
+    .Message video,
+    .Chat .subtitle,
+    .Chat .last-message,
+    .Chat .last-message-summary,
+    .Chat .title,
+    .MiddleHeader .title
+) {
+    filter: blur(6px) !important;
+    opacity: 0.75 !important;
+    user-select: none !important;
+    -webkit-user-select: none !important;
+    transition: filter 0.15s ease-out, opacity 0.15s ease-out !important;
+}
+
+html[data-chathub-service="telegram"][data-chathub-privacy="true"] :is(
+    .Message .message-content,
+    .Message .media-inner,
+    .Message .Album,
+    .Message img,
+    .Message video,
+    .Chat .subtitle,
+    .Chat .last-message,
+    .Chat .last-message-summary,
+    .Chat .title,
+    .MiddleHeader .title,
+    .Avatar,
+    .Avatar :is(img, canvas, span, svg)
+):hover,
+html[data-chathub-service="telegram"][data-chathub-privacy="true"] .Avatar:hover :is(img, canvas, span, svg),
+html[data-chathub-service="telegram"][data-chathub-privacy="true"] :is(.Chat, .ListItem, .Message, .MiddleHeader):hover .Avatar :is(img, canvas, span, svg),
+html[data-chathub-service="telegram"][data-chathub-privacy="true"] .Message:hover :is(.message-content, .media-inner, .Album, img, video, .Avatar),
+html[data-chathub-service="telegram"][data-chathub-privacy="true"] .Chat:hover :is(.subtitle, .last-message, .last-message-summary, .title, .Avatar),
+html[data-chathub-service="telegram"][data-chathub-privacy="true"] .ListItem:hover :is(.title, .subtitle, .last-message, .Avatar),
+html[data-chathub-service="telegram"][data-chathub-privacy="true"] .MiddleHeader:hover :is(.title, .Avatar) {
+    filter: none !important;
+    opacity: 1 !important;
+    user-select: text !important;
+    -webkit-user-select: text !important;
+}
+
