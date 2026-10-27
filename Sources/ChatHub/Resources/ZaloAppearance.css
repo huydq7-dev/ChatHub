@@ -539,5 +539,6 @@ html[data-chathub-service="zalo"][data-chathub-privacy="true"] :is(#header, .thr
     opacity: 1 !important;
     user-select: text !important;
     -webkit-user-select: text !important;
+    transition: none !important;
 }
 

@@ -673,7 +673,6 @@ html[data-chathub-service="telegram"][data-chathub-privacy="true"] :is(
 html[data-chathub-service="telegram"][data-chathub-privacy="true"] :is(
     /* Telegram Web A */
     .Message .message-content,
-    .Message .text-content,
     .Message .media-inner,
     .Message .Album,
     .Message img:not([class*="emoji"]),
@@ -690,7 +689,6 @@ html[data-chathub-service="telegram"][data-chathub-privacy="true"] :is(
 
     /* Telegram Web K */
     .bubble .bubble-content,
-    .bubble .message,
     .bubble-call,
     .bubble-media,
     .bubble img:not([class*="emoji"]),
@@ -712,7 +710,6 @@ html[data-chathub-service="telegram"][data-chathub-privacy="true"] :is(
 html[data-chathub-service="telegram"][data-chathub-privacy="true"] :is(
     /* Web A */
     .Message .message-content,
-    .Message .text-content,
     .Message .media-inner,
     .Message .Album,
     .Message img,
@@ -731,7 +728,8 @@ html[data-chathub-service="telegram"][data-chathub-privacy="true"] :is(
 
     /* Web K */
     .bubble .bubble-content,
-    .bubble .message,
+    .bubble-call,
+    .bubble-media,
     .bubble img,
     .bubble video,
     .chatlist-chat .dialog-title,
@@ -739,24 +737,27 @@ html[data-chathub-service="telegram"][data-chathub-privacy="true"] :is(
     .chatlist-chat .chatlist-parts,
     .chat-info .person,
     .chat-info .chat-info-name,
+    .chat-info .chat-subtitle,
     .avatar,
     .avatar-photo,
-    .user-avatar
-):hover,
-html[data-chathub-service="telegram"][data-chathub-privacy="true"] :is(.Avatar, .avatar, .avatar-photo, .user-avatar, .peer-avatar):hover :is(img, canvas, span, svg, .avatar-photo),
-html[data-chathub-service="telegram"][data-chathub-privacy="true"] :is(.Chat, .ListItem, .Message, .MiddleHeader, .Topic):hover :is(.Avatar, .Avatar *),
-html[data-chathub-service="telegram"][data-chathub-privacy="true"] :is(.chatlist-chat, .chat-info, .bubble):hover :is(.avatar, .avatar-photo, .user-avatar, .peer-avatar, img, canvas, span, svg),
-html[data-chathub-service="telegram"][data-chathub-privacy="true"] .Message:hover :is(.message-content, .text-content, .media-inner, .Album, img, video, .Avatar, .Avatar *),
-html[data-chathub-service="telegram"][data-chathub-privacy="true"] .Chat:hover :is(.subtitle, .last-message, .last-message-summary, .title, .Avatar, .Avatar *),
-html[data-chathub-service="telegram"][data-chathub-privacy="true"] .ListItem:hover :is(.title, .subtitle, .last-message, .Avatar, .Avatar *),
-html[data-chathub-service="telegram"][data-chathub-privacy="true"] .MiddleHeader:hover :is(.title, .Avatar, .Avatar *),
-html[data-chathub-service="telegram"][data-chathub-privacy="true"] .Topic:hover :is(.topic-title, .Avatar, .Avatar *),
-html[data-chathub-service="telegram"][data-chathub-privacy="true"] .bubble:hover :is(.bubble-content, .message, .bubble-call, .bubble-media, img, video, .avatar, .avatar-photo, .user-avatar, .peer-avatar),
-html[data-chathub-service="telegram"][data-chathub-privacy="true"] .chatlist-chat:hover :is(.dialog-title, .dialog-subtitle, .chatlist-parts, .avatar, .avatar-photo, .user-avatar, .peer-avatar),
-html[data-chathub-service="telegram"][data-chathub-privacy="true"] .chat-info:hover :is(.person, .chat-info-name, .chat-subtitle, .avatar, .avatar-photo) {
+    .user-avatar,
+    .peer-avatar
+):hover:not(#chathub-peek-boost),
+html[data-chathub-service="telegram"][data-chathub-privacy="true"] :is(.Avatar, .avatar, .avatar-photo, .user-avatar, .peer-avatar):hover:not(#chathub-peek-boost) :is(img, canvas, span, svg, .avatar-photo, *),
+html[data-chathub-service="telegram"][data-chathub-privacy="true"] :is(.Chat, .ListItem, .Message, .MiddleHeader, .Topic):hover:not(#chathub-peek-boost) :is(.Avatar, .Avatar *, .avatar, .avatar *),
+html[data-chathub-service="telegram"][data-chathub-privacy="true"] :is(.chatlist-chat, .chat-info, .bubble):hover:not(#chathub-peek-boost) :is(.avatar, .avatar-photo, .user-avatar, .peer-avatar, img, canvas, span, svg, *),
+html[data-chathub-service="telegram"][data-chathub-privacy="true"] .Message:hover:not(#chathub-peek-boost) :is(.message-content, .media-inner, .Album, img, video, .Avatar, .Avatar *),
+html[data-chathub-service="telegram"][data-chathub-privacy="true"] .Chat:hover:not(#chathub-peek-boost) :is(.subtitle, .last-message, .last-message-summary, .title, .Avatar, .Avatar *),
+html[data-chathub-service="telegram"][data-chathub-privacy="true"] .ListItem:hover:not(#chathub-peek-boost) :is(.title, .subtitle, .last-message, .Avatar, .Avatar *),
+html[data-chathub-service="telegram"][data-chathub-privacy="true"] .MiddleHeader:hover:not(#chathub-peek-boost) :is(.title, .Avatar, .Avatar *),
+html[data-chathub-service="telegram"][data-chathub-privacy="true"] .Topic:hover:not(#chathub-peek-boost) :is(.topic-title, .Avatar, .Avatar *),
+html[data-chathub-service="telegram"][data-chathub-privacy="true"] .bubble:hover:not(#chathub-peek-boost) :is(.bubble-content, .bubble-call, .bubble-media, img, video, .avatar, .avatar-photo, .user-avatar, .peer-avatar, .avatar *),
+html[data-chathub-service="telegram"][data-chathub-privacy="true"] .chatlist-chat:hover:not(#chathub-peek-boost) :is(.dialog-title, .dialog-subtitle, .chatlist-parts, .avatar, .avatar-photo, .user-avatar, .peer-avatar, .avatar *),
+html[data-chathub-service="telegram"][data-chathub-privacy="true"] .chat-info:hover:not(#chathub-peek-boost) :is(.person, .chat-info-name, .chat-subtitle, .avatar, .avatar-photo, .avatar *) {
     filter: none !important;
     opacity: 1 !important;
     user-select: text !important;
     -webkit-user-select: text !important;
+    transition: none !important;
 }
 
