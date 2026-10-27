@@ -15,10 +15,17 @@ final class DownloadHandler: NSObject, WKDownloadDelegate {
     private var hasSecurityScope = false
     private var activeDownload: WKDownload?
     private var didComplete = false
+    private var wasCancelled = false
+    private let id = UUID()
+    private let accountName: String
 
-    init(download: WKDownload, window: NSWindow?, completion: @escaping @MainActor @Sendable (Error?) -> Void) {
+    init(
+        download: WKDownload, window: NSWindow?, accountName: String,
+        completion: @escaping @MainActor @Sendable (Error?) -> Void
+    ) {
         activeDownload = download
         self.window = window
+        self.accountName = accountName
         self.completion = completion
     }
 
@@ -47,6 +54,8 @@ final class DownloadHandler: NSObject, WKDownloadDelegate {
                 stagingFile = folder.appendingPathComponent("download")
                 hasSecurityScope = url.startAccessingSecurityScopedResource()
                 destination = url
+                DownloadCenter.shared.begin(
+                    id: id, filename: url.lastPathComponent, accountName: accountName, destination: url)
                 completionHandler(stagingFile)
             } catch {
                 completionHandler(nil)
@@ -69,6 +78,7 @@ final class DownloadHandler: NSObject, WKDownloadDelegate {
     }
 
     func cancel() {
+        wasCancelled = true
         activeDownload?.cancel { _ in }
         finish(nil)
     }
@@ -77,6 +87,16 @@ final class DownloadHandler: NSObject, WKDownloadDelegate {
         guard !didComplete else { return }
         didComplete = true
         activeDownload = nil
+        // A download the user declined to save never reached the list.
+        if destination != nil {
+            if let error {
+                DownloadCenter.shared.fail(id, message: error.localizedDescription)
+            } else if wasCancelled {
+                DownloadCenter.shared.fail(id, message: tr("Cancelled"))
+            } else {
+                DownloadCenter.shared.finish(id)
+            }
+        }
         if hasSecurityScope { destination?.stopAccessingSecurityScopedResource() }
         if let stagingDirectory { try? FileManager.default.removeItem(at: stagingDirectory) }
         completion(error)

@@ -132,6 +132,8 @@ struct OverviewView: View {
                     }
                     .contextMenu {
                         Button(tr("Edit Account…")) { store.editingAccount = account }
+                        Button(tr("Open Side by Side")) { store.openSideBySide(account.id) }
+                            .disabled(store.selectedID == account.id)
                         Button(tr(account.isPinned ? "Unpin" : "Pin to Top")) {
                             store.setPinned(account, !account.isPinned)
                         }
