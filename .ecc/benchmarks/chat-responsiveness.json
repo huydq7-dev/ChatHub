@@ -12,6 +12,20 @@
     "duplicateFocusCalls": 100,
     "duplicateAppearanceCalls": 100
   },
+  "after": {
+    "repeatedHostFocusRequests": 0,
+    "backgroundViewportResizes": 0,
+    "forcedWindowLayouts": 0,
+    "messengerSyntheticEvents": 0,
+    "duplicateFocusCalls": 0,
+    "duplicateAppearanceCalls": 0
+  },
+  "greenCommit": "5577ed7",
+  "attachmentFocusFixCommit": "691cdb2",
+  "limitations": [
+    "Counters measure removed redundant work, not end-to-end latency or frame rate.",
+    "Authenticated provider compatibility and the user's affected Messenger conversations need live verification."
+  ],
   "workload": {
     "hostUpdates": 100,
     "hostResizes": 100,

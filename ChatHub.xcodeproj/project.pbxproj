@@ -10,6 +10,7 @@
 		06A36BD1F8FC8A2EE0BAE090 /* icon-messenger.png in Resources */ = {isa = PBXBuildFile; fileRef = B82159D34B485DE63615CFBD /* icon-messenger.png */; };
 		0921D305FEC399B0D78D15FF /* Design.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CF831FCF5A5F165258861A8 /* Design.swift */; };
 		1154283E44FB7DE6729E4311 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = B95DC1BEDD2E1858E6EDCCAB /* Localizable.strings */; };
+		1409803745335F673D817342 /* WorkspaceWindowStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD83DD9918EB825182F8D571 /* WorkspaceWindowStyle.swift */; };
 		19B7485C43289238992031B4 /* icon-telegram.png in Resources */ = {isa = PBXBuildFile; fileRef = 906E8DBB1CDA039DB816AD05 /* icon-telegram.png */; };
 		2296F68A9C704BE535A68D3F /* icon-discord.png in Resources */ = {isa = PBXBuildFile; fileRef = CFB665C5690AB9A3AF50AFF8 /* icon-discord.png */; };
 		247AF29D141208C8D47DC150 /* TelegramAppearance.css in Resources */ = {isa = PBXBuildFile; fileRef = 3D819505BBB842178CE2B809 /* TelegramAppearance.css */; };
@@ -86,6 +87,7 @@
 		B82159D34B485DE63615CFBD /* icon-messenger.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "icon-messenger.png"; sourceTree = "<group>"; };
 		B89326CF898775FEDD83BD63 /* WebNavigationFailure.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebNavigationFailure.swift; sourceTree = "<group>"; };
 		BB02CFF4F87CC1EA9552E53F /* icon-zalo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "icon-zalo.png"; sourceTree = "<group>"; };
+		BD83DD9918EB825182F8D571 /* WorkspaceWindowStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceWindowStyle.swift; sourceTree = "<group>"; };
 		BEA4CBF97662091D4D2EBF60 /* ZaloAppearance.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = ZaloAppearance.css; sourceTree = "<group>"; };
 		BFEE3FA6C106B30B70D11F31 /* AppIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = AppIcon.icns; sourceTree = "<group>"; };
 		C092968BE13F142C081C83A6 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
@@ -141,6 +143,7 @@
 				79162CAFC8DB8B656023B531 /* UpdateBanner.swift */,
 				75C8DEA79ECADB4AC53A77A5 /* WorkspaceToolbar.swift */,
 				60A07362E7D58CCD1323E9D9 /* WorkspaceView.swift */,
+				BD83DD9918EB825182F8D571 /* WorkspaceWindowStyle.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -321,6 +324,7 @@
 				41F0FAAE2482EF4B2F9CCA78 /* WorkspaceStore.swift in Sources */,
 				B8AF4F75BCE3D3E12A2CAA0A /* WorkspaceToolbar.swift in Sources */,
 				7FBC79616E8A0AFEB932B80F /* WorkspaceView.swift in Sources */,
+				1409803745335F673D817342 /* WorkspaceWindowStyle.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
