@@ -11,6 +11,22 @@ import WebKit
 
 @MainActor
 struct ResponsivenessTests {
+    @Test func hostShownBeforeAttachmentReceivesKeyboardFocusOnceAttached() {
+        let host = WebHostContainerView(frame: NSRect(x: 0, y: 0, width: 800, height: 600))
+        let view = WKWebView(frame: .zero, configuration: transientConfiguration())
+        host.show(view)
+        let window = CountingWindow()
+        defer { window.close() }
+        window.contentView = host
+        #expect(window.firstResponder === view)
+        window.responderRequests = 0
+        for _ in 0..<100 { host.show(view) }
+        #expect(window.responderRequests == 0)
+        window.contentView = NSView()
+        window.contentView = host
+        #expect(window.firstResponder === view)
+    }
+
     @Test func repeatedHostUpdatesDoNotTakeKeyboardFocus() {
         let window = CountingWindow()
         defer { window.close() }
