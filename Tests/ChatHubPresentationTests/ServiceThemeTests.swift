@@ -108,6 +108,83 @@ struct ServiceThemeTests {
         #expect(disabled["filter"] == "none")
     }
 
+    @Test func zaloPrivacyShieldBlursChatAvatarsAndSenderNames() async throws {
+        let configuration = WKWebViewConfiguration()
+        configuration.websiteDataStore = .nonPersistent()
+        let view = WKWebView(frame: CGRect(x: 0, y: 0, width: 1100, height: 800), configuration: configuration)
+        let navigation = ThemeNavigation()
+        view.navigationDelegate = navigation
+        let html = """
+            <div id="sidebarNav">
+                <div id="main-tab"></div>
+                <div class="conv-item"><div class="avatar"><img id="sidebarAvatarImg" src="data:image/png;base64,iVBORw0KGgo="></div></div>
+            </div>
+            <div id="header">
+                <div class="header-info">
+                    <img id="headerAvatarImg" src="data:image/png;base64,iVBORw0KGgo=">
+                    <span id="headerTitle" class="header-title">Group Name</span>
+                </div>
+            </div>
+            <div class="chat-message">
+                <div id="msgAvatar" class="zl-avatar"><img id="msgAvatarImg" src="data:image/png;base64,iVBORw0KGgo="></div>
+                <div class="chat-content">
+                    <div class="card-sender-name" id="senderName">User Name</div>
+                    <div id="outgoing" class="card" style="background:var(--blue-message)">Sample</div>
+                </div>
+            </div>
+            <div class="chat-box-input-container"><div id="editor" contenteditable="true">Draft</div></div>
+            """
+        try await navigation.load(view, html: html, baseURL: ChatService.zalo.homeURL)
+        let source = try #require(
+            ServiceTheme.bootstrap(
+                service: .zalo,
+                appearance: BrowserAppearance(privacyShield: true)
+            )
+        )
+        let privacy = try await evaluate(
+            view,
+            body: source + """
+                return {
+                    privacy: document.documentElement.getAttribute('data-chathub-privacy') || '',
+                    msgAvatarFilter: getComputedStyle(document.getElementById('msgAvatarImg')).filter || '',
+                    msgAvatarClip: getComputedStyle(document.getElementById('msgAvatarImg')).clipPath || '',
+                    senderNameFilter: getComputedStyle(document.getElementById('senderName')).filter || '',
+                    headerAvatarFilter: getComputedStyle(document.getElementById('headerAvatarImg')).filter || '',
+                    headerTitleFilter: getComputedStyle(document.getElementById('headerTitle')).filter || '',
+                    sidebarAvatarFilter: getComputedStyle(document.getElementById('sidebarAvatarImg')).filter || '',
+                    outgoingFilter: getComputedStyle(document.getElementById('outgoing')).filter || ''
+                };
+                """
+        )
+        #expect(privacy["privacy"] == "true")
+        #expect(privacy["msgAvatarFilter"]?.contains("blur") == true)
+        #expect(privacy["msgAvatarClip"]?.contains("circle") == true)
+        #expect(privacy["senderNameFilter"]?.contains("blur") == true)
+        #expect(privacy["headerAvatarFilter"]?.contains("blur") == true)
+        #expect(privacy["headerTitleFilter"]?.contains("blur") == true)
+        #expect(privacy["sidebarAvatarFilter"]?.contains("blur") == true)
+        #expect(privacy["outgoingFilter"]?.contains("blur") == true)
+
+        let disabled = try await evaluate(
+            view,
+            body: """
+                globalThis.__chatHubNativeAppearance.update({privacyShield: false});
+                return {
+                    privacy: document.documentElement.getAttribute('data-chathub-privacy') || '',
+                    msgAvatarFilter: getComputedStyle(document.getElementById('msgAvatarImg')).filter || '',
+                    senderNameFilter: getComputedStyle(document.getElementById('senderName')).filter || '',
+                    headerAvatarFilter: getComputedStyle(document.getElementById('headerAvatarImg')).filter || '',
+                    outgoingFilter: getComputedStyle(document.getElementById('outgoing')).filter || ''
+                };
+                """
+        )
+        #expect(disabled["privacy"] == "false")
+        #expect(disabled["msgAvatarFilter"] == "none")
+        #expect(disabled["senderNameFilter"] == "none")
+        #expect(disabled["headerAvatarFilter"] == "none")
+        #expect(disabled["outgoingFilter"] == "none")
+    }
+
     @Test func workspaceWindowStyleTogglesFloatingLevel() {
         let window = NSWindow(
             contentRect: NSRect(x: 0, y: 0, width: 800, height: 600),

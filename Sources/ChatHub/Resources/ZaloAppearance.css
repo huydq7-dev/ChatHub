@@ -452,14 +452,35 @@ html[data-chathub-theme] :is(
 }
 
 /* Privacy Shield Mode for Zalo */
-/* Zalo profile avatars: circular clip-path so blur is strictly circular */
+/* Ensure avatar containers clip their children to a perfect circle */
+html[data-chathub-service="zalo"][data-chathub-privacy="true"] :is(
+    .avatar,
+    .zl-avatar,
+    [class*="avatar"],
+    .card-avatar,
+    .chat-item-avatar
+) {
+    border-radius: 50% !important;
+    overflow: hidden !important;
+}
+
+/* Zalo profile, sidebar, header, and chat-stream avatars: circular clip-path so blur is strictly circular */
 html[data-chathub-service="zalo"][data-chathub-privacy="true"] :is(
     .conv-item :is(img, svg, canvas, [class*="avatar"]),
     .msg-item :is(img, svg, canvas, [class*="avatar"]),
     [class*="conv-item"] :is(img, svg, canvas, [class*="avatar"]),
     [class*="msg-item"] :is(img, svg, canvas, [class*="avatar"]),
     #sidebarNav :is(.avatar, .zl-avatar, [class*="avatar"]) :is(img, svg, canvas),
-    :is(#header, .thread-chat-header, .chat-header, .header-info) :is(img, svg)
+    :is(#header, .thread-chat-header, .chat-header, .header-info, [class*="header"]) :is(img, svg, canvas, [class*="avatar"]),
+    .zl-avatar :is(img, svg, canvas, span, div),
+    .avatar :is(img, svg, canvas, span, div),
+    [class*="avatar"] :is(img, svg, canvas, span, div),
+    .card-avatar :is(img, svg, canvas, span, div),
+    .chat-item-avatar :is(img, svg, canvas, span, div),
+    :is(.chat-message, .message-view, .chat-item, [class*="chat-message"], [class*="message-view"], [class*="chat-item"], .chat-content, .chat-message-list, #conversation-scroll) :is(.avatar, .zl-avatar, [class*="avatar"], .card-avatar, .chat-item-avatar) :is(img, svg, canvas, span, div),
+    :is(.chat-message, .message-view, .chat-item, [class*="chat-message"], [class*="message-view"], [class*="chat-item"], .chat-content, .chat-message-list, #conversation-scroll) :is(img, svg, canvas):is(.avatar, .zl-avatar, [class*="avatar"], .card-avatar, .avatar-img, .zl-avatar__img),
+    :is(img, svg, canvas):is(.avatar, .zl-avatar, [class*="avatar"], .avatar-img, .zl-avatar__img, .card-avatar),
+    div:is(.zl-avatar, .avatar, [class*="avatar"], .card-avatar)[style*="background"]
 ) {
     border-radius: 50% !important;
     overflow: hidden !important;
@@ -472,13 +493,18 @@ html[data-chathub-service="zalo"][data-chathub-privacy="true"] :is(
 html[data-chathub-service="zalo"][data-chathub-privacy="true"] :is(
     .chat-content .card,
     .chat-message-list .card,
+    .card--text,
     .bubble-content,
     .msg-text,
     .message-view__body,
+    .card-sender-name,
+    .member-name,
+    .msg-info .sender-name,
+    .sender-name,
     .chat-content img:not([class*="emoji"]):not([class*="reaction"]):not([class*="sticker"]),
     .chat-content video,
     .chat-content .file-item,
-    :is(#header, .thread-chat-header, .chat-header) :is(.header-title, .header-subtitle, .chat-header-title),
+    :is(#header, .thread-chat-header, .chat-header, .header-info, [class*="header"]) :is(.header-title, .header-subtitle, .chat-header-title),
     :is(.conv-item, .msg-item, [class*="conv-item"], [class*="msg-item"]) :is(.conv-item-title__name, .conv-message, .conv-item-body__main, .truncate, .conv-dbname, .conv-time)
 ) {
     filter: blur(6px) !important;
@@ -492,13 +518,23 @@ html[data-chathub-service="zalo"][data-chathub-privacy="true"] :is(
 html[data-chathub-service="zalo"][data-chathub-privacy="true"] :is(
     .chat-content .card,
     .chat-message-list .card,
+    .card--text,
     .bubble-content,
     .msg-text,
     .message-view__body,
+    .card-sender-name,
+    .member-name,
+    .msg-info .sender-name,
+    .sender-name,
     .chat-content img,
     .chat-content video,
     .chat-content .file-item,
-    :is(#header, .thread-chat-header, .chat-header) :is(img, svg, .header-title, .header-subtitle, .chat-header-title),
+    .avatar,
+    .zl-avatar,
+    [class*="avatar"],
+    .card-avatar,
+    .chat-item-avatar,
+    :is(#header, .thread-chat-header, .chat-header, .header-info, [class*="header"]) :is(img, svg, canvas, .header-title, .header-subtitle, .chat-header-title, .avatar, .zl-avatar, [class*="avatar"]),
     :is(.conv-item, .msg-item, [class*="conv-item"], [class*="msg-item"]) :is(.conv-item-title__name, .conv-message, .conv-item-body__main, .truncate, .conv-dbname, .conv-time),
     :is(.conv-item, .msg-item, [class*="conv-item"], [class*="msg-item"]) :is(img, svg, canvas, [class*="avatar"], .avatar, .zl-avatar),
     #sidebarNav :is(img, svg, canvas, [class*="avatar"])
@@ -516,25 +552,83 @@ html[data-chathub-service="zalo"][data-chathub-privacy="true"] :is(
     .avatar, .zl-avatar, [class*="avatar"], [class*="avatar"] img,
     .conv-message, .conv-item-body__main, .conv-item-title__name, .truncate, .conv-dbname, .conv-time
 ),
-/* Direct hover on sidebar avatar container or image */
+/* Direct hover on any avatar container or image across Zalo */
 html[data-chathub-service="zalo"][data-chathub-privacy="true"] :is(
-    .conv-item,
-    .msg-item,
-    [class*="conv-item"],
-    [class*="msg-item"],
-    #sidebarNav
-) :is(img, svg, canvas, .avatar, .zl-avatar, [class*="avatar"]):hover,
+    .avatar,
+    .zl-avatar,
+    [class*="avatar"],
+    .card-avatar,
+    .chat-item-avatar,
+    .conv-item :is(.avatar, .zl-avatar, [class*="avatar"]),
+    .msg-item :is(.avatar, .zl-avatar, [class*="avatar"]),
+    #sidebarNav :is(.avatar, .zl-avatar, [class*="avatar"])
+):hover,
 html[data-chathub-service="zalo"][data-chathub-privacy="true"] :is(
-    .conv-item,
-    .msg-item,
-    [class*="conv-item"],
-    [class*="msg-item"],
-    #sidebarNav
-) :is(.avatar, .zl-avatar, [class*="avatar"]):hover :is(img, svg, canvas),
-/* Chat message & header hover */
+    .avatar,
+    .zl-avatar,
+    [class*="avatar"],
+    .card-avatar,
+    .chat-item-avatar,
+    .conv-item :is(.avatar, .zl-avatar, [class*="avatar"]),
+    .msg-item :is(.avatar, .zl-avatar, [class*="avatar"]),
+    #sidebarNav :is(.avatar, .zl-avatar, [class*="avatar"])
+):hover :is(img, svg, canvas, span, div, *),
+html[data-chathub-service="zalo"][data-chathub-privacy="true"] :is(
+    img, svg, canvas
+):is(.avatar, .zl-avatar, [class*="avatar"], .avatar-img, .zl-avatar__img, .card-avatar):hover,
+/* Chat message row hover: unblurs bubble, sender name, media, and message avatar */
 html[data-chathub-service="zalo"][data-chathub-privacy="true"] .chat-content .card:hover :is(.text, .card--text, .bubble-content, .msg-text, img, video, .file-item),
-html[data-chathub-service="zalo"][data-chathub-privacy="true"] :is(.message-view, .chat-message, .chat-content .card, div:has(> .bubble-content)):hover :is(.card, .text, .card--text, .bubble-content, .msg-text, img, svg, video, .file-item),
-html[data-chathub-service="zalo"][data-chathub-privacy="true"] :is(#header, .thread-chat-header, .chat-header, .header-info, [class*="header"]):hover :is(.header-title, .header-subtitle, .chat-header-title, img, svg) {
+html[data-chathub-service="zalo"][data-chathub-privacy="true"] :is(
+    .message-view,
+    .chat-message,
+    .chat-item,
+    [class*="chat-message"],
+    [class*="message-view"],
+    [class*="chat-item"],
+    .chat-content .card,
+    div:has(> .bubble-content)
+):hover :is(
+    .card,
+    .text,
+    .card--text,
+    .bubble-content,
+    .msg-text,
+    .message-view__body,
+    .card-sender-name,
+    .member-name,
+    .msg-info .sender-name,
+    .sender-name,
+    img,
+    svg,
+    canvas,
+    video,
+    .file-item,
+    .avatar,
+    .zl-avatar,
+    [class*="avatar"],
+    .card-avatar,
+    .chat-item-avatar,
+    .avatar *,
+    .zl-avatar *,
+    [class*="avatar"] *,
+    .card-avatar *,
+    .chat-item-avatar *
+),
+/* Chat header hover: unblurs header title, subtitle, and header avatar */
+html[data-chathub-service="zalo"][data-chathub-privacy="true"] :is(#header, .thread-chat-header, .chat-header, .header-info, [class*="header"]):hover :is(
+    .header-title,
+    .header-subtitle,
+    .chat-header-title,
+    img,
+    svg,
+    canvas,
+    .avatar,
+    .zl-avatar,
+    [class*="avatar"],
+    .avatar *,
+    .zl-avatar *,
+    [class*="avatar"] *
+) {
     filter: none !important;
     opacity: 1 !important;
     user-select: text !important;
