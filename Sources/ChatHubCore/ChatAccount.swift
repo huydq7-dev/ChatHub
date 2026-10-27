@@ -57,11 +57,15 @@ public struct ChatAccount: Identifiable, Codable, Equatable, Sendable {
     public var notificationsMuted: Bool
     /// Notifications resume by themselves once this moment has passed.
     public var snoozedUntil: Date?
+    public var isPinned: Bool
+    /// Set once the service has been seen signed in, so a later sign-in page means the session expired.
+    public var hasSignedIn: Bool
 
     public init(
         id: UUID = UUID(), service: ChatService, name: String,
         subtitle: String = "", customURL: URL? = nil, createdAt: Date = .now,
-        notificationsMuted: Bool = false, snoozedUntil: Date? = nil
+        notificationsMuted: Bool = false, snoozedUntil: Date? = nil,
+        isPinned: Bool = false, hasSignedIn: Bool = false
     ) {
         self.id = id
         self.service = service
@@ -71,6 +75,8 @@ public struct ChatAccount: Identifiable, Codable, Equatable, Sendable {
         self.createdAt = createdAt
         self.notificationsMuted = notificationsMuted
         self.snoozedUntil = snoozedUntil
+        self.isPinned = isPinned
+        self.hasSignedIn = hasSignedIn
     }
 
     public func isSnoozed(at date: Date = .now) -> Bool {
@@ -89,6 +95,8 @@ public struct ChatAccount: Identifiable, Codable, Equatable, Sendable {
         createdAt = try container.decode(Date.self, forKey: .createdAt)
         notificationsMuted = try container.decodeIfPresent(Bool.self, forKey: .notificationsMuted) ?? false
         snoozedUntil = try container.decodeIfPresent(Date.self, forKey: .snoozedUntil)
+        isPinned = try container.decodeIfPresent(Bool.self, forKey: .isPinned) ?? false
+        hasSignedIn = try container.decodeIfPresent(Bool.self, forKey: .hasSignedIn) ?? false
     }
 
     public var url: URL? { service == .custom ? customURL : service.homeURL }

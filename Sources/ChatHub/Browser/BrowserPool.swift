@@ -14,6 +14,8 @@ final class BrowserPool {
     /// Muted accounts whose session was released after sitting idle; they reopen when selected.
     private(set) var sleeping: Set<UUID> = []
     private static let preloadSpacing = 1.5
+    /// Called when a service starts or stops asking its user to sign in.
+    @ObservationIgnored var onSignInChange: ((UUID, Bool) -> Void)?
     @ObservationIgnored private var lastActive: [UUID: Date] = [:]
     @ObservationIgnored private var appearance = BrowserAppearance()
     @ObservationIgnored private let monitor = NWPathMonitor()
@@ -36,6 +38,12 @@ final class BrowserPool {
     var selectedSession: BrowserSession? { selectedID.flatMap { sessions[$0] } }
     var unreadCounts: [UUID: Int] { sessions.mapValues(\.unreadCount) }
 
+    private func makeSession(for account: ChatAccount) -> BrowserSession {
+        let session = BrowserSession(account: account, appearance: appearance)
+        session.onSignInChange = { [weak self] id, required in self?.onSignInChange?(id, required) }
+        return session
+    }
+
     func activate(_ account: ChatAccount?) {
         if let previous = selectedID { lastActive[previous] = Date() }
         selectedID = account?.id
@@ -43,7 +51,7 @@ final class BrowserPool {
         sleeping.remove(account.id)
         lastActive[account.id] = Date()
         if sessions[account.id] == nil {
-            sessions[account.id] = BrowserSession(account: account, appearance: appearance)
+            sessions[account.id] = makeSession(for: account)
         }
         sessions[account.id]?.updateAppearance(appearance)
         sessions[account.id]?.startIfNeeded()
@@ -55,7 +63,7 @@ final class BrowserPool {
     func preload(_ accounts: [ChatAccount]) async {
         for account in accounts where sessions[account.id] == nil && !sleeping.contains(account.id) {
             guard !Task.isCancelled else { return }
-            let session = BrowserSession(account: account, appearance: appearance)
+            let session = makeSession(for: account)
             sessions[account.id] = session
             lastActive[account.id] = Date()
             session.startIfNeeded()

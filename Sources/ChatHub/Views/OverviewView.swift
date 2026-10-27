@@ -124,11 +124,17 @@ struct OverviewView: View {
             }
             LazyVGrid(columns: columns, spacing: HubSpace.md) {
                 ForEach(AccountNavigation.unreadFirst(store.accounts, unread: browsers.unreadCounts)) { account in
-                    AccountOverviewCard(account: account, session: browsers.sessions[account.id]) {
+                    AccountOverviewCard(
+                        account: account, session: browsers.sessions[account.id],
+                        signedOut: store.signedOut.contains(account.id)
+                    ) {
                         store.select(account.id)
                     }
                     .contextMenu {
                         Button(tr("Edit Account…")) { store.editingAccount = account }
+                        Button(tr(account.isPinned ? "Unpin" : "Pin to Top")) {
+                            store.setPinned(account, !account.isPinned)
+                        }
                         AccountNotificationMenu(account: account)
                         if store.canMove(account, by: -1) {
                             Button(tr("Move Up")) { store.move(account, by: -1) }
@@ -185,6 +191,7 @@ struct OverviewView: View {
 private struct AccountOverviewCard: View {
     let account: ChatAccount
     let session: BrowserSession?
+    let signedOut: Bool
     let action: () -> Void
     @State private var hovered = false
 
@@ -193,7 +200,14 @@ private struct AccountOverviewCard: View {
             HStack(spacing: HubSpace.sm) {
                 ServiceIcon(service: account.service, size: 40)
                     .overlay(alignment: .bottomTrailing) {
-                        if let session {
+                        if signedOut {
+                            Image(systemName: "person.crop.circle.badge.exclamationmark.fill")
+                                .font(.system(size: 12))
+                                .foregroundStyle(.orange)
+                                .background(HubStyle.surface, in: Circle())
+                                .offset(x: 3, y: 3)
+                                .help(tr("Signed out. Open this account to sign in again."))
+                        } else if let session {
                             if session.hasFailed {
                                 Image(systemName: "exclamationmark.circle.fill")
                                     .font(.system(size: 12))

@@ -16,6 +16,7 @@
 		2296F68A9C704BE535A68D3F /* icon-discord.png in Resources */ = {isa = PBXBuildFile; fileRef = CFB665C5690AB9A3AF50AFF8 /* icon-discord.png */; };
 		247AF29D141208C8D47DC150 /* TelegramAppearance.css in Resources */ = {isa = PBXBuildFile; fileRef = 3D819505BBB842178CE2B809 /* TelegramAppearance.css */; };
 		249D5424B23F67A4A78F88D4 /* icon-zalo.png in Resources */ = {isa = PBXBuildFile; fileRef = BB02CFF4F87CC1EA9552E53F /* icon-zalo.png */; };
+		252BFF6B55547428CD0E50D2 /* SignInDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F784394E90308BDB0A26A57 /* SignInDetector.swift */; };
 		32F76B7F5355F9A6BA10F945 /* BrowserPool.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB65ECBABE4AE20647C690AB /* BrowserPool.swift */; };
 		38237BF24595D3D9161B4DB2 /* AccountNavigation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E618619BFDD11B9F796FED2B /* AccountNavigation.swift */; };
 		41F0FAAE2482EF4B2F9CCA78 /* WorkspaceStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D8604B5158582591AEF800A /* WorkspaceStore.swift */; };
@@ -52,6 +53,7 @@
 		B8D05B97932C5E2BFDA931D6 /* ChatHubApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35CA23D250648B876EDAAD9B /* ChatHubApp.swift */; };
 		B9CE5C566E9B3D4DC93E8F2F /* WorkspaceRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FB35DB69AB7EF45CD225AFD /* WorkspaceRepository.swift */; };
 		C06D2C0DCF813870D776F050 /* ConversationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C9E590D59CAAB599A4646ED /* ConversationView.swift */; };
+		C16833482995B8D6C4AA0A19 /* AccountOrdering.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75120F37425BED0A5AB21DD8 /* AccountOrdering.swift */; };
 		C17095604322990289FABF38 /* QuietHours.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31F077B1BF8F8234F36AC24C /* QuietHours.swift */; };
 		C66BACB7AE7F2BA76AC35F0A /* Localization.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABD75900051EC04AC08F52F4 /* Localization.swift */; };
 		D84BA9E3D046B967295DB0F0 /* LaunchAtLogin.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE8B1A0848657DD2C67928B8 /* LaunchAtLogin.swift */; };
@@ -66,6 +68,7 @@
 		15169739DF0C2C21D57C70D3 /* ChatAccount.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatAccount.swift; sourceTree = "<group>"; };
 		15FBFE37C64805E9143E2475 /* DownloadedFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadedFile.swift; sourceTree = "<group>"; };
 		1A976FE272AF1BE0CEDB9565 /* ChatHub.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ChatHub.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		1F784394E90308BDB0A26A57 /* SignInDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInDetector.swift; sourceTree = "<group>"; };
 		242A520FB484BED4F38A344E /* SettingsSections.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsSections.swift; sourceTree = "<group>"; };
 		24FC0FB85C0F25577AD4B4B2 /* AppLock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLock.swift; sourceTree = "<group>"; };
 		2CF831FCF5A5F165258861A8 /* Design.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Design.swift; sourceTree = "<group>"; };
@@ -90,6 +93,7 @@
 		6F0DD7F78576F36AD65FAE6C /* AccountNotificationMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountNotificationMenu.swift; sourceTree = "<group>"; };
 		6FB35DB69AB7EF45CD225AFD /* WorkspaceRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceRepository.swift; sourceTree = "<group>"; };
 		71927B67C507CE8C5AA78962 /* AccountEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountEditor.swift; sourceTree = "<group>"; };
+		75120F37425BED0A5AB21DD8 /* AccountOrdering.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountOrdering.swift; sourceTree = "<group>"; };
 		75C8DEA79ECADB4AC53A77A5 /* WorkspaceToolbar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkspaceToolbar.swift; sourceTree = "<group>"; };
 		906E8DBB1CDA039DB816AD05 /* icon-telegram.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "icon-telegram.png"; sourceTree = "<group>"; };
 		9ABC46808A44AC5DD7DCF0F9 /* NavigationPolicy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationPolicy.swift; sourceTree = "<group>"; };
@@ -129,6 +133,7 @@
 			isa = PBXGroup;
 			children = (
 				E618619BFDD11B9F796FED2B /* AccountNavigation.swift */,
+				75120F37425BED0A5AB21DD8 /* AccountOrdering.swift */,
 				3AE786BBCFB60C26FB1D65C5 /* AppLockPolicy.swift */,
 				2F328BB0DC986FC8F983B730 /* BrowserAppearance.swift */,
 				15169739DF0C2C21D57C70D3 /* ChatAccount.swift */,
@@ -137,6 +142,7 @@
 				9ABC46808A44AC5DD7DCF0F9 /* NavigationPolicy.swift */,
 				422F2512262F6481F8F3E5B9 /* NotificationPolicy.swift */,
 				31F077B1BF8F8234F36AC24C /* QuietHours.swift */,
+				1F784394E90308BDB0A26A57 /* SignInDetector.swift */,
 				B89326CF898775FEDD83BD63 /* WebNavigationFailure.swift */,
 				6FB35DB69AB7EF45CD225AFD /* WorkspaceRepository.swift */,
 			);
@@ -326,6 +332,7 @@
 				B0C3FE636975DE9AAFF621E3 /* AccountEditor.swift in Sources */,
 				38237BF24595D3D9161B4DB2 /* AccountNavigation.swift in Sources */,
 				43EF91A9CDBFA8E1C4D998ED /* AccountNotificationMenu.swift in Sources */,
+				C16833482995B8D6C4AA0A19 /* AccountOrdering.swift in Sources */,
 				93C54A72EF89145A2CEE1851 /* AccountSwitcherView.swift in Sources */,
 				6E6F2E0AFE20D55B1C966C75 /* AppLock.swift in Sources */,
 				98045B1695A6B0BF7C493D77 /* AppLockPolicy.swift in Sources */,
@@ -355,6 +362,7 @@
 				A0A05B07291FE85E19B1EC79 /* SettingsSections.swift in Sources */,
 				B38A41E81859E5DBB7AA2AC9 /* SettingsView.swift in Sources */,
 				DC27F22385552FBF18C9138E /* SidebarPositionRestorer.swift in Sources */,
+				252BFF6B55547428CD0E50D2 /* SignInDetector.swift in Sources */,
 				FA1120536E882DF15D7B2BDA /* WebNavigationFailure.swift in Sources */,
 				AA272F37132FB9654D992D6E /* WorkspaceLayout.swift in Sources */,
 				B9CE5C566E9B3D4DC93E8F2F /* WorkspaceRepository.swift in Sources */,

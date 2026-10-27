@@ -73,6 +73,14 @@ final class HubNotificationCenter: NSObject, UNUserNotificationCenterDelegate {
         deliver(account: account, title: title, body: body)
     }
 
+    /// The service asked the user to sign in again. The text is ChatHub's own, so previews never hide it.
+    func postSignInNeeded(account: ChatAccount) {
+        deliver(
+            account: account, title: account.name,
+            body: String(format: tr("Signed out of %@. Open ChatHub to sign in again."), account.service.name),
+            isServiceContent: false)
+    }
+
     /// Services that never call the Notification API still get one alert per unread increase.
     private func scheduleFallbackNotification(for account: ChatAccount) {
         let increasedAt = Date()
@@ -94,7 +102,7 @@ final class HubNotificationCenter: NSObject, UNUserNotificationCenterDelegate {
         }
     }
 
-    private func deliver(account: ChatAccount, title: String, body: String) {
+    private func deliver(account: ChatAccount, title: String, body: String, isServiceContent: Bool = true) {
         guard
             NotificationPolicy.shouldAlert(
                 isMuted: isMuted(account.id),
@@ -107,7 +115,8 @@ final class HubNotificationCenter: NSObject, UNUserNotificationCenterDelegate {
         }
         guard canUseUserNotifications else { return }
         configure()
-        let hidePreviews = UserDefaults.standard.bool(forKey: ChatAppearancePreferences.hidePreviewsKey)
+        let hidePreviews =
+            isServiceContent && UserDefaults.standard.bool(forKey: ChatAppearancePreferences.hidePreviewsKey)
         let cleanTitle = hidePreviews ? "" : title.trimmingCharacters(in: .whitespacesAndNewlines)
         let cleanBody = hidePreviews ? "" : body.trimmingCharacters(in: .whitespacesAndNewlines)
         let content = UNMutableNotificationContent()

@@ -10,6 +10,8 @@ final class WorkspaceStore {
     private(set) var accounts: [ChatAccount] = []
     private(set) var selectedID: UUID?
     private(set) var loadError: String?
+    /// Accounts whose service is asking to sign in again. Not saved; the next launch re-detects it.
+    private(set) var signedOut: Set<UUID> = []
     var errorMessage: String?
     var isAddingAccount = false
     var isSwitchingAccount = false
@@ -92,26 +94,73 @@ final class WorkspaceStore {
         guard commit(accounts: updated, selectedID: selection) else { return false }
         accounts = updated
         selectedID = selection
+        signedOut.remove(account.id)
         return true
     }
 
     func canMove(_ account: ChatAccount, by offset: Int) -> Bool {
         guard let index = accounts.firstIndex(where: { $0.id == account.id }) else { return false }
         let target = index + offset
-        return accounts.indices.contains(target)
+        // Pinned accounts stay above the others; moving across the boundary is done by pinning.
+        return accounts.indices.contains(target) && accounts[target].isPinned == accounts[index].isPinned
     }
 
     @discardableResult
     func move(_ account: ChatAccount, by offset: Int) -> Bool {
-        guard let index = accounts.firstIndex(where: { $0.id == account.id }) else { return false }
+        guard canMove(account, by: offset),
+            let index = accounts.firstIndex(where: { $0.id == account.id })
+        else { return false }
         let target = index + offset
-        guard accounts.indices.contains(target) else { return false }
         var updated = accounts
         let item = updated.remove(at: index)
         updated.insert(item, at: target)
         guard commit(accounts: updated, selectedID: selectedID) else { return false }
         accounts = updated
         return true
+    }
+
+    /// The account being dragged, if the payload is one of ours. Reordering is off while a search filters the list.
+    func draggedAccountID(from items: [String]) -> UUID? {
+        guard searchText.isEmpty, let first = items.first, let id = UUID(uuidString: first),
+            accounts.contains(where: { $0.id == id })
+        else { return nil }
+        return id
+    }
+
+    @discardableResult
+    func moveAccount(_ id: UUID, before target: UUID) -> Bool {
+        replaceOrder(AccountOrdering.move(id, before: target, in: accounts))
+    }
+
+    @discardableResult
+    func moveAccountToEnd(_ id: UUID) -> Bool {
+        replaceOrder(AccountOrdering.moveToEnd(id, in: accounts))
+    }
+
+    @discardableResult
+    func setPinned(_ account: ChatAccount, _ pinned: Bool) -> Bool {
+        replaceOrder(AccountOrdering.setPinned(pinned, for: account.id, in: accounts))
+    }
+
+    private func replaceOrder(_ updated: [ChatAccount]) -> Bool {
+        guard updated != accounts, commit(accounts: updated, selectedID: selectedID) else { return false }
+        accounts = updated
+        return true
+    }
+
+    /// Records whether a service is asking to sign in. Returns true when a session that had been
+    /// signed in has just expired, so the caller can tell the user once.
+    @discardableResult
+    func recordSignInState(for id: UUID, signInRequired: Bool) -> Bool {
+        guard let account = accounts.first(where: { $0.id == id }) else { return false }
+        if signInRequired {
+            guard account.hasSignedIn, !signedOut.contains(id) else { return false }
+            signedOut.insert(id)
+            return true
+        }
+        signedOut.remove(id)
+        if !account.hasSignedIn { _ = change(account) { $0.hasSignedIn = true } }
+        return false
     }
 
     func isMuted(_ id: UUID) -> Bool { accounts.first { $0.id == id }?.notificationsMuted ?? false }
